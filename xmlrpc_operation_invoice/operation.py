@@ -86,48 +86,70 @@ class AccountInvoice(orm.Model):
         xmlrpc_ctx = {}
         
         # Generate string for export file:
-        mask = '%-2s%-2s%-6s%-8s%-2s%-8s%-8s%-60s%-1s%-15s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-8s%-3s%-40s\r\n'
+        mask = '%s%s%s\r\n' % ( #3 block for readability:
+            '%-2s%-2s%-6s%-8s%-2s%-8s%-8s', #header
+            '%-1s%-15s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-8s', #row
+            '%-3s', #foot
+            )
+
         xmlrpc_ctx['input_file_string'] = ''
         for invoice in self.browse(cr, uid, ids, context=context):
             for line in invoice.invoice_line:
                 xmlrpc_ctx['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
                         mask % (                        
-                            # -------
-                            # Header:
-                            # -------
-                            invoice.journal_id.account_code, #'FT', # TODO NC # Sigla documento 2
-                            invoice.journal_id.account_serie, #'1', # TODO #Serie documento 2
-                            int(invoice.number.split('/')[-1]),# N.(6N) # val.
-                            '%s%s%s' % (# Date (8)
+                            # -------------------------------------------------
+                            #                    Header:
+                            # -------------------------------------------------
+                            # Doc (2)
+                            invoice.journal_id.account_code, 
+                            # Serie (2)
+                            invoice.journal_id.account_serie, 
+                            # N.(6N) # val.
+                            int(invoice.number.split('/')[-1]), 
+                            # Date (8)
+                            '%s%s%s' % (
                                 invoice.date_invoice[:4], 
                                 invoice.date_invoice[5:7], 
                                 invoice.date_invoice[8:10], 
                                 ),
-                            '', # TODO # Causale 2 # 99 different
-                            invoice.partner_id.sql_customer_code, # Codice cliente 8
-                            '', # TODO #Codice Agente 8
-                            '', # TODO #[Descrizione agente 60] ????
+                            # Transport reason (2)    
+                            invoice.transportation_reason_id.import_id or '', 
+                            # Codice cliente 8
+                            invoice.partner_id.sql_customer_code, 
+                            # TODO # Codice Agente 8
+                            '',
 
-                            # -------
-                            # Detail:
-                            # -------
-                            'R', # Tipo di riga 1 (D, R, T)
-                            line.product_id.default_code or '', # Code (15)
-                            line.product_id.name, # Description (60)
-                            line.product_id.uom_id.account_ref or '',# UOM (2)
-                            line.quantity, # Q. 10N (2 dec.)
-                            line.price_unit, # Prezzo netto 10N (3 dec.)
-                            line.invoice_line_tax_id[0].account_ref, # Tax (5)
-                            0, # Provvigione 5
-                            line.discount, #Sconto 50
-                            '', # Contropartita 8
+                            # -------------------------------------------------
+                            #                    Detail:
+                            # -------------------------------------------------
+                            # Tipo di riga 1 (D, R, T)
+                            'R', 
+                            # Code (15)
+                            line.product_id.default_code or '', 
+                            # Description (60)
+                            line.product_id.name, 
+                            # UOM (2)
+                            line.product_id.uom_id.account_ref or '',
+                            # Q. 10N (2 dec.)
+                            line.quantity, 
+                            # Price 10N (3 dec.)
+                            line.price_unit, 
+                            # Tax (5)
+                            line.invoice_line_tax_id[0].account_ref, 
+                            # Provv. (5)
+                            0, 
+                            # Discount (50)
+                            line.discount, 
+                            # Account (8)
+                            line.account_id.account_ref or '', 
 
-                            # -----
-                            # Foot:
-                            # -----
-                            invoice.payment_term.import_id, # Codice Pagamento 3
-                            invoice.payment_term.name, # Descrizione pagamento 40
+                            # -------------------------------------------------
+                            #                     Foot:
+                            # -------------------------------------------------
+                            # Codice Pagamento 3
+                            invoice.payment_term.import_id, 
+                            # TODO bank
                             ))
 
         res =  self.pool.get('xmlrpc.operation').execute_operation(
