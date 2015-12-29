@@ -22,6 +22,7 @@ import os
 import sys
 from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
 import ConfigParser
+import erpeek # for request VS ODOO
 
 # -----------------------------------------------------------------------------
 #                                Parameters
@@ -37,17 +38,10 @@ xmlrpc_port = eval(config.get('XMLRPC', 'port'))
 # XMLRPC server:
 odoo_host = config.get('ODOO', 'host') 
 odoo_port = eval(config.get('ODOO', 'port'))
+odoo_db = config.get('ODOO', 'db')
 odoo_user = config.get('ODOO', 'user')
-odoo_login = config.get('ODOO', 'login')
+odoo_password = config.get('ODOO', 'password')
 
-# TODO read parameter for operation from ODOO
-# Parameters calculated:
-# Transit files:
-#file_cl = r'%s\production\%s' % (path, 'esito_cl.txt')
-
-# Files for stock movement:
-#file_move = r'%s\production\%s' % (path, 'move.txt')
-# Note: result file are the same with 'esito_' before file name
 
 #sprix_command = r'%s\mxdesk.exe -command=mxrs.exe
 # -login=openerp -t0 -x2 win32g -p#%s -a%s -k%s:%s' % (
@@ -69,46 +63,83 @@ server.register_introspection_functions()
 # -----------------------------------------------------------------------------
 #                                 Functions
 # -----------------------------------------------------------------------------
-def execute(operation, context=None):
+def execute(operation, parameter=None):
     ''' Execute method for call function (saved in ODOO)
-    '''
-    if context is None:
-        context = {}
-
-    # --------
-    # Utility:
-    # --------
-    def read_result(transit_file, is_list=False):
-        ''' Read result files
-        '''
-        try:
-            res = ''
-            res_file = open(transit_file, 'r')
+        operation: name of operation (searched in odoo xmlrpc.operation obj
+        parameter: dict with extra parameter
+            > input_file_string: text of input file
             
-            for item in res_file:
-                res += res_file.read().strip()
+        @return: dict with parameter:
+            error: if there's an error during operation
+            result_string_file: output file returned as a string
+    '''
+    # Setup dict:
+    parameter = parameter or {}
+    res = {}
+
+    # ---------------------------------------------------------------------
+    #                 Read operation in ODOO (no cases here)
+    # ---------------------------------------------------------------------
+    erp = erppeek.Client(
+        'http://%s:%s' % (odoo_host, odoo_port),
+        db=odoo_db, user=odoo_user, password=odoo_password)
+    
+    operation_pool = erp.XmlrpcOperation
+    context = operation_pool.read_parameter(operation) 
+    # Read parameters:
+    #   > shell_command
+    #   > input_filename
+    #   > result_filename
+    
+    if not context:
+        res['error'] = 'No input context (check operation parameter in ODOO)!'
+        return res
+
+    # ---------------------------------------------------------------------
+    #                         Execute operation: 
+    # ---------------------------------------------------------------------
+    # Create input file with string passed:
+    try:
+        # Read parameters:
+        input_file_string = parameter.get('input_file_string', False)
+        input_filename = context.get('input_filename', False)
+        
+        # Check if it's present:
+        if input_file_string and input_filename:
+           input_file = open(input_filename, 'w')
+           input_file.write(input_file_string) # TODO \r problems?!?
+           input_file.close()
+    except:
+        res['error'] = 'Error creating input file'
+        return res
+    
+    # Execute shell script:
+    try:
+        os.system(context.get('shell_command')) # Launch sprix
+    except:
+        res['error'] = 'Error launch shell command'
+        return res
+
+    # Read result:
+    try:
+        result_filename = context.get('result_filename', False)
+        if result_filename:
+           res['result_string_file'] = ''
+           res_file = open(result_filename, 'r')
+        
+            for line in res_file:
+                res['result_string_file'] += '%s\n' % line
 
             res_file.close()
-            os.remove(transit_file)    
-            return res                
-        except:
-            return False # for all errors    
-        
-    # -------------------------------------------------------------------------
-    #                        Cases (operations):
-    # -------------------------------------------------------------------------    
-    # TODO read operation from ODOO
-    
-    if operation.upper() == 'CL': 
-        # Call sprix for create CL:
-        try:
-            os.system('')#sprix_command % sprix_cl)            
-        except:
-            return '#Error launching importation CL command' # on error    
-        
-        # get result of operation:
-        #return get_res(file_cl) 
-    return False # error
+            os.remove(result_filename) # TODO history?
+    except:
+        res['error'] = 'Error reading result file'
+        return res
+
+    # ---------------------------------------------------------------------
+    #                           Return result:
+    # ---------------------------------------------------------------------
+    return res
 
 # -----------------------------------------------------------------------------
 #                  Register Function in XML-RPC server:
