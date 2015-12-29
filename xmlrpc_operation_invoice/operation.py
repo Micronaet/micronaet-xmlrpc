@@ -53,7 +53,6 @@ class XmlrpcOperation(orm.Model):
             context: xmlrpc context dict
         '''
         try:
-            import pdb; pdb.set_trace()
             if operation != 'invoice':
                 # Super call for other cases:
                 return super(XmlrpcOperation, self).execute_operation(
@@ -63,15 +62,14 @@ class XmlrpcOperation(orm.Model):
             xmlrpc_server = server_pool.get_xmlrpc_server(
                 cr, uid, context=context)
             res = xmlrpc_server.execute('invoice', parameter)
-            if res['error']:
+            if res.get('error', False):
                 _logger.error(res['error'])
                 # TODO raise
             # TODO confirm export!    
         except:    
             raise osv.except_osv(
                 _('Connect error:'), _('XMLRPC connecting server'))
-
-        return True
+        return res
     
 class AccountInvoice(orm.Model):
     ''' Add export function to invoice obj
@@ -128,7 +126,15 @@ class AccountInvoice(orm.Model):
                             invoice.payment_term.name, # Descrizione pagamento 40
                             ))
 
-        self.pool.get('xmlrpc.operation').execute_operation(
+        res =  self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'invoice', parameter=xmlrpc_ctx, context=context)
+            
+        result_string_file = res.get('result_string_file', False)
+        if result_string_file:
+            if result_string_file.startswith == 'OK':
+                # TODO check for close importation process
+                return True
+        _logger.error('No importation of invoice!')    
+        return False
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

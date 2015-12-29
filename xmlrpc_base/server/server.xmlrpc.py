@@ -73,7 +73,7 @@ def execute(operation, parameter=None):
             error: if there's an error during operation
             result_string_file: output file returned as a string
     '''
-    print '[INFO] Run operation: %s Parameter[%s]' % (
+    print '[INFO] Run operation: %s Parameter list: %s' % (
         operation, parameter.keys())
 
     # Setup dict:
@@ -100,6 +100,7 @@ def execute(operation, parameter=None):
     input_path = operation_proxy.input_path
     result_filename = operation_proxy.result_filename
     result_path = operation_proxy.result_path
+    demo = operation_proxy.demo
     if not shell_command:
         res['error'] = 'Error no shell command'
         return res
@@ -119,13 +120,19 @@ def execute(operation, parameter=None):
             input_file = open(input_filename, 'w')
             input_file.write(input_file_string) # TODO \r problems?!?
             input_file.close()
+            print '[INFO] Create input file: %s' % input_filename
     except:
         res['error'] = 'Error creating input file'
         return res
     
     # Execute shell script:
+    if demo: # Jump shell and result
+        res['error'] = 'Demo mode no shell execution'
+        return res
+       
     try:
         os.system(shell_command) # Launch sprix
+        print '[INFO] Launch command: %s' % shell_command
     except:
         res['error'] = 'Error launch shell command'
         return res
@@ -143,6 +150,7 @@ def execute(operation, parameter=None):
 
             res_file.close()
             os.remove(result_filename) # TODO history?
+            print '[INFO] Manage result file: %s' % result_filename
     except:
         res['error'] = 'Error reading result file'
         return res
@@ -150,6 +158,7 @@ def execute(operation, parameter=None):
     # ---------------------------------------------------------------------
     #                           Return result:
     # ---------------------------------------------------------------------
+    print '[INFO] End operation'
     return res
 
 # -----------------------------------------------------------------------------
