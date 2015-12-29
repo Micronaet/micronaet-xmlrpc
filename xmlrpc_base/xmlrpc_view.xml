@@ -49,7 +49,6 @@
                     <sheet>
                         <group col="4" colspan="4">
                             <field name="name" />                            
-                            <field name="operation" /> 
                             <field name="shell_command" />                            
                             <field name="input_filename" />
                             <field name="result_filename" />                            
@@ -64,9 +63,8 @@
             <field name="name">xmlrpc.operation.tree</field>
             <field name="model">xmlrpc.operation</field>
             <field name="arch" type="xml">
-                <tree string="XMLRPC operation" version="7.0">        
+                <tree string="XMLRPC operation">
                     <field name="name" />                            
-                    <field name="operation" /> 
                     <field name="shell_command" />                            
                     <field name="input_filename" />
                     <field name="result_filename" />                            
