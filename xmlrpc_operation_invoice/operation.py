@@ -95,8 +95,7 @@ class XmlrpcServer(orm.Model):
 
 class XmlrpcOperation(orm.Model):
     ''' Model name: XmlrpcOperation
-    '''
-    
+    '''    
     _name = 'xmlrpc.operation'
     _description = 'XMLRPC Operation'
     
@@ -106,6 +105,5 @@ class XmlrpcOperation(orm.Model):
         'input_filename': fields.char('Input filename', size=100),
         'result_filename': fields.char('Result filename', size=100),
         'note': fields.text('Note'),
-        }
-        
+        }        
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
