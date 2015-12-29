@@ -46,6 +46,26 @@ class XmlrpcServer(orm.Model):
     _name = 'xmlrpc.server'
     _description = 'XMLRPC Server'
     
+    def get_xmlrpc_server(self, cr, uid, context=None):
+        ''' Connect with server and retur obj
+        '''
+        server_ids = self.search(cr, uid, [], context=context)
+        if not server_ids:
+            return False
+        
+        server_proxy = self.browse(cr, uid, server_ids, context=context)[0]
+        
+        try:
+            xmlrpc_server = 'http://%s:%s' % (
+                server_proxy.host, server_proxy.port)
+        except:
+            raise osv.except_osv(
+                _('Connect error:'),
+                _('XMLRPC connecting server'), )
+            return False
+        return xmlrpclib.ServerProxy(xmlrpc_server)
+        #mx_server.execute(operation, context)
+    
     def get_default_company(self, cr, uid, context=None): 
         ''' If only one use that
         '''
@@ -60,15 +80,18 @@ class XmlrpcServer(orm.Model):
         
     _columns = {
         'name': fields.char('Operation', size=64, required=True),
-        'host': fields.char('Input filename', size=100),
-        'port': fields.integer('Port'),
+        'host': fields.char('Input filename', size=100, required=True),
+        'port': fields.integer('Port', required=True),
         # TODO authentication?
         'company_id': fields.many2one('res.company', 'Company', required=True),         
+        'note': fields.text('Note'),
         }
 
     _defaults = {
+        'host': lambda *x: 'localhost',
+        'port': lambda *x: 8069,
         'company_id': lambda s, cr, uid, ctx: s.get_default_company(
-            cr, uid, ctx):
+            cr, uid, ctx),
         }    
 
 class XmlrpcOperation(orm.Model):
@@ -80,9 +103,10 @@ class XmlrpcOperation(orm.Model):
     
     _columns = {
         'name': fields.char('Operation', size=64, required=True),
+        'shell_command': fields.char('Shell command', size=120),
         'input_filename': fields.char('Input filename', size=100),
         'result_filename': fields.char('Result filename', size=100),
+        'note': fields.text('Note'),
         }
-
         
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
