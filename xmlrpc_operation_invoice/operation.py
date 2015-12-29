@@ -92,40 +92,42 @@ class AccountInvoice(orm.Model):
         xmlrpc_ctx['input_file_string'] = ''
         for invoice in self.browse(cr, uid, ids, context=context):
             for line in invoice.invoice_line:
-                xmlrpc_ctx['input_file_string'] += mask % (
-                
-                    # -------
-                    # Header:
-                    # -------
-                    'FT', # TODO # Sigla documento 2
-                    '1', # TODO #Serie documento 2
-                    invoice.name, # TODO clean Numero documento 6N
-                    invoice.date_invoice, #Data documento 8
-                    '', # TODO # Causale 2 # 99 different
-                    invoice.partner_id.sql_customer_code, # Codice cliente 8
-                    '', # TODO #Codice Agente 8
-                    '', # TODO #[Descrizione agente 60] ????
+                xmlrpc_ctx['input_file_string'] += self.pool.get(
+                    'xmlrpc.server').clean_as_ascii(
+                        mask % (                        
+                            # -------
+                            # Header:
+                            # -------
+                            'FT', # TODO # Sigla documento 2
+                            '1', # TODO #Serie documento 2
+                            invoice.name, # TODO clean Numero documento 6N
+                            invoice.date_invoice, #Data documento 8
+                            '', # TODO # Causale 2 # 99 different
+                            invoice.partner_id.sql_customer_code, # Codice cliente 8
+                            '', # TODO #Codice Agente 8
+                            '', # TODO #[Descrizione agente 60] ????
 
-                    # -------
-                    # Detail:
-                    # -------
-                    'R', # Tipo di riga 1 (D, R, T)
-                    line.product_id.default_code, #Codice articolo 15
-                    line.product_id.name, #Descrizione articolo 60
-                    line.product_id.uom_id.name,  # TODO #Unità di misura 2
-                    line.quantity, #Quantità 10N(2 decimali)
-                    line.price_unit, #Prezzo netto 10N(3 decimali)
-                    line.invoice_line_tax_id[0].name,  # TODO #Aliquota 5
-                    0, # Provvigione 5
-                    line.discount, #Sconto 50
-                    '', # Contropartita 8
+                            # -------
+                            # Detail:
+                            # -------
+                            'R', # Tipo di riga 1 (D, R, T)
+                            line.product_id.default_code, #Codice articolo 15
+                            line.product_id.name, #Descrizione articolo 60
+                            line.product_id.uom_id.name,  # TODO #Unità di misura 2
+                            line.quantity, #Quantità 10N(2 decimali)
+                            line.price_unit, #Prezzo netto 10N(3 decimali)
+                            line.invoice_line_tax_id[0].name,  # TODO #Aliquota 5
+                            0, # Provvigione 5
+                            line.discount, #Sconto 50
+                            '', # Contropartita 8
 
-                    # -----
-                    # Foot:
-                    # -----
-                    invoice.payment_term.import_id, # Codice Pagamento 3
-                    invoice.payment_term.name, # Descrizione pagamento 40
-                    )                
+                            # -----
+                            # Foot:
+                            # -----
+                            invoice.payment_term.import_id, # Codice Pagamento 3
+                            invoice.payment_term.name, # Descrizione pagamento 40
+                            ))
+
         self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'invoice', parameter=xmlrpc_ctx, context=context)
 

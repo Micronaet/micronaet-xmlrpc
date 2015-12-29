@@ -46,6 +46,17 @@ class XmlrpcServer(orm.Model):
     _name = 'xmlrpc.server'
     _description = 'XMLRPC Server'
     
+    def clean_as_ascii(self, value):
+        ''' Procedure for clean not ascii char in string
+        '''
+        res = ''
+        for c in value:
+            if ord(c) <127:
+                res += c
+            else:
+                res += '#'           
+        return res
+        
     def get_xmlrpc_server(self, cr, uid, context=None):
         ''' Connect with server and return obj
         '''

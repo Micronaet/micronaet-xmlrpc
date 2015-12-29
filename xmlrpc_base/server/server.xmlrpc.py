@@ -73,7 +73,6 @@ def execute(operation, parameter=None):
             error: if there's an error during operation
             result_string_file: output file returned as a string
     '''
-    import pdb; pdb.set_trace()
     print '[INFO] Run operation: %s Parameter[%s]' % (
         operation, parameter.keys())
 
