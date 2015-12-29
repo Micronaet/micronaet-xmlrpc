@@ -74,6 +74,9 @@ def execute(operation, parameter=None):
             result_string_file: output file returned as a string
     '''
     import pdb; pdb.set_trace()
+    print '[INFO] Run operation: %s Parameter[%s]' % (
+        operation, parameter.keys())
+
     # Setup dict:
     parameter = parameter or {}
     res = {}
@@ -85,17 +88,23 @@ def execute(operation, parameter=None):
         'http://%s:%s' % (odoo_host, odoo_port),
         db=odoo_db, user=odoo_user, password=odoo_password)
     
-    operation_pool = erp.XmlrpcOperation
-    context = operation_pool.read_parameter(operation) 
-    # Read parameters:
-    #   > shell_command
-    #   > input_filename
-    #   > result_filename
-    
-    if not context:
-        res['error'] = 'No input context (check operation parameter in ODOO)!'
+    # Read operation parameters:
+    operation_pool = erp.XmlrpcOperation    
+    operation_ids = operation_pool.search([('name', '=', operation)])
+    if not operation_ids:
+        res['error'] = 'Cannot find operation "%s"' % operation
         return res
 
+    operation_proxy = operation_pool.browse(operation_ids)[0]    
+    shell_command = operation_proxy.shell_command
+    input_filename = operation_proxy.input_filename
+    input_path = operation_proxy.input_path
+    result_filename = operation_proxy.result_filename
+    result_path = operation_proxy.result_path
+    if not shell_command:
+        res['error'] = 'Error no shell command'
+        return res
+    
     # ---------------------------------------------------------------------
     #                         Execute operation: 
     # ---------------------------------------------------------------------
@@ -103,36 +112,38 @@ def execute(operation, parameter=None):
     try:
         # Read parameters:
         input_file_string = parameter.get('input_file_string', False)
-        input_filename = context.get('input_filename', False)
         
         # Check if it's present:
         if input_file_string and input_filename:
-           input_file = open(input_filename, 'w')
-           input_file.write(input_file_string) # TODO \r problems?!?
-           input_file.close()
+            input_filename = os.path.expanduser(os.path.join(
+                input_path, input_filename))
+            input_file = open(input_filename, 'w')
+            input_file.write(input_file_string) # TODO \r problems?!?
+            input_file.close()
     except:
         res['error'] = 'Error creating input file'
         return res
     
     # Execute shell script:
     try:
-        os.system(context.get('shell_command')) # Launch sprix
+        os.system(shell_command) # Launch sprix
     except:
         res['error'] = 'Error launch shell command'
         return res
 
     # Read result:
     try:
-        result_filename = context.get('result_filename', False)
         if result_filename:
-           res['result_string_file'] = ''
-           res_file = open(result_filename, 'r')
+            res['result_string_file'] = ''
+            result_filename = os.path.expanduser(os.path.join(
+                result_path, result_filename))
+            res_file = open(result_filename, 'r')
         
-           for line in res_file:
-               res['result_string_file'] += '%s\n' % line
+            for line in res_file:
+                res['result_string_file'] += '%s\n' % line
 
-           res_file.close()
-           os.remove(result_filename) # TODO history?
+            res_file.close()
+            os.remove(result_filename) # TODO history?
     except:
         res['error'] = 'Error reading result file'
         return res

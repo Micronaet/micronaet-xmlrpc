@@ -21,6 +21,7 @@ import os
 import sys
 import logging
 import openerp
+import xmlrpclib
 import openerp.netsvc as netsvc
 import openerp.addons.decimal_precision as dp
 from openerp.osv import fields, osv, expression, orm
@@ -38,66 +39,10 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
 
 _logger = logging.getLogger(__name__)
 
-# TODO log operations!!
-class XmlrpcServer(orm.Model):
-    ''' Model name: XmlrpcServer
-    '''    
-    _name = 'xmlrpc.server'
-    _description = 'XMLRPC Server'
-    
-    def get_xmlrpc_server(self, cr, uid, context=None):
-        ''' Connect with server and return obj
-        '''
-        server_ids = self.search(cr, uid, [], context=context)
-        if not server_ids:
-            return False
-        
-        server_proxy = self.browse(cr, uid, server_ids, context=context)[0]
-        
-        try:
-            xmlrpc_server = 'http://%s:%s' % (
-                server_proxy.host, server_proxy.port)
-        except:
-            raise osv.except_osv(
-                _('Connect error:'), _('XMLRPC connecting server'))
-            return False
-        return xmlrpclib.ServerProxy(xmlrpc_server)
-        #mx_server.execute(operation, context)
-
-    def get_default_company(self, cr, uid, context=None): 
-        ''' If only one use that
-        '''
-        try:
-            company_ids = self.pool.get('res.company').search(
-                cr, uid, [], context=context)            
-            if len(company_ids) == 1:
-                return company_ids[0]
-        except:    
-            pass
-        return False    
-        
-    _columns = {
-        'name': fields.char('Operation', size=64, required=True),
-        'host': fields.char('Input filename', size=100, required=True),
-        'port': fields.integer('Port', required=True),
-        # TODO authentication?
-
-        'company_id': fields.many2one('res.company', 'Company', required=True),         
-        'note': fields.text('Note'),
-        }
-
-    _defaults = {
-        'host': lambda *x: 'localhost',
-        'port': lambda *x: 8069,
-        'company_id': lambda s, cr, uid, ctx: s.get_default_company(
-            cr, uid, ctx),
-        }    
-
 class XmlrpcOperation(orm.Model):
     ''' Model name: XmlrpcOperation
     '''    
-    _name = 'xmlrpc.operation'
-    _description = 'XMLRPC Operation'
+    _inherit = 'xmlrpc.operation'
 
     # ------------------
     # Override function:
@@ -107,25 +52,27 @@ class XmlrpcOperation(orm.Model):
             operation: in this module is 'invoice'
             context: xmlrpc context dict
         '''
-        #self.search(cr, uid, [('name', '=', operation], context=context)
-        server_pool = self.pool.get('xmlrpc.base')
-        xmlrpc_server = server_pool.get_xmlrpc_server(cr, uid, context=context)
-        if not xmlrpc_server:
+        try:
+            import pdb; pdb.set_trace()
+            if operation != 'invoice':
+                # Super call for other cases:
+                return super(XmlrpcOperation, self).execute_operation(
+                    cr, uid, operation, parameter, context=context)
+                    
+            server_pool = self.pool.get('xmlrpc.server')
+            xmlrpc_server = server_pool.get_xmlrpc_server(
+                cr, uid, context=context)
+            res = xmlrpc_server.execute('invoice', parameter)
+            if res['error']:
+                _logger.error(res['error'])
+                # TODO raise
+            # TODO confirm export!    
+        except:    
             raise osv.except_osv(
                 _('Connect error:'), _('XMLRPC connecting server'))
-        import pdb; pdb.set_trace()        
-        xmlrpc_server.execute('invoice', parameter)
-        
+
         return True
     
-    _columns = {
-        'name': fields.char('Operation', size=64, required=True),
-        'shell_command': fields.char('Shell command', size=120),
-        'input_filename': fields.char('Input filename', size=100),
-        'result_filename': fields.char('Result filename', size=100),
-        'note': fields.text('Note'),
-        }        
-
 class AccountInvoice(orm.Model):
     ''' Add export function to invoice obj
     '''    

@@ -21,6 +21,7 @@ import os
 import sys
 import logging
 import openerp
+import xmlrpclib
 import openerp.netsvc as netsvc
 import openerp.addons.decimal_precision as dp
 from openerp.osv import fields, osv, expression, orm
@@ -96,18 +97,21 @@ class XmlrpcOperation(orm.Model):
     _name = 'xmlrpc.operation'
     _description = 'XMLRPC Operation'
     
-    def execute_operation(self, cr, uid, operation, context=None):
+    def execute_operation(self, cr, uid, operation, parameter, context=None):
         ''' Virtual function that will be overrided
         '''
         return True
         
     _columns = {
+        'demo': fields.boolean('Demo mode'),
         'name': fields.char('Operation', size=64, required=True),
-        #'command': fields.char('ID Operation', size=64, required=True),
+        #'operation': fields.char('ID Operation', size=64, required=True),
         'shell_command': fields.char('Shell command', size=120),
         'input_filename': fields.char('Input filename', size=100),
+        'input_path': fields.char('Input path', size=180),
         'result_filename': fields.char('Result filename', size=100),
+        'result_path': fields.char('Result path', size=180),
         'note': fields.text('Note'),
-        }
+        }        
         
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

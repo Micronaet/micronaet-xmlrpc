@@ -48,9 +48,12 @@
                 <form string="XMLRPC operation" version="7.0">        
                     <sheet>
                         <group col="4" colspan="4">
+                            <field name="demo" />
                             <field name="name" />                            
                             <field name="shell_command" />                            
+                            <field name="input_path" />
                             <field name="input_filename" />
+                            <field name="result_path" />                            
                             <field name="result_filename" />                            
                             <separator string="Note" />
                             <field name="note" colspan="4" nolabel="1"/>
@@ -64,9 +67,12 @@
             <field name="model">xmlrpc.operation</field>
             <field name="arch" type="xml">
                 <tree string="XMLRPC operation">
+                    <field name="demo" />
                     <field name="name" />                            
                     <field name="shell_command" />                            
+                    <field name="input_path" />
                     <field name="input_filename" />
+                    <field name="result_path" />                            
                     <field name="result_filename" />                            
                 </tree>
             </field>
