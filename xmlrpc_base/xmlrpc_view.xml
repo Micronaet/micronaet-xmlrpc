@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+       <!-- module.wizard -->
+       <record id="_wizard_view" model="ir.ui.view">
+            <field name="name"></field>
+            <field name="model">.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Wizard" version="7.0">
+                   <header>
+                       <button string="Cancel" special="cancel" />
+                       <button name="action_done" string="Done" type="object" icon="gtk-jump-to" class="oe_highlight" />
+                   </header>                   
+                   <group colspan="4" col="4">
+                        <field name="product_id" />
+                        <separator string="Note" colspan="4"/>
+                        <field name="note" nolabel="1" colspan="4" readonly="1"/>                        
+                   </group>
+                </form>
+            </field>
+      </record>
+
+      <record model="ir.actions.act_window" id="action__wizard_form">
+          <field name="name"></field>
+          <field name="res_model">.wizard</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">form</field>
+          <field name="target">new</field>
+          <field name="view_id" ref="_wizard_view"/>
+      </record>      
+    </data>
+</openerp>
