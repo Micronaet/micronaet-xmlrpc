@@ -5,6 +5,9 @@ __pycache__/
 # C extensions
 *.so
 
+#Micronaet
+*.*~
+
 # Distribution / packaging
 .Python
 env/
