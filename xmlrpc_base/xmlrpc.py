@@ -102,6 +102,7 @@ class XmlrpcOperation(orm.Model):
     
     _columns = {
         'name': fields.char('Operation', size=64, required=True),
+        'operation': fields.char('ID Operation', size=64, required=True),
         'shell_command': fields.char('Shell command', size=120),
         'input_filename': fields.char('Input filename', size=100),
         'result_filename': fields.char('Result filename', size=100),
