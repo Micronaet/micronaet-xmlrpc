@@ -42,11 +42,6 @@ odoo_db = config.get('ODOO', 'db')
 odoo_user = config.get('ODOO', 'user')
 odoo_password = config.get('ODOO', 'password')
 
-
-#sprix_command = r'%s\mxdesk.exe -command=mxrs.exe
-# -login=openerp -t0 -x2 win32g -p#%s -a%s -k%s:%s' % (
-#    path, '%s', company_code, mx_user, mx_login)
-
 # -----------------------------------------------------------------------------
 #                         Restrict to a particular path
 # -----------------------------------------------------------------------------
@@ -174,15 +169,12 @@ print 'Start XMLRPC server on %s:%s' % (
     xmlrpc_host,
     xmlrpc_port,
     )
-
 print 'ODOO connection at %s@%s:%s/%s' % (
     odoo_user,
     odoo_host,
     odoo_port,
     odoo_db,
     )
-
 server.serve_forever()
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
 

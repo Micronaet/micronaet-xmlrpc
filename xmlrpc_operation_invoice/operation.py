@@ -85,7 +85,6 @@ class AccountInvoice(orm.Model):
         xmlrpc_ctx = {}
         
         # Generate string for export file:
-        #                                |                                     | 
         mask = '%2s%2s%6s%8s%2s%8s%8s%60s%1s%15s%60s%2s%10.2f%10.3f%5s%5s%50s%8s%3s%40s\r\n'
         xmlrpc_ctx['input_file_string'] = ''
         for invoice in self.browse(cr, uid, ids, context=context):
