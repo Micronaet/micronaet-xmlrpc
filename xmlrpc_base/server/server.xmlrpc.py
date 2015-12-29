@@ -22,7 +22,7 @@ import os
 import sys
 from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
 import ConfigParser
-import erpeek # for request VS ODOO
+import erppeek # for request VS ODOO
 
 # -----------------------------------------------------------------------------
 #                                Parameters
@@ -73,6 +73,7 @@ def execute(operation, parameter=None):
             error: if there's an error during operation
             result_string_file: output file returned as a string
     '''
+    import pdb; pdb.set_trace()
     # Setup dict:
     parameter = parameter or {}
     res = {}
@@ -127,11 +128,11 @@ def execute(operation, parameter=None):
            res['result_string_file'] = ''
            res_file = open(result_filename, 'r')
         
-            for line in res_file:
-                res['result_string_file'] += '%s\n' % line
+           for line in res_file:
+               res['result_string_file'] += '%s\n' % line
 
-            res_file.close()
-            os.remove(result_filename) # TODO history?
+           res_file.close()
+           os.remove(result_filename) # TODO history?
     except:
         res['error'] = 'Error reading result file'
         return res
@@ -149,6 +150,19 @@ server.register_function(execute, 'execute')
 # -----------------------------------------------------------------------------
 #                       Run the server's main loop:
 # -----------------------------------------------------------------------------
+# Log connection:
+print 'Start XMLRPC server on %s:%s' % (
+    xmlrpc_host,
+    xmlrpc_port,
+    )
+
+print 'ODOO connection at %s@%s:%s/%s' % (
+    odoo_user,
+    odoo_host,
+    odoo_port,
+    odoo_db,
+    )
+
 server.serve_forever()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

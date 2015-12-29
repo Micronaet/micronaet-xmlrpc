@@ -30,11 +30,13 @@
     'depends': [
         'base',
         'xmlrpc_base',
+        'account',
         ],
     'init_xml': [],
     'demo': [],
     'data': [
-        'operation_view.xml',
+        #'operation_view.xml',        
+        'invoice_view.xml',
         'data/operation.xml',
         ],
     'active': False,

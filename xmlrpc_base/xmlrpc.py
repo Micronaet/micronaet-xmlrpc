@@ -58,11 +58,8 @@ class XmlrpcServer(orm.Model):
             xmlrpc_server = 'http://%s:%s' % (
                 server_proxy.host, server_proxy.port)
         except:
-            raise osv.except_osv(
-                _('Connect error:'), _('XMLRPC connecting server'))
             return False
         return xmlrpclib.ServerProxy(xmlrpc_server)
-        #mx_server.execute(operation, context)
 
     def get_default_company(self, cr, uid, context=None): 
         ''' If only one use that
@@ -99,6 +96,11 @@ class XmlrpcOperation(orm.Model):
     _name = 'xmlrpc.operation'
     _description = 'XMLRPC Operation'
     
+    def execute_operation(self, cr, uid, operation, context=None):
+        ''' Virtual function that will be overrided
+        '''
+        return True
+        
     _columns = {
         'name': fields.char('Operation', size=64, required=True),
         #'command': fields.char('ID Operation', size=64, required=True),
