@@ -83,19 +83,20 @@ class AccountInvoice(orm.Model):
         assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
 
         # TODO use with validate trigger for get the number
-        xmlrpc_ctx = {}
+        parameter = {}
         
         # Generate string for export file:
-        mask = '%s%s%s\r\n' % ( #3 block for readability:
+        mask = '%s%s%s%s' % ( #3 block for readability:
             '%-2s%-2s%-6s%-8s%-2s%-8s%-8s', #header
             '%-1s%-15s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-8s', #row
             '%-3s', #foot
+            '\r\n', # Win CR
             )
 
-        xmlrpc_ctx['input_file_string'] = ''
+        parameter['input_file_string'] = ''
         for invoice in self.browse(cr, uid, ids, context=context):
             for line in invoice.invoice_line:
-                xmlrpc_ctx['input_file_string'] += self.pool.get(
+                parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
                         mask % (                        
                             # -------------------------------------------------
@@ -153,7 +154,7 @@ class AccountInvoice(orm.Model):
                             ))
 
         res =  self.pool.get('xmlrpc.operation').execute_operation(
-            cr, uid, 'invoice', parameter=xmlrpc_ctx, context=context)
+            cr, uid, 'invoice', parameter=parameter, context=context)
             
         result_string_file = res.get('result_string_file', False)
         if result_string_file:
