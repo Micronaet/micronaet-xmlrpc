@@ -79,13 +79,14 @@ class AccountInvoice(orm.Model):
     def xmlrpc_export_invoice(self, cr, uid, ids, context=None):
         ''' Export current invoice 
             # TODO manage list of invoices?
-        '''
+        '''        
         assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
 
+        # TODO use with validate trigger for get the number
         xmlrpc_ctx = {}
         
         # Generate string for export file:
-        mask = '%2s%2s%6s%8s%2s%8s%8s%60s%1s%15s%60s%2s%10.2f%10.3f%5s%5s%50s%8s%3s%40s\r\n'
+        mask = '%-2s%-2s%-6s%-8s%-2s%-8s%-8s%-60s%-1s%-15s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-8s%-3s%-40s\r\n'
         xmlrpc_ctx['input_file_string'] = ''
         for invoice in self.browse(cr, uid, ids, context=context):
             for line in invoice.invoice_line:
@@ -95,10 +96,14 @@ class AccountInvoice(orm.Model):
                             # -------
                             # Header:
                             # -------
-                            'FT', # TODO # Sigla documento 2
-                            '1', # TODO #Serie documento 2
-                            invoice.name, # TODO clean Numero documento 6N
-                            invoice.date_invoice, #Data documento 8
+                            invoice.journal_id.account_code, #'FT', # TODO NC # Sigla documento 2
+                            invoice.journal_id.account_serie, #'1', # TODO #Serie documento 2
+                            int(invoice.number.split('/')[-1]),# N.(6N) # val.
+                            '%s%s%s' % (# Date (8)
+                                invoice.date_invoice[:4], 
+                                invoice.date_invoice[5:7], 
+                                invoice.date_invoice[8:10], 
+                                ),
                             '', # TODO # Causale 2 # 99 different
                             invoice.partner_id.sql_customer_code, # Codice cliente 8
                             '', # TODO #Codice Agente 8
@@ -108,12 +113,12 @@ class AccountInvoice(orm.Model):
                             # Detail:
                             # -------
                             'R', # Tipo di riga 1 (D, R, T)
-                            line.product_id.default_code, #Codice articolo 15
-                            line.product_id.name, #Descrizione articolo 60
-                            line.product_id.uom_id.name,  # TODO #Unità di misura 2
-                            line.quantity, #Quantità 10N(2 decimali)
-                            line.price_unit, #Prezzo netto 10N(3 decimali)
-                            line.invoice_line_tax_id[0].name,  # TODO #Aliquota 5
+                            line.product_id.default_code or '', # Code (15)
+                            line.product_id.name, # Description (60)
+                            line.product_id.uom_id.account_ref or '',# UOM (2)
+                            line.quantity, # Q. 10N (2 dec.)
+                            line.price_unit, # Prezzo netto 10N (3 dec.)
+                            line.invoice_line_tax_id[0].account_ref, # Tax (5)
                             0, # Provvigione 5
                             line.discount, #Sconto 50
                             '', # Contropartita 8

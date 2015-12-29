@@ -75,9 +75,9 @@ def execute(operation, parameter=None):
     parameter = parameter or {}
     res = {}
 
-    # ---------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     #                 Read operation in ODOO (no cases here)
-    # ---------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     erp = erppeek.Client(
         'http://%s:%s' % (odoo_host, odoo_port),
         db=odoo_db, user=odoo_user, password=odoo_password)
@@ -100,9 +100,9 @@ def execute(operation, parameter=None):
         res['error'] = 'Error no shell command'
         return res
     
-    # ---------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     #                         Execute operation: 
-    # ---------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Create input file with string passed:
     try:
         # Read parameters:
@@ -122,6 +122,7 @@ def execute(operation, parameter=None):
     
     # Execute shell script:
     if demo: # Jump shell and result
+        print '[INFO] Run in demo mode, no result!'
         res['error'] = 'Demo mode no shell execution'
         return res
        
@@ -150,9 +151,9 @@ def execute(operation, parameter=None):
         res['error'] = 'Error reading result file'
         return res
 
-    # ---------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     #                           Return result:
-    # ---------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     print '[INFO] End operation'
     return res
 
