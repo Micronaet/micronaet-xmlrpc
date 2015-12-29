@@ -1,0 +1,4 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+access_xmlrpc_server_user,xmlrpc.server,model_xmlrpc_server,base.group_user,1,1,1,1
+access_xmlrpc_operation_user,xmlrpc.operation,model_xmlrpc_operation,base.group_user,1,1,1,1
+

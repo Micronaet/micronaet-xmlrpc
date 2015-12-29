@@ -38,4 +38,51 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
 
 _logger = logging.getLogger(__name__)
 
+# TODO log operations!!
+class XmlrpcServer(orm.Model):
+    ''' Model name: XmlrpcServer
+    '''
+    
+    _name = 'xmlrpc.server'
+    _description = 'XMLRPC Server'
+    
+    def get_default_company(self, cr, uid, context=None): 
+        ''' If only one use that
+        '''
+        try:
+            company_ids = self.pool.get('res.company').search(
+                cr, uid, [], context=context)            
+            if len(company_ids) == 1:
+                return company_ids[0]
+        except:    
+            pass
+        return False    
+        
+    _columns = {
+        'name': fields.char('Operation', size=64, required=True),
+        'host': fields.char('Input filename', size=100),
+        'port': fields.integer('Port'),
+        # TODO authentication?
+        'company_id': fields.many2one('res.company', 'Company', required=True),         
+        }
+
+    _defaults = {
+        'company_id': lambda s, cr, uid, ctx: s.get_default_company(
+            cr, uid, ctx):
+        }    
+
+class XmlrpcOperation(orm.Model):
+    ''' Model name: XmlrpcOperation
+    '''
+    
+    _name = 'xmlrpc.operation'
+    _description = 'XMLRPC Operation'
+    
+    _columns = {
+        'name': fields.char('Operation', size=64, required=True),
+        'input_filename': fields.char('Input filename', size=100),
+        'result_filename': fields.char('Result filename', size=100),
+        }
+
+        
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
