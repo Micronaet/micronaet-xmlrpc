@@ -95,6 +95,11 @@ class AccountInvoice(orm.Model):
 
         parameter['input_file_string'] = ''
         for invoice in self.browse(cr, uid, ids, context=context):
+            if not invoice.number:
+                raise osv.except_osv(
+                    _('XMLRPC sync error'), 
+                    _('Invoice must be validated!'))
+                
             for line in invoice.invoice_line:
                 parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
@@ -103,9 +108,9 @@ class AccountInvoice(orm.Model):
                             #                    Header:
                             # -------------------------------------------------
                             # Doc (2)
-                            invoice.journal_id.account_code, 
+                            invoice.journal_id.account_code,
                             # Serie (2)
-                            invoice.journal_id.account_serie, 
+                            invoice.journal_id.account_serie,
                             # N.(6N) # val.
                             int(invoice.number.split('/')[-1]), 
                             # Date (8)
@@ -117,7 +122,7 @@ class AccountInvoice(orm.Model):
                             # Transport reason (2)    
                             invoice.transportation_reason_id.import_id or '', 
                             # Codice cliente 8
-                            invoice.partner_id.sql_customer_code, 
+                            invoice.partner_id.sql_customer_code or '', 
                             # TODO # Codice Agente 8
                             '',
 
