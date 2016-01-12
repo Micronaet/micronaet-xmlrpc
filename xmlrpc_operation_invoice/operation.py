@@ -163,10 +163,20 @@ class AccountInvoice(orm.Model):
             
         result_string_file = res.get('result_string_file', False)
         if result_string_file:
-            if result_string_file.startswith == 'OK':
-                # TODO check for close importation process
+            if result_string_file.startswith('OK'):
+                # TODO test if number passed if for correct invoice number!
+                self.write(cr, uid, ids[0], {
+                    'xmlrpc_sync': True,
+                    }, context=context)
                 return True
-        _logger.error('No importation of invoice!')    
+        # TODO write better error
+        raise osv.except_osv(
+            _('Sync error:'), _('Cannot sync with accounting!'))        
         return False
+    
+    _columns = {
+        'xmlrpc_sync': fields.boolean('XMLRPC syncronized'),        
+        }    
+        
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
