@@ -75,7 +75,12 @@ class AccountInvoice(orm.Model):
     ''' Add export function to invoice obj
     '''    
     _inherit = 'account.invoice'
-
+  
+    def dummy_button(self, cr, uid, ids, context=None):
+        ''' For show an icon as a button
+        '''
+        return True
+        
     def xmlrpc_export_invoice(self, cr, uid, ids, context=None):
         ''' Export current invoice 
             # TODO manage list of invoices?
