@@ -67,7 +67,7 @@ class XmlrpcOperation(orm.Model):
                 # TODO raise
             # TODO confirm export!    
         except:    
-            _logger.error(sys_exc_info())
+            _logger.error(sys.exc_info())
             raise osv.except_osv(
                 _('Connect error:'), _('XMLRPC connecting server'))
         return res
