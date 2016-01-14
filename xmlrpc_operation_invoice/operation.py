@@ -160,7 +160,8 @@ class AccountInvoice(orm.Model):
                             #                     Foot:
                             # -------------------------------------------------
                             # Codice Pagamento 3
-                            invoice.payment_term.import_id, 
+                            invoice.payment_term.import_id \
+                                if invoice.payment_term else '', 
                             # TODO bank
                             ))
 
