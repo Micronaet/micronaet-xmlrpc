@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>
+        <!--Customer invoice-->
         <record model="ir.ui.view" id="view_accont_invoice_export_form">
             <field name="name">account.invoice.form</field>
             <field name="model">account.invoice</field>
@@ -8,6 +9,24 @@
             <field name="arch" type="xml">
                 <xpath expr="/form/header/field[@name='state']" position="before">
                     <button name="xmlrpc_export_invoice" string="Export in Account" type="object" attrs="{'invisible':['|',('state','=','draft'),('xmlrpc_sync','=',True)]}"/>
+                    <field name="xmlrpc_sync" invisible="1"/>
+                </xpath>
+                <xpath expr="/form/sheet" position="before">
+                    <div style="background-color:green;text-align:center;font-weight:bold;color:white;">
+                        <separator string="Account Sync" attrs="{'invisible': [('xmlrpc_sync', '=', False)]}" />
+                    </div>
+                </xpath>                
+            </field>
+        </record>
+
+        <!--Supplier invoice-->
+        <record model="ir.ui.view" id="view_accont_invoice_export_supplier_form">
+            <field name="name">account.invoice.supplier.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/header/field[@name='state']" position="before">
+                    <button name="xmlrpc_export_invoice" string="Export in Account" type="object" attrs="{'invisible':['|',('state','not in',('open','=','paid')),('xmlrpc_sync','=',True)]}"/>
                     <field name="xmlrpc_sync" invisible="1"/>
                 </xpath>
                 <xpath expr="/form/sheet" position="before">
