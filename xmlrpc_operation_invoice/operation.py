@@ -148,7 +148,8 @@ class AccountInvoice(orm.Model):
                             # Price 10N (3 dec.)
                             line.price_unit, 
                             # Tax (5)
-                            line.invoice_line_tax_id[0].account_ref, 
+                            line.invoice_line_tax_id[0].account_ref \
+                                if line.invoice_line_tax_id else '', 
                             # Provv. (5)
                             0, 
                             # Discount (50)
