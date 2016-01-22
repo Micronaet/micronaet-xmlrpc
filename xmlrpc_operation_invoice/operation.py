@@ -136,7 +136,7 @@ class AccountInvoice(orm.Model):
                             #                    Detail:
                             # -------------------------------------------------
                             # Tipo di riga 1 (D, R, T)
-                            'R', 
+                            'R',
                             # Code (15)
                             line.product_id.default_code or '', 
                             # Description (60)
