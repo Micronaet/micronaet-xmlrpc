@@ -179,7 +179,9 @@ class AccountInvoice(orm.Model):
                 return True
         # TODO write better error
         raise osv.except_osv(
-            _('Sync error:'), _('Cannot sync with accounting!'))        
+            _('Sync error:'), 
+            _('Cannot sync with accounting! (return esit not present'),
+            )
         return False
     
     _columns = {
