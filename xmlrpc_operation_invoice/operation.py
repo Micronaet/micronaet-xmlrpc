@@ -85,7 +85,14 @@ class AccountInvoice(orm.Model):
     def xmlrpc_export_invoice(self, cr, uid, ids, context=None):
         ''' Export current invoice 
             # TODO manage list of invoices?
-        '''        
+        '''
+        def clean_description(value):
+            ''' Remove \n and \t and return first 40 char
+            ''' 
+            value = value.replace('\n', ' ')            
+            value = value.replace('\t', ' ') 
+            return value[:40]
+            
         assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
 
         # TODO use with validate trigger for get the number
@@ -140,8 +147,9 @@ class AccountInvoice(orm.Model):
                             # Code (15)
                             line.product_id.default_code or '', 
                             # Description (60)
-                            line.name[:40] if line.use_text_description \
-                                else line.product_id.name,
+                            clean_desc(
+                                line.name) if line.use_text_description \
+                                    else line.product_id.name,                                    
                             # UOM (2)
                             line.product_id.uom_id.account_ref or '',
                             # Q. 10N (2 dec.)
