@@ -147,7 +147,7 @@ class AccountInvoice(orm.Model):
                             # Code (15)
                             line.product_id.default_code or '', 
                             # Description (60)
-                            clean_desc(
+                            clean_description(
                                 line.name) if line.use_text_description \
                                     else line.product_id.name,                                    
                             # UOM (2)
