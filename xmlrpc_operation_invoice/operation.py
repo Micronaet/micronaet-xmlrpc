@@ -148,8 +148,8 @@ class AccountInvoice(orm.Model):
                             line.product_id.default_code or '', 
                             # Description (60)
                             clean_description(
-                                line.name) if line.use_text_description \
-                                    else line.product_id.name,                                    
+                                line.name if line.use_text_description \
+                                    else line.product_id.name),
                             # UOM (2)
                             line.product_id.uom_id.account_ref or '',
                             # Q. 10N (2 dec.)
