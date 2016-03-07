@@ -101,7 +101,7 @@ class AccountInvoice(orm.Model):
         # Generate string for export file:
         mask = '%s%s%s%s' % ( #3 block for readability:
             '%-2s%-2s%-6s%-8s%-2s%-8s%-8s', #header
-            '%-1s%-15s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-8s', #row
+            '%-1s%-15s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s', #row
             '%-3s', #foot
             '\r\n', # Win CR
             )
@@ -162,7 +162,9 @@ class AccountInvoice(orm.Model):
                             # Provv. (5)
                             0, 
                             # Discount (50)
-                            line.discount, 
+                            line.multi_discount_rates,
+                            # Discount numeric (10)
+                            line.discount,
                             # Account (8)
                             line.account_id.account_ref or '', 
 
