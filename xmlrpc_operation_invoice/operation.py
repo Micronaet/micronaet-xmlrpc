@@ -162,9 +162,9 @@ class AccountInvoice(orm.Model):
                             # Provv. (5)
                             0, 
                             # Discount (50)
-                            line.multi_discount_rates,
+                            line.multi_discount_rates or '',
                             # Discount numeric (10)
-                            line.discount,
+                            line.discount or '',
                             # Account (8)
                             line.account_id.account_ref or '', 
 
