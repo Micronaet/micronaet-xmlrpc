@@ -134,10 +134,11 @@ class AccountInvoice(orm.Model):
                                 ),
                             # Transport reason (2)    
                             invoice.transportation_reason_id.import_id or '', 
-                            # Codice cliente 8
+                            # Customer code (8)
                             invoice.partner_id.sql_customer_code or '', 
-                            # TODO # Codice Agente 8
-                            '',
+                            # Agent code (8)
+                            invoice.mx_agent_id.sql_agent_code or \
+                                invoice.mx_agent_id.sql_supplier_code or '',
 
                             # -------------------------------------------------
                             #                    Detail:
