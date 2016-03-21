@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data noupdate="1">
+        <!--xmlrpc.operation-->
+        <record model="xmlrpc.operation" id="data_operation_partner">
+            <field name="name">partner</field>
+            <field name="shell_command">'c:\mexal_cli\prog\mxdesk.exe -command=mxrs.exe -login=openerp -t0 -x2 win32g -p#000 -aAZI -kadmin:pwd</field>
+            <field name="input_filename">partner.csv</field>
+            <field name="result_filename">res_partner.csv</field>
+            <field name="note">Partner import ODOO VS Accounting program</field>
+        </record>
+    </data>
+</openerp>
