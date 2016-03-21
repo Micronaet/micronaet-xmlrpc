@@ -92,7 +92,7 @@ class ResPartner(orm.Model):
         parameter = {}
         
         # Generate string for export file:
-        mask = '%-2s%-2s%-6s%-8s%-2s%-8s%-8s\r\n' # Win CR
+        mask = '%1s%1s%1s%-40s%-13s%\r\n' # Win CR
 
         parameter['input_file_string'] = ''
         for partner in self.browse(cr, uid, ids, context=context):
@@ -107,6 +107,7 @@ class ResPartner(orm.Model):
                         mask % (                        
                             'X' if partner.customer,
                             'X' if partner.supplier,                            
+                            ' ', # TODO destination
                             partner.name,
                             partner.vat,
                             ))
@@ -118,7 +119,7 @@ class ResPartner(orm.Model):
         if result_string_file:
             if result_string_file.startswith('OK'):
                 res = result_string_file.split(';')
-                if len(res) != 2:
+                if len(res) != 3:
                     raise osv.except_osv(
                         _('XMLRPC sync error'), 
                         _('Error reading result operation!'))
@@ -128,6 +129,7 @@ class ResPartner(orm.Model):
                     'xmlrpc_sync': True,
                     'sql_customer_code': res[0],
                     'sql_supplier_code': res[1],
+                    'sql_destination_code': res[2],
                     }, context=context)
                 return True
                 
