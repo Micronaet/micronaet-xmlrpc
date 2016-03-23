@@ -120,13 +120,18 @@ class ResPartner(orm.Model):
                     _('Partner with sync code, need empty (SQL)!'))
 
             # Vat not present
-            if not partner.vat:
+            if partner.is_company and not partner.vat:
                 raise osv.except_osv(
                     _('XMLRPC sync error'), 
                     _('Partner mandatory field not present: vat!'))
             
             # TODO check multi vat on database:
-
+            
+            # TODO check parent destination for address:
+            if partner.is_address: # TODO remove
+                raise osv.except_osv(
+                    _('XMLRPC sync error'), 
+                    _('Address temporary not creable!'))
 
             # ------------------
             # Create parameters:
@@ -138,18 +143,20 @@ class ResPartner(orm.Model):
                         'X' if partner.supplier else '',
                         'X' if partner.is_address else '', # TODO destination
                         partner.name[:60],
-                        partner.vat,                            
-                        ('%s %s' % (partner.street, partner.street2))[:40],
-                        partner.zip[:5],
-                        partner.city[:40],
+                        partner.vat,          
+                        ('%s %s' % (
+                            partner.street or '', 
+                            partner.street2 or ''))[:40],
+                        (partner.zip or '')[:5],
+                        (partner.city or '')[:40],
                         (partner.state_id.code or '')[:4],
                         (partner.country_id.name or '')[:40],                        
-                        partner.website[:40],
-                        partner.phone[:40],
-                        partner.mobile[:40],
-                        partner.fax[:40],
-                        partner.email[:40],
-                        partner.discount_rates[:40],
+                        (partner.website or '')[:40],
+                        (partner.phone or '')[:40],
+                        (partner.mobile or '')[:40],
+                        (partner.fax or '')[:40],
+                        (partner.email or '')[:40],
+                        (partner.discount_rates or '')[:40],
                         ))
 
         res =  self.pool.get('xmlrpc.operation').execute_operation(
