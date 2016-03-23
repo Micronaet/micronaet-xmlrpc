@@ -59,6 +59,7 @@ class XmlrpcOperation(orm.Model):
                     cr, uid, operation, parameter, context=context)
                     
             server_pool = self.pool.get('xmlrpc.server')
+            import pdb; pdb.set_trace()
             xmlrpc_server = server_pool.get_xmlrpc_server(
                 cr, uid, context=context)
             res = xmlrpc_server.execute('partner', parameter)
@@ -90,30 +91,64 @@ class ResPartner(orm.Model):
 
         # TODO use with validate trigger for get the number
         parameter = {}
-        import pdb; pdb.set_trace()
         
         # Generate string for export file:
-        mask = '%1s%1s%1s%-40s%-13s%\r\n' # Win CR
-
+        mask = '%1s%1s%1s%-60s%-15s%-40s%-5s%-40s%-4s%-40s%-40s%-40s%-40s%-40s%-40s%-40s\r\n' # Win CR
         parameter['input_file_string'] = ''
         
-        # TODO check VAT presence
         for partner in self.browse(cr, uid, ids, context=context):
+            # --------------------------
             # Check manatory parameters:
-            if not invoice.number:
+            # --------------------------
+            # yet sync
+            if partner.xmlrpc_sync:
                 raise osv.except_osv(
                     _('XMLRPC sync error'), 
-                    _('Partner mandatory field not present!'))
+                    _('Partner yet sync!'))
 
-                parameter['input_file_string'] += self.pool.get(
-                    'xmlrpc.server').clean_as_ascii(
-                        mask % (                        
-                            'X' if partner.customer else '',
-                            'X' if partner.supplier else '',
-                            ' ', # TODO destination
-                            partner.name,
-                            partner.vat,                            
-                            ))
+            # company or address
+            if not partner.is_company and not partner.is_address:
+                raise osv.except_osv(
+                    _('XMLRPC sync error'), 
+                    _('Partner need to be company or address'))
+            
+            # there's SQL code
+            if partner.sql_customer_code or \
+                    partner.sql_supplier_code or \
+                    partner.sql_destination_code:
+                raise osv.except_osv(
+                    _('XMLRPC sync error'), 
+                    _('Partner with sync code, need empty (SQL)!'))
+
+            # Vat not present
+            if not partner.vat:
+                raise osv.except_osv(
+                    _('XMLRPC sync error'), 
+                    _('Partner mandatory field not present: vat!'))
+
+            # ------------------
+            # Create parameters:
+            # ------------------
+            parameter['input_file_string'] += self.pool.get(
+                'xmlrpc.server').clean_as_ascii(
+                    mask % (                        
+                        'X' if partner.customer else '',
+                        'X' if partner.supplier else '',
+                        'X' if partner.is_address else '', # TODO destination
+                        partner.name[:60],
+                        partner.vat,                            
+                        ('%s %s' % (partner.street, partner.street2))[:40],
+                        partner.zip[:5],
+                        partner.city[:40],
+                        (partner.state_id.code or '')[:4],
+                        (partner.country_id.name or '')[:40],                        
+                        partner.website[:40],
+                        partner.phone[:40],
+                        partner.mobile[:40],
+                        partner.fax[:40],
+                        partner.email[:40],
+                        partner.discount_rates[:40],
+                        ))
 
         res =  self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'partner', parameter=parameter, context=context)
@@ -139,7 +174,7 @@ class ResPartner(orm.Model):
         # TODO write better error
         raise osv.except_osv(
             _('Sync error:'), 
-            _('Cannot sync with accounting! (return esit not present'),
+            _('Cannot sync with accounting! (return esit not present)'),
             )
         return False
     
