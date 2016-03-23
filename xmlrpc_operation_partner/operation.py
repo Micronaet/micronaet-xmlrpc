@@ -90,11 +90,14 @@ class ResPartner(orm.Model):
 
         # TODO use with validate trigger for get the number
         parameter = {}
+        import pdb; pdb.set_trace()
         
         # Generate string for export file:
         mask = '%1s%1s%1s%-40s%-13s%\r\n' # Win CR
 
         parameter['input_file_string'] = ''
+        
+        # TODO check VAT presence
         for partner in self.browse(cr, uid, ids, context=context):
             # Check manatory parameters:
             if not invoice.number:
@@ -105,11 +108,11 @@ class ResPartner(orm.Model):
                 parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
                         mask % (                        
-                            'X' if partner.customer,
-                            'X' if partner.supplier,                            
+                            'X' if partner.customer else '',
+                            'X' if partner.supplier else '',
                             ' ', # TODO destination
                             partner.name,
-                            partner.vat,
+                            partner.vat,                            
                             ))
 
         res =  self.pool.get('xmlrpc.operation').execute_operation(
