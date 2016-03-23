@@ -59,7 +59,6 @@ class XmlrpcOperation(orm.Model):
                     cr, uid, operation, parameter, context=context)
                     
             server_pool = self.pool.get('xmlrpc.server')
-            import pdb; pdb.set_trace()
             xmlrpc_server = server_pool.get_xmlrpc_server(
                 cr, uid, context=context)
             res = xmlrpc_server.execute('partner', parameter)
@@ -125,6 +124,9 @@ class ResPartner(orm.Model):
                 raise osv.except_osv(
                     _('XMLRPC sync error'), 
                     _('Partner mandatory field not present: vat!'))
+            
+            # TODO check multi vat on database:
+
 
             # ------------------
             # Create parameters:
@@ -161,16 +163,37 @@ class ResPartner(orm.Model):
                     raise osv.except_osv(
                         _('XMLRPC sync error'), 
                         _('Error reading result operation!'))
-                    
-                # TODO test if number passed if for correct invoice number!
+
                 self.write(cr, uid, ids[0], {
                     'xmlrpc_sync': True,
                     'sql_customer_code': res[0],
                     'sql_supplier_code': res[1],
                     'sql_destination_code': res[2],
-                    }, context=context)
+                    }, context=context)                    
+                # TODO send email to accounting people    
+                #user = self.pool.get("res.users").browse(cr, uid, 1)
+                #user.message_post(context=context, body="Hi, this message is showing up in the wrong place")
+
+                #post_vars = {'subject': "Message subject",
+                #             'body': "Message body",
+                #             'partner_ids': [(4, 3)],} # Where "4" adds the ID to the list 
+                                                       # of followers and "3" is the partner ID 
+                #thread_pool = self.pool.get('mail.thread')
+                #thread_pool.message_post(
+                #        cr, uid, False,
+                #        type="notification",
+                #        subtype="mt_comment",
+                #        context=context,
+                #        **post_vars)
+
                 return True
-                
+
+            else: # raise error passed:
+                raise osv.except_osv(
+                    _('Sync error:'), 
+                    _('Returned data: %s') % res,
+                    )
+                    
         # TODO write better error
         raise osv.except_osv(
             _('Sync error:'), 
