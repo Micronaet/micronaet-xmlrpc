@@ -81,7 +81,7 @@ class ResPartner(orm.Model):
         ''' For show an icon as a button
         '''
         return True
-        
+
     # Button:    
     def xmlrpc_export_checkinvoice(self, cr, uid, ids, context=None):
         ''' Export current invoice 

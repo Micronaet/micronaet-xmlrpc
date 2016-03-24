@@ -7,9 +7,11 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
-                <xpath expr="/form/sheet/notebook" position="before">
-                    <button name="xmlrpc_export_partner" string="Sync in Account" type="object"/><!-- attrs="{'invisible':['|','|','|',('xmlrpc_sync','=',True),('sql_customer_code','!=',False),('sql_supplier_code','!=',False),('sql_destination_code','!=',False)]}"-->
-                    <field name="xmlrpc_sync" invisible="1"/>
+                <xpath expr="/form/sheet" position="before">
+                    <header>
+                        <button name="xmlrpc_export_partner" string="Sync in Account" type="object" icon="gtk-refresh"/><!-- attrs="{'invisible':['|','|','|',('xmlrpc_sync','=',True),('sql_customer_code','!=',False),('sql_supplier_code','!=',False),('sql_destination_code','!=',False)]}"-->
+                        <field name="xmlrpc_sync" invisible="1"/>
+                    </header>    
                 </xpath>
             </field>
         </record>
