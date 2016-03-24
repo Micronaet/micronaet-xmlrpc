@@ -25,7 +25,7 @@
                         <group col="4" colspan="4">
                             <field name="name" />                            
                         </group>
-                    <sheet>        
+                    </sheet>        
                 </form>                
             </field>
         </record>
