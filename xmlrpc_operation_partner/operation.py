@@ -92,7 +92,7 @@ class ResPartner(orm.Model):
         parameter = {}
         
         # Generate string for export file:
-        mask = '%1s%1s%1s%-60s%-15s%-40s%-5s%-40s%-4s%-40s%-40s%-40s%-40s%-40s%-40s%-40s\r\n' # Win CR
+        mask = '%1s%1s%1s%-60s%-15s%-16s%-40s%-5s%-40s%-4s%-40s%-40s%-40s%-40s%-40s%-40s%-40s%-12s\r\n' # Win CR
         parameter['input_file_string'] = ''
         
         for partner in self.browse(cr, uid, ids, context=context):
@@ -133,6 +133,7 @@ class ResPartner(orm.Model):
                     _('XMLRPC sync error'), 
                     _('Address temporary not creable!'))
 
+            parent_code = ''
             # ------------------
             # Create parameters:
             # ------------------
@@ -143,7 +144,8 @@ class ResPartner(orm.Model):
                         'X' if partner.supplier else '',
                         'X' if partner.is_address else '', # TODO destination
                         partner.name[:60],
-                        partner.vat,          
+                        (partner.vat or '')[:15],
+                        (partner.fiscalcode or '')[:16],
                         ('%s %s' % (
                             partner.street or '', 
                             partner.street2 or ''))[:40],
@@ -157,6 +159,7 @@ class ResPartner(orm.Model):
                         (partner.fax or '')[:40],
                         (partner.email or '')[:40],
                         (partner.discount_rates or '')[:40],
+                        parent_code[:12],
                         ))
 
         res =  self.pool.get('xmlrpc.operation').execute_operation(
