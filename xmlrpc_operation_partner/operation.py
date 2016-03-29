@@ -106,7 +106,7 @@ class ResPartner(orm.Model):
         parameter = {}
         
         # Generate string for export file:
-        mask = '%1s%1s%1s%-60s%-15s%-16s%-40s%-5s%-40s%-4s%-40s%-40s%-40s%-40s%-40s%-40s%-40s%-12s\n' # Win CR
+        mask = '%1s%1s%1s%-60s%-15s%-16s%-40s%-5s%-40s%-4s%-40s%1s%-40s%-40s%-40s%-40s%-40s%-40s%-12s%-5s\n' # Win CR
         parameter['input_file_string'] = ''
         
         for partner in self.browse(cr, uid, ids, context=context):
@@ -139,7 +139,12 @@ class ResPartner(orm.Model):
             if partner.is_company and not partner.vat:
                 raise osv.except_osv(
                     _('XMLRPC sync error'), 
-                    _('Partner mandatory field not present: vat!'))
+                    _('Partner mandatory field not present: vat'))
+            # Fiscal position not present
+            if partner.is_company and not partner.property_account_position:
+                raise osv.except_osv(
+                    _('XMLRPC sync error'), 
+                    _('Partner mandatory field not present: Account position'))
             
             # TODO check multi vat on database:
             
@@ -155,17 +160,17 @@ class ResPartner(orm.Model):
                     raise osv.except_osv(
                         _('XMLRPC sync error'), 
                         _('Partner with sync code, need empty (SQL)!'))
-                
-                if partner.parent_id.customer:
-                    if partner.parent_id.sql_customer_code:
-                        parent_code = partner.parent_id.sql_customer_code
+                parent =  partner.parent_id
+                if parent.customer:
+                    if parent.sql_customer_code:
+                        parent_code = parent.sql_customer_code
                     else:    
                         raise osv.except_osv(
                             _('XMLRPC sync error'), 
                             _('No customer code in parent partner!'))
-                elif partner.parent_id.supplier:
-                    if partner.parent_id.sql_supplier_code:
-                        parent_code = partner.parent_id.sql_supplier_code
+                elif parent.supplier:
+                    if parent.sql_supplier_code:
+                        parent_code = parent.sql_supplier_code
                     else:    
                         raise osv.except_osv(
                             _('XMLRPC sync error'), 
@@ -174,7 +179,14 @@ class ResPartner(orm.Model):
                     raise osv.except_osv(
                         _('XMLRPC sync error'), 
                         _('Check supplier or code in parent partner!'))
-
+                esention = parent.property_account_position.esention_ref or ''
+                cei = parent.property_account_position.cei_ref or ''
+            else:            
+                esention = \
+                    partner_id.property_account_position.esention_ref or ''
+                cei = \
+                    partner_id.property_account_position.cei_ref or ''
+            
             # ------------------
             # Create parameters:
             # ------------------
@@ -194,6 +206,7 @@ class ResPartner(orm.Model):
                         (partner.city or '')[:40],
                         (partner.state_id.code or '')[:4],
                         (partner.country_id.name or '')[:40],                        
+                        (cei or '')[:1],
                         (partner.website or '')[:40],
                         (partner.phone or '')[:40],
                         (partner.mobile or '')[:40],
@@ -201,6 +214,7 @@ class ResPartner(orm.Model):
                         (partner.email or '')[:40],
                         (partner.discount_rates or '')[:40],
                         (parent_code or '')[:12],
+                        (esention or '')[:5],
                         ))
 
         res =  self.pool.get('xmlrpc.operation').execute_operation(
