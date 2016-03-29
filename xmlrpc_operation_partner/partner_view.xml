@@ -9,7 +9,8 @@
             <field name="arch" type="xml">
                 <xpath expr="/form/sheet" position="before">
                     <header>
-                        <button name="xmlrpc_export_partner" string="Sync in Account" type="object" icon="gtk-refresh"/><!-- attrs="{'invisible':['|','|','|',('xmlrpc_sync','=',True),('sql_customer_code','!=',False),('sql_supplier_code','!=',False),('sql_destination_code','!=',False)]}"-->
+                        <button name="xmlrpc_export_partner" string="Sync Customer" type="object" icon="gtk-refresh" context="{'sync_type':'customer'}"/><!-- attrs="{'invisible':['|','|','|',('xmlrpc_sync','=',True),('sql_customer_code','!=',False),('sql_supplier_code','!=',False),('sql_destination_code','!=',False)]}"-->
+                        <button name="xmlrpc_export_partner" string="Sync Supplier" type="object" icon="gtk-refresh" context="{'sync_type':'supplier'}"/><!-- attrs="{'invisible':['|','|','|',('xmlrpc_sync','=',True),('sql_customer_code','!=',False),('sql_supplier_code','!=',False),('sql_destination_code','!=',False)]}"-->
                         <field name="xmlrpc_sync" invisible="1"/>
                     </header>    
                 </xpath>

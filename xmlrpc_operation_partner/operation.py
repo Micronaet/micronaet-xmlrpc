@@ -87,6 +87,16 @@ class ResPartner(orm.Model):
             # TODO manage list of invoices?
         '''
         assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
+        context = context or {}
+        
+        sync_type = context.get('sync_type', False) 
+        if not sync_type:
+            raise osv.except_osv(
+                _('XMLRPC sync error'), 
+                _('Error on button sync type (no customer or supplier)'))
+            
+        customer = context.get('sync_type', False) == 'customer'
+        import pdb; pdb.set_trace()
 
         # TODO use with validate trigger for get the number
         parameter = {}
@@ -112,12 +122,14 @@ class ResPartner(orm.Model):
                     _('Partner need to be company or address'))
             
             # there's SQL code
-            if partner.sql_customer_code or \
-                    partner.sql_supplier_code or \
-                    partner.sql_destination_code:
+            if customer and partner.sql_customer_code:
                 raise osv.except_osv(
                     _('XMLRPC sync error'), 
-                    _('Partner with sync code, need empty (SQL)!'))
+                    _('Customer with sync code present, need empty (SQL)!'))
+            if not customer and partner.sql_supplier_code:
+                raise osv.except_osv(
+                    _('XMLRPC sync error'), 
+                    _('Supplier with sync code present, need empty (SQL)!'))
 
             # Vat not present
             if partner.is_company and not partner.vat:
@@ -128,12 +140,32 @@ class ResPartner(orm.Model):
             # TODO check multi vat on database:
             
             # TODO check parent destination for address:
-            if partner.is_address: # TODO remove
-                raise osv.except_osv(
-                    _('XMLRPC sync error'), 
-                    _('Address temporary not creable!'))
-
             parent_code = ''
+            if partner.is_address:
+                if partner.sql_destination_code:
+                    raise osv.except_osv(
+                        _('XMLRPC sync error'), 
+                        _('Partner with sync code, need empty (SQL)!'))
+                
+                if partner.parent_id.customer:
+                    if partner.partner_id.sql_customer_code:
+                        parent_code = partner.partner_id.sql_customer_code
+                    else:    
+                        raise osv.except_osv(
+                            _('XMLRPC sync error'), 
+                            _('No customer code in parent partner!'))
+                elif partner.parent_id.supplier:
+                    if partner.partner_id.sql_supplier_code:
+                        parent_code = partner.partner_id.sql_supplier_code
+                    else:    
+                        raise osv.except_osv(
+                            _('XMLRPC sync error'), 
+                            _('No supplier code in parent partner!'))
+                else: # no check for supplier / customer
+                    raise osv.except_osv(
+                        _('XMLRPC sync error'), 
+                        _('Check supplier or code in parent partner!'))
+
             # ------------------
             # Create parameters:
             # ------------------
@@ -142,7 +174,7 @@ class ResPartner(orm.Model):
                     mask % (                        
                         'X' if partner.customer else '',
                         'X' if partner.supplier else '',
-                        'X' if partner.is_address else '', # TODO destination
+                        'X' if partner.is_address else '',
                         partner.name[:60],
                         (partner.vat or '')[:15],
                         (partner.fiscalcode or '')[:16],
@@ -159,7 +191,7 @@ class ResPartner(orm.Model):
                         (partner.fax or '')[:40],
                         (partner.email or '')[:40],
                         (partner.discount_rates or '')[:40],
-                        parent_code[:12],
+                        (parent_code or '')[:12],
                         ))
 
         res =  self.pool.get('xmlrpc.operation').execute_operation(
