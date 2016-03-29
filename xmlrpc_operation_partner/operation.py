@@ -250,7 +250,6 @@ class ResPartner(orm.Model):
                     field: code,
                     }
 
-                self.message_post(cr, uid, ids, message, context=context) # XXX after
                 try:
                     self.write(cr, uid, ids, data, context=context)
                 except:
@@ -259,8 +258,10 @@ class ResPartner(orm.Model):
                         _('Error update DB, write manually: %s: %s\n%s') % (
                             field,
                             code,
-                            sys.exc_info(), ),
+                            sys.exc_info(), 
+                            ),
                         )
+                self.message_post(cr, uid, ids, message, context=context)
                         
                 # TODO send email to accounting people    
                 #post_vars = {'subject': "Message subject",
