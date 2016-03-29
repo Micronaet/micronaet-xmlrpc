@@ -233,9 +233,6 @@ class ResPartner(orm.Model):
                     message, context=context)
 
                 # TODO send email to accounting people    
-                #user = self.pool.get("res.users").browse(cr, uid, 1)
-                #user.message_post(context=context, body="Hi, this message is showing up in the wrong place")
-
                 #post_vars = {'subject': "Message subject",
                 #             'body': "Message body",
                 #             'partner_ids': [(4, 3)],} # Where "4" adds the ID to the list 
