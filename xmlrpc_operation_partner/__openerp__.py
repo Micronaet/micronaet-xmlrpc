@@ -30,6 +30,7 @@
     'depends': [
         'base',
         'xmlrpc_base',
+        'sql_partner', # for fields to update
         ],
     'init_xml': [],
     'demo': [],
