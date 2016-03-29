@@ -232,15 +232,15 @@ class ResPartner(orm.Model):
                         _('Error reading result operation!'))
 
                 data = {
-                    'xmlrpc_sync': True,
+                    'xmlrpc_sync': False, # XXX not used
                     }
-                if res[0].strip():
+                if res[1].strip():
                     data['sql_customer_code'] = res[0].strip()
                     message = _('Account sync for customer, code: %s') % res[0] 
-                if res[1].strip():    
+                if res[2].strip():    
                     data['sql_supplier_code'] = res[1].strip()
                     message = _('Account sync for supplier, code: %s') % res[1] 
-                if res[2].strip():    
+                if res[3].strip():    
                     data['sql_destination_code'] = res[2].strip()
                     message = _('Account sync for dest., code: %s') % res[2] 
 
