@@ -157,15 +157,15 @@ class ResPartner(orm.Model):
                         _('Partner with sync code, need empty (SQL)!'))
                 
                 if partner.parent_id.customer:
-                    if partner.partner_id.sql_customer_code:
-                        parent_code = partner.partner_id.sql_customer_code
+                    if partner.parent_id.sql_customer_code:
+                        parent_code = partner.parent_id.sql_customer_code
                     else:    
                         raise osv.except_osv(
                             _('XMLRPC sync error'), 
                             _('No customer code in parent partner!'))
                 elif partner.parent_id.supplier:
-                    if partner.partner_id.sql_supplier_code:
-                        parent_code = partner.partner_id.sql_supplier_code
+                    if partner.parent_id.sql_supplier_code:
+                        parent_code = partner.parent_id.sql_supplier_code
                     else:    
                         raise osv.except_osv(
                             _('XMLRPC sync error'), 
