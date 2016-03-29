@@ -222,7 +222,6 @@ class ResPartner(orm.Model):
         res =  self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'partner', parameter=parameter, context=context)
         result_string_file = res.get('result_string_file', False)
-        import pdb; pdb.set_trace()
         if result_string_file:
             if result_string_file.startswith('OK'):
                 res = result_string_file.split(';')
@@ -244,7 +243,8 @@ class ResPartner(orm.Model):
                     data['sql_destination_code'] = res[3].strip()
                     message = _('Account sync for dest., code: %s') % res[3] 
 
-                self.write(cr, uid, ids[0], data, context=context)           
+                import pdb; pdb.set_trace()
+                self.write(cr, uid, ids[0], data, context=context)          
                 self.message_post(cr, uid, ids, 
                     message, context=context)
 
@@ -261,19 +261,21 @@ class ResPartner(orm.Model):
                 #        subtype="mt_comment",
                 #        context=context,
                 #        **post_vars)
-                return True
+                return True # END PROCEDURE!
 
             else: # raise error passed:
                 raise osv.except_osv(
                     _('Sync error:'), 
                     _('Returned data: %s') % res,
                     )
+                return False
                     
         # TODO write better error
         raise osv.except_osv(
             _('Sync error:'), 
             _('Cannot sync with accounting! (return esit not present)'),
             )
+            
         _logger.info('End correct importation XMLRPC sync for partner')
         return False
     
