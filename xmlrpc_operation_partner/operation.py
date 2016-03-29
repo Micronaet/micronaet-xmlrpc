@@ -219,7 +219,7 @@ class ResPartner(orm.Model):
                         ))
                         
         _logger.info('Data: %s' % (parameter, ))
-        
+        import pdb; pdb.set_trace()
         res =  self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'partner', parameter=parameter, context=context)
         result_string_file = res.get('result_string_file', False)
