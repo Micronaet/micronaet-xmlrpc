@@ -230,31 +230,38 @@ class ResPartner(orm.Model):
                         _('XMLRPC sync error'), 
                         _('Error reading result operation!'))
 
-                data = {
-                    #'xmlrpc_sync': False, # XXX not used
-                    }
+                code = ''    
+                field = ''
                 if res[1].strip():
-                    data['sql_customer_code'] = res[1].strip()
+                    field = 'sql_customer_code'
+                    code = res[1].strip()
                     message = _('Account sync for customer, code: %s') % res[1] 
                 if res[2].strip():    
-                    data['sql_supplier_code'] = res[2].strip()
+                    field = 'sql_supplier_code'
+                    code = res[2].strip()
                     message = _('Account sync for supplier, code: %s') % res[2] 
                 if res[3].strip():    
-                    data['sql_destination_code'] = res[3].strip()
+                    field = 'sql_destination_code'
+                    code = res[3].strip()
                     message = _('Account sync for dest., code: %s') % res[3] 
 
-                import pdb; pdb.set_trace()
+                data = {
+                    #'xmlrpc_sync': False, # XXX not used
+                    field: code,
+                    }
+
+                self.message_post(cr, uid, ids, message, context=context) # XXX after
                 try:
                     self.write(cr, uid, ids, data, context=context)
                 except:
                     raise osv.except_osv(
                         _('Sync error:'), 
-                        _('Error update DB: %s') % (sys.exc_info(), ),
+                        _('Error update DB, write manually: %s: %s\n%s') % (
+                            field,
+                            code,
+                            sys.exc_info(), ),
                         )
                         
-                self.message_post(cr, uid, ids, 
-                    message, context=context)
-
                 # TODO send email to accounting people    
                 #post_vars = {'subject': "Message subject",
                 #             'body': "Message body",
