@@ -183,9 +183,9 @@ class ResPartner(orm.Model):
                 cei = parent.property_account_position.cei_ref or ''
             else:            
                 esention = \
-                    partner_id.property_account_position.esention_ref or ''
+                    partner.property_account_position.esention_ref or ''
                 cei = \
-                    partner_id.property_account_position.cei_ref or ''
+                    partner.property_account_position.cei_ref or ''
             
             # ------------------
             # Create parameters:
