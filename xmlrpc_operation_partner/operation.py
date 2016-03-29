@@ -236,15 +236,15 @@ class ResPartner(orm.Model):
                     }
                 if res[1].strip():
                     data['sql_customer_code'] = res[0].strip()
-                    message = _('Account sync for customer, code: %s') % res[0] 
+                    message = _('Account sync for customer, code: %s') % res[1] 
                 if res[2].strip():    
                     data['sql_supplier_code'] = res[1].strip()
-                    message = _('Account sync for supplier, code: %s') % res[1] 
+                    message = _('Account sync for supplier, code: %s') % res[2] 
                 if res[3].strip():    
                     data['sql_destination_code'] = res[2].strip()
-                    message = _('Account sync for dest., code: %s') % res[2] 
+                    message = _('Account sync for dest., code: %s') % res[3] 
 
-                self.write(cr, uid, ids[0], data, context=context)                    
+                self.write(cr, uid, ids[0], data, context=context)           
                 self.message_post(cr, uid, ids, 
                     message, context=context)
 
