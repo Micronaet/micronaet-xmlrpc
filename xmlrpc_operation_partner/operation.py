@@ -231,7 +231,7 @@ class ResPartner(orm.Model):
                         _('Error reading result operation!'))
 
                 data = {
-                    'xmlrpc_sync': False, # XXX not used
+                    #'xmlrpc_sync': False, # XXX not used
                     }
                 if res[1].strip():
                     data['sql_customer_code'] = res[1].strip()
@@ -244,7 +244,7 @@ class ResPartner(orm.Model):
                     message = _('Account sync for dest., code: %s') % res[3] 
 
                 import pdb; pdb.set_trace()
-                self.write(cr, uid, ids[0], data, context=context)          
+                self.write(cr, uid, ids, data, context=context)
                 self.message_post(cr, uid, ids, 
                     message, context=context)
 
