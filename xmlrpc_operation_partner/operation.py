@@ -220,6 +220,7 @@ class ResPartner(orm.Model):
         res =  self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'partner', parameter=parameter, context=context)
         result_string_file = res.get('result_string_file', False)
+        import pdb; pdb.set_trace()
         if result_string_file:
             if result_string_file.startswith('OK'):
                 res = result_string_file.split(';')
