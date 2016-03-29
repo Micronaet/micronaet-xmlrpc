@@ -219,7 +219,6 @@ class ResPartner(orm.Model):
                         ))
                         
         _logger.info('Data: %s' % (parameter, ))
-        import pdb; pdb.set_trace()
         res =  self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'partner', parameter=parameter, context=context)
         result_string_file = res.get('result_string_file', False)
@@ -227,7 +226,7 @@ class ResPartner(orm.Model):
         if result_string_file:
             if result_string_file.startswith('OK'):
                 res = result_string_file.split(';')
-                if len(res) != 3:
+                if len(res) != 4:
                     raise osv.except_osv(
                         _('XMLRPC sync error'), 
                         _('Error reading result operation!'))
@@ -235,14 +234,14 @@ class ResPartner(orm.Model):
                 data = {
                     'xmlrpc_sync': True,
                     }
-                if res[0]:    
-                    data['sql_customer_code'] = res[0]
+                if res[0].strip():
+                    data['sql_customer_code'] = res[0].strip()
                     message = _('Account sync for customer, code: %s') % res[0] 
-                if res[1]:    
-                    data['sql_supplier_code'] = res[1]
+                if res[1].strip():    
+                    data['sql_supplier_code'] = res[1].strip()
                     message = _('Account sync for supplier, code: %s') % res[1] 
-                if res[2]:    
-                    data['sql_destination_code'] = res[2]
+                if res[2].strip():    
+                    data['sql_destination_code'] = res[2].strip()
                     message = _('Account sync for dest., code: %s') % res[2] 
 
                 self.write(cr, uid, ids[0], data, context=context)                    
@@ -252,8 +251,9 @@ class ResPartner(orm.Model):
                 # TODO send email to accounting people    
                 #post_vars = {'subject': "Message subject",
                 #             'body': "Message body",
-                #             'partner_ids': [(4, 3)],} # Where "4" adds the ID to the list 
-                                                       # of followers and "3" is the partner ID 
+                #             'partner_ids': [(4, 3)],}
+                # Where "4" adds the ID to the list 
+                # of followers and "3" is the partner ID 
                 #thread_pool = self.pool.get('mail.thread')
                 #thread_pool.message_post(
                 #        cr, uid, False,
