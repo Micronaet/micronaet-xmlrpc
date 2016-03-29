@@ -244,7 +244,14 @@ class ResPartner(orm.Model):
                     message = _('Account sync for dest., code: %s') % res[3] 
 
                 import pdb; pdb.set_trace()
-                self.write(cr, uid, ids, data, context=context)
+                try:
+                    self.write(cr, uid, ids, data, context=context)
+                except:
+                    raise osv.except_osv(
+                        _('Sync error:'), 
+                        _('Error update DB: %s') % (sys.exc_info(), ),
+                        )
+                        
                 self.message_post(cr, uid, ids, 
                     message, context=context)
 
