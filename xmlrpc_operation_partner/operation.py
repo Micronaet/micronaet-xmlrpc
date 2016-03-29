@@ -88,7 +88,7 @@ class ResPartner(orm.Model):
         '''
         assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
         context = context or {}
-        
+
         sync_type = context.get('sync_type', False) 
         if not sync_type:
             raise osv.except_osv(
@@ -215,12 +215,23 @@ class ResPartner(orm.Model):
                         _('XMLRPC sync error'), 
                         _('Error reading result operation!'))
 
-                self.write(cr, uid, ids[0], {
+                data = {
                     'xmlrpc_sync': True,
-                    'sql_customer_code': res[0],
-                    'sql_supplier_code': res[1],
-                    'sql_destination_code': res[2],
-                    }, context=context)                    
+                    }
+                if res[0]:    
+                    data['sql_customer_code'] = res[0]
+                    message = _('Account sync for customer, code: %s') % res[0] 
+                if res[1]:    
+                    data['sql_supplier_code'] = res[1]
+                    message = _('Account sync for supplier, code: %s') % res[1] 
+                if res[2]:    
+                    data['sql_destination_code'] = res[2]
+                    message = _('Account sync for dest., code: %s') % res[2] 
+
+                self.write(cr, uid, ids[0], data, context=context)                    
+                self.message_post(cr, uid, ids, 
+                    message, context=context)
+
                 # TODO send email to accounting people    
                 #user = self.pool.get("res.users").browse(cr, uid, 1)
                 #user.message_post(context=context, body="Hi, this message is showing up in the wrong place")
@@ -236,7 +247,6 @@ class ResPartner(orm.Model):
                 #        subtype="mt_comment",
                 #        context=context,
                 #        **post_vars)
-
                 return True
 
             else: # raise error passed:
@@ -253,7 +263,7 @@ class ResPartner(orm.Model):
         return False
     
     _columns = {
-        'xmlrpc_sync': fields.boolean('XMLRPC syncronized'),        
+        'xmlrpc_sync': fields.boolean('XMLRPC syncronized'), # TODO remove
         }    
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
