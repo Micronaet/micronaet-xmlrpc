@@ -89,6 +89,7 @@ class ResPartner(orm.Model):
         assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
         context = context or {}
 
+        _logger.info('Start XMLRPC sync for partner')
         sync_type = context.get('sync_type', False) 
         if not sync_type:
             raise osv.except_osv(
@@ -216,7 +217,9 @@ class ResPartner(orm.Model):
                         (parent_code or '')[:12],
                         (esention or '')[:5],
                         ))
-
+                        
+        _logger.info('Data: %s' % (parameter, ))
+        
         res =  self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'partner', parameter=parameter, context=context)
         result_string_file = res.get('result_string_file', False)
@@ -271,6 +274,7 @@ class ResPartner(orm.Model):
             _('Sync error:'), 
             _('Cannot sync with accounting! (return esit not present)'),
             )
+        _logger.info('End correct importation XMLRPC sync for partner')
         return False
     
     _columns = {
