@@ -96,13 +96,17 @@ class ResPartner(orm.Model):
                 _('Error on button sync type (no customer or supplier)'))
             
         customer = context.get('sync_type', False) == 'customer'
-        import pdb; pdb.set_trace()
-
+        
+        # Set X state:
+        customer_x = customer
+        supplier_x = not customer
+        destination_x = False
+        
         # TODO use with validate trigger for get the number
         parameter = {}
         
         # Generate string for export file:
-        mask = '%1s%1s%1s%-60s%-15s%-16s%-40s%-5s%-40s%-4s%-40s%-40s%-40s%-40s%-40s%-40s%-40s%-12s\r\n' # Win CR
+        mask = '%1s%1s%1s%-60s%-15s%-16s%-40s%-5s%-40s%-4s%-40s%-40s%-40s%-40s%-40s%-40s%-40s%-12s\n' # Win CR
         parameter['input_file_string'] = ''
         
         for partner in self.browse(cr, uid, ids, context=context):
@@ -142,6 +146,11 @@ class ResPartner(orm.Model):
             # TODO check parent destination for address:
             parent_code = ''
             if partner.is_address:
+                destination_x = True
+                # reset:
+                customer_x = False
+                supplier_x = False
+                
                 if partner.sql_destination_code:
                     raise osv.except_osv(
                         _('XMLRPC sync error'), 
@@ -172,9 +181,9 @@ class ResPartner(orm.Model):
             parameter['input_file_string'] += self.pool.get(
                 'xmlrpc.server').clean_as_ascii(
                     mask % (                        
-                        'X' if partner.customer else '',
-                        'X' if partner.supplier else '',
-                        'X' if partner.is_address else '',
+                        'X' if customer_x else '',
+                        'X' if supplier_x else '',
+                        'X' if destination_x else '',
                         partner.name[:60],
                         (partner.vat or '')[:15],
                         (partner.fiscalcode or '')[:16],
@@ -196,7 +205,7 @@ class ResPartner(orm.Model):
 
         res =  self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'partner', parameter=parameter, context=context)
-            
+        import pdb; pdb.set_trace()    
         result_string_file = res.get('result_string_file', False)
         if result_string_file:
             if result_string_file.startswith('OK'):
