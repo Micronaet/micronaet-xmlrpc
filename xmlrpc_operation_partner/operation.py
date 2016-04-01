@@ -251,8 +251,9 @@ class ResPartner(orm.Model):
                     }
 
                 try:
+                    # XXX RAISE ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     self.write(cr, uid, ids, data, context=context)
-                except:
+                except:                    
                     raise osv.except_osv(
                         _('Sync error:'), 
                         _('Error update DB, write manually: %s: %s\n%s') % (

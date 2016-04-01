@@ -75,7 +75,7 @@ class XmlrpcOperation(orm.Model):
 class ResPartner(orm.Model):
     ''' Add export function to invoice obj
     '''    
-    _inherit = 'res.partner'
+    _inherit = 'res.partner' # TODO change or ... not...
   
     def dummy_button(self, cr, uid, ids, context=None):
         ''' For show an icon as a button
@@ -99,18 +99,32 @@ class ResPartner(orm.Model):
             
         result_string_file = res.get('result_string_file', False)
         if result_string_file:
-            # ----------------------------
+            # -----------------------------------------------------------------
             # Read invoice data from file:
-            # ----------------------------
+            # -----------------------------------------------------------------
             acc_invoice = {}
-            for line in result_string_file:
-                line = line.split(';')
-                number = line[0].strip()
-                amount = float(line[1].strip())
-                vat = float(line[2].strip())
+            import pdb; pdb.set_trace()            
+            year = '2016' # TODO change
+            for line in result_string_file.split('\n'):
+                if not line.strip():
+                    continue # jump empty line
                 
-                acc_invoice[number] = (amount, vat)
-                            
+                # -------------------------------------------------------------
+                # Parser the line:
+                # -------------------------------------------------------------
+                line = line.split(';')
+                doc = line[0].strip()
+                series = line[1].strip()
+                number = line[2].strip()                
+                invoice = '%s/%s/%s/%04d' % (doc, series, year, number)
+
+                partner_code = float(line[3].strip())                
+                amount = float(line[4].strip().replace(',', '.') or '0')
+                vat = float(line[5].strip().replace(',', '.') or '0')
+                total = float(line[6].strip().replace(',', '.') or '0')
+                approx = float(line[7].strip() or '0')
+                acc_invoice[invoice] = (amount, vat, total, approx)
+
             # --------------------------
             # Compare with invoice ODOO:
             # --------------------------
@@ -130,6 +144,11 @@ class ResPartner(orm.Model):
                         tax != acc_invoice[name][0]:
                     error += '%s. difference: [%s - %s] [%s - %s]\n' % (
                         name,
+                        'TODO', # TODO
+                        'TODO', # TODO
+                        'TODO', # TODO
+                        'TODO', # TODO
+                        )
 
                     invoice_different.append(name) # TODO better data!
                     

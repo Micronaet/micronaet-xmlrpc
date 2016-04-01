@@ -35,7 +35,7 @@
     'demo': [],
     'data': [
         ##'operation.xml',        
-        #'partner_view.xml',
+        'check_view.xml',
         'data/operation.xml',
         ],
     'active': False,
