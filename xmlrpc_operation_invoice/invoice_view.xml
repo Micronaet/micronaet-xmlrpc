@@ -43,9 +43,10 @@
             <field name="inherit_id" ref="account.invoice_tree"/>
             <field name="arch" type="xml">
                 <field name="state" position="after">
+                <!--<field name="partner_id" position="before">-->
                     <field name="xmlrpc_sync" invisible="1"/>
-                    <button name="dummy_button" string="Account sync" type="object" icon="gtk-yes" attrs="{'invisible':[('xmlrpc_sync','=',False)]}"/>
                     <button name="dummy_button" string="Account unsync" type="object" icon="gtk-no" attrs="{'invisible':[('xmlrpc_sync','=',True)]}"/>
+                    <button name="dummy_button" string="Account sync" type="object" icon="gtk-yes" attrs="{'invisible':[('xmlrpc_sync','=',False)]}"/>
                 </field>
             </field>
         </record>
