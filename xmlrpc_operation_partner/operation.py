@@ -220,10 +220,10 @@ class ResPartner(orm.Model):
                         (partner.private_name or '')[:40],
                         (partner.private_surname or '')[:40],                        
                         ))
-                        
         _logger.info('Data: %s' % (parameter, ))
         res =  self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'partner', parameter=parameter, context=context)
+        import pdb; pdb.set_trace()                
         result_string_file = res.get('result_string_file', False)
         if result_string_file:
             if result_string_file.startswith('OK'):
