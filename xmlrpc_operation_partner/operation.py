@@ -137,7 +137,7 @@ class ResPartner(orm.Model):
                 _('Supplier with sync code present, need empty (SQL)!'))
 
         # Vat not present
-        if partner.is_company and not partner.is_private not partner.vat:
+        if partner.is_company and not partner.is_private and not partner.vat:
             raise osv.except_osv(
                 _('XMLRPC sync error'), 
                 _('Partner mandatory field not present: vat'))
