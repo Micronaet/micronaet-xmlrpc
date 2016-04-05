@@ -184,8 +184,9 @@ class AccountInvoice(orm.Model):
         result_string_file = res.get('result_string_file', False)
         if result_string_file:
             if result_string_file.startswith('OK'):
+                import pdb; pdb.set_trace()
                 # TODO test if number passed if for correct invoice number!
-                self.write(cr, uid, ids[0], {
+                self.write(cr, uid, ids, {
                     'xmlrpc_sync': True,
                     }, context=context)
                 return True
@@ -199,6 +200,5 @@ class AccountInvoice(orm.Model):
     _columns = {
         'xmlrpc_sync': fields.boolean('XMLRPC syncronized'),        
         }    
-        
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
