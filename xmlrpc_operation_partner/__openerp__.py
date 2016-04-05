@@ -31,6 +31,7 @@
         'base',
         'xmlrpc_base',
         'sql_partner', # for fields to update
+        'l10n_it_private', # private info
         ],
     'init_xml': [],
     'demo': [],
