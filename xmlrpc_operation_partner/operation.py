@@ -110,120 +110,118 @@ class ResPartner(orm.Model):
         mask = '%1s%1s%1s%-60s%-15s%-16s%-40s%-5s%-40s%-4s%-40s%1s%-40s%-40s%-40s%-40s%-40s%-40s%-12s%-5s%-40s%-40s%1s\n' # Win CR
         parameter['input_file_string'] = ''
         
-        for partner in self.browse(cr, uid, ids, context=context):
-            # --------------------------
-            # Check manatory parameters:
-            # --------------------------
-            # yet sync
-            if partner.xmlrpc_sync:
-                raise osv.except_osv(
-                    _('XMLRPC sync error'), 
-                    _('Partner yet sync!'))
+        partner = self.browse(cr, uid, ids, context=context)
+        # --------------------------
+        # Check manatory parameters:
+        # --------------------------
+        # yet sync
+        if partner.xmlrpc_sync:
+            raise osv.except_osv(
+                _('XMLRPC sync error'), 
+                _('Partner yet sync!'))
 
-            # company or address
-            if not partner.is_company and not partner.is_address:
-                raise osv.except_osv(
-                    _('XMLRPC sync error'), 
-                    _('Partner need to be company or address'))
-            
-            # there's SQL code
-            if customer and partner.sql_customer_code:
-                raise osv.except_osv(
-                    _('XMLRPC sync error'), 
-                    _('Customer with sync code present, need empty (SQL)!'))
-            if not customer and partner.sql_supplier_code:
-                raise osv.except_osv(
-                    _('XMLRPC sync error'), 
-                    _('Supplier with sync code present, need empty (SQL)!'))
+        # company or address
+        if not partner.is_company and not partner.is_address:
+            raise osv.except_osv(
+                _('XMLRPC sync error'), 
+                _('Partner need to be company or address'))
+        
+        # there's SQL code
+        if customer and partner.sql_customer_code:
+            raise osv.except_osv(
+                _('XMLRPC sync error'), 
+                _('Customer with sync code present, need empty (SQL)!'))
+        if not customer and partner.sql_supplier_code:
+            raise osv.except_osv(
+                _('XMLRPC sync error'), 
+                _('Supplier with sync code present, need empty (SQL)!'))
 
-            # Vat not present
-            if partner.is_company and not partner.vat:
+        # Vat not present
+        if partner.is_company and not partner.vat:
+            raise osv.except_osv(
+                _('XMLRPC sync error'), 
+                _('Partner mandatory field not present: vat'))
+        # Fiscal position not present
+        if partner.is_company and not partner.property_account_position:
+            raise osv.except_osv(
+                _('XMLRPC sync error'), 
+                _('Partner mandatory field not present: Account position'))
+        
+        # TODO check multi vat on database:
+        
+        # TODO check parent destination for address:
+        parent_code = ''
+        if partner.is_address:
+            destination_x = True
+            # reset:
+            customer_x = False
+            supplier_x = False
+            
+            if partner.sql_destination_code:
                 raise osv.except_osv(
                     _('XMLRPC sync error'), 
-                    _('Partner mandatory field not present: vat'))
-            # Fiscal position not present
-            if partner.is_company and not partner.property_account_position:
-                raise osv.except_osv(
-                    _('XMLRPC sync error'), 
-                    _('Partner mandatory field not present: Account position'))
-            
-            # TODO check multi vat on database:
-            
-            # TODO check parent destination for address:
-            parent_code = ''
-            if partner.is_address:
-                destination_x = True
-                # reset:
-                customer_x = False
-                supplier_x = False
-                
-                if partner.sql_destination_code:
+                    _('Partner with sync code, need empty (SQL)!'))
+            parent =  partner.parent_id
+            if parent.customer:
+                if parent.sql_customer_code:
+                    parent_code = parent.sql_customer_code
+                else:    
                     raise osv.except_osv(
                         _('XMLRPC sync error'), 
-                        _('Partner with sync code, need empty (SQL)!'))
-                parent =  partner.parent_id
-                if parent.customer:
-                    if parent.sql_customer_code:
-                        parent_code = parent.sql_customer_code
-                    else:    
-                        raise osv.except_osv(
-                            _('XMLRPC sync error'), 
-                            _('No customer code in parent partner!'))
-                elif parent.supplier:
-                    if parent.sql_supplier_code:
-                        parent_code = parent.sql_supplier_code
-                    else:    
-                        raise osv.except_osv(
-                            _('XMLRPC sync error'), 
-                            _('No supplier code in parent partner!'))
-                else: # no check for supplier / customer
+                        _('No customer code in parent partner!'))
+            elif parent.supplier:
+                if parent.sql_supplier_code:
+                    parent_code = parent.sql_supplier_code
+                else:    
                     raise osv.except_osv(
                         _('XMLRPC sync error'), 
-                        _('Check supplier or code in parent partner!'))
-                esention = parent.property_account_position.esention_ref or ''
-                cei = parent.property_account_position.cei_ref or ''
-            else:            
-                esention = \
-                    partner.property_account_position.esention_ref or ''
-                cei = \
-                    partner.property_account_position.cei_ref or ''
-            
-            # ------------------
-            # Create parameters:
-            # ------------------
-            parameter['input_file_string'] += self.pool.get(
-                'xmlrpc.server').clean_as_ascii(
-                    mask % (                        
-                        'X' if customer_x else '',
-                        'X' if supplier_x else '',
-                        'X' if destination_x else '',
-                        partner.name[:60],
-                        (partner.vat or '')[:15],
-                        (partner.fiscalcode or '')[:16],
-                        ('%s %s' % (
-                            partner.street or '', 
-                            partner.street2 or ''))[:40],
-                        (partner.zip or '')[:5],
-                        (partner.city or '')[:40],
-                        (partner.state_id.code or '')[:4],
-                        (partner.country_id.name or '')[:40],                        
-                        (cei or '')[:1],
-                        (partner.website or '')[:40],
-                        (partner.phone or '')[:40],
-                        (partner.mobile or '')[:40],
-                        (partner.fax or '')[:40],
-                        (partner.email or '')[:40],
-                        (partner.discount_rates or '')[:40],
-                        (parent_code or '')[:12],
-                        (esention or '')[:5],
-                        'S' if partner.is_private else 'N',
-                        (partner.private_name or '')[:40],
-                        (partner.private_surname or '')[:40],                        
-                        ))
+                        _('No supplier code in parent partner!'))
+            else: # no check for supplier / customer
+                raise osv.except_osv(
+                    _('XMLRPC sync error'), 
+                    _('Check supplier or code in parent partner!'))
+            esention = parent.property_account_position.esention_ref or ''
+            cei = parent.property_account_position.cei_ref or ''
+        else:            
+            esention = partner.property_account_position.esention_ref or ''
+            cei = partner.property_account_position.cei_ref or ''
+        
+        # ------------------
+        # Create parameters:
+        # ------------------
+        parameter['input_file_string'] += self.pool.get(
+            'xmlrpc.server').clean_as_ascii(
+                mask % (                        
+                    'X' if customer_x else '',
+                    'X' if supplier_x else '',
+                    'X' if destination_x else '',
+                    partner.name[:60],
+                    (partner.vat or '')[:15],
+                    (partner.fiscalcode or '')[:16],
+                    ('%s %s' % (
+                        partner.street or '', 
+                        partner.street2 or ''))[:40],
+                    (partner.zip or '')[:5],
+                    (partner.city or '')[:40],
+                    (partner.state_id.code or '')[:4],
+                    (partner.country_id.name or '')[:40],                        
+                    (cei or '')[:1],
+                    (partner.website or '')[:40],
+                    (partner.phone or '')[:40],
+                    (partner.mobile or '')[:40],
+                    (partner.fax or '')[:40],
+                    (partner.email or '')[:40],
+                    (partner.discount_rates or '')[:40],
+                    (parent_code or '')[:12],
+                    (esention or '')[:5],
+                    'S' if partner.is_private else 'N',
+                    (partner.private_name or '')[:40],
+                    (partner.private_surname or '')[:40],                        
+                    ))
+
         _logger.info('Data: %s' % (parameter, ))
         res =  self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'partner', parameter=parameter, context=context)
-        import pdb; pdb.set_trace()                
         result_string_file = res.get('result_string_file', False)
         if result_string_file:
             if result_string_file.startswith('OK'):
