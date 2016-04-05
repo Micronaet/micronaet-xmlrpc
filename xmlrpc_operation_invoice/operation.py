@@ -184,7 +184,6 @@ class AccountInvoice(orm.Model):
         result_string_file = res.get('result_string_file', False)
         if result_string_file:
             if result_string_file.startswith('OK'):
-                import pdb; pdb.set_trace()
                 # TODO test if number passed if for correct invoice number!
                 self.write(cr, uid, ids, {
                     'xmlrpc_sync': True,
