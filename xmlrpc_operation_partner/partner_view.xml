@@ -1,7 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
-    <data>    
+    <data>
         <!--Customer res.partner-->
+        <!-- Short view for partner -->
+        <record model="ir.ui.view" id="view_insert_res_partner_form">
+            <field name="name">res.partner.insert.form</field>
+            <field name="model">res.partner</field>
+            <field name="priority" eval="40" />
+            <field name="arch" type="xml">
+                <form string="Syncro partner" version="7.0">        
+                    <header>
+                        <button name="xmlrpc_export_partner" string="Sync Customer" type="object" icon="gtk-refresh" context="{'sync_type':'customer'}"/><!-- attrs="{'invisible':['|','|','|',('xmlrpc_sync','=',True),('sql_customer_code','!=',False),('sql_supplier_code','!=',False),('sql_destination_code','!=',False)]}"-->
+                        <button name="xmlrpc_export_partner" string="Sync Supplier" type="object" icon="gtk-refresh" context="{'sync_type':'supplier'}"/><!-- attrs="{'invisible':['|','|','|',('xmlrpc_sync','=',True),('sql_customer_code','!=',False),('sql_supplier_code','!=',False),('sql_destination_code','!=',False)]}"-->
+                        <field name="xmlrpc_sync" invisible="1"/>
+                    </header>    
+                    <sheet>
+                        <group col="4" colspan="4">
+                            <field name="name" />
+                            <field name="vat" />
+                            
+                            
+                        </group>
+                    </sheet>        
+                </form>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="action_insert_res_partner">
+            <field name="name">Syncro partner</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_insert_res_partner_form"/>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+        </record>
+        <menuitem 
+            parent="base.menu_partner_form" 
+            id="menu_insert_res_partner" 
+            action="action_insert_res_partner"
+            string="Syncro partner"
+            />
+        
+        
         <record model="ir.ui.view" id="view_res_partner_sync_export_form">
             <field name="name">res.partner.form</field>
             <field name="model">res.partner</field>
