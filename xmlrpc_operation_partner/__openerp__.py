@@ -32,6 +32,7 @@
         'xmlrpc_base',
         'sql_partner', # for fields to update
         'l10n_it_private', # private info
+        'mx_partner_zone', # zone
         ],
     'init_xml': [],
     'demo': [],

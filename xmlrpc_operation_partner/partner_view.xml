@@ -10,16 +10,42 @@
             <field name="arch" type="xml">
                 <form string="Syncro partner" version="7.0">        
                     <header>
-                        <button name="xmlrpc_export_partner" string="Sync Customer" type="object" icon="gtk-refresh" context="{'sync_type':'customer'}"/><!-- attrs="{'invisible':['|','|','|',('xmlrpc_sync','=',True),('sql_customer_code','!=',False),('sql_supplier_code','!=',False),('sql_destination_code','!=',False)]}"-->
-                        <button name="xmlrpc_export_partner" string="Sync Supplier" type="object" icon="gtk-refresh" context="{'sync_type':'supplier'}"/><!-- attrs="{'invisible':['|','|','|',('xmlrpc_sync','=',True),('sql_customer_code','!=',False),('sql_supplier_code','!=',False),('sql_destination_code','!=',False)]}"-->
+                        <button name="xmlrpc_export_partner" string="Sync Customer" type="object" icon="gtk-refresh" context="{'sync_type':'customer'}"/>
+                        <button name="xmlrpc_export_partner" string="Sync Supplier" type="object" icon="gtk-refresh" context="{'sync_type':'supplier'}"/>
                         <field name="xmlrpc_sync" invisible="1"/>
                     </header>    
                     <sheet>
                         <group col="4" colspan="4">
                             <field name="name" />
                             <field name="vat" />
-                            
-                            
+                            <field name="street" />
+                            <field name="street2" />
+                            <field name="zip" />
+                            <field name="city" />
+                            <field name="state_id" />
+                            <field name="country_id" />
+                            <field name="zone_id" />
+                            <field name="website" />
+                            <field name="phone" />
+                            <field name="mobile" />
+                            <field name="fax" />
+                            <field name="email" />
+                            <field name="lang" />
+                            <field name="statistic_category_id" />
+                            <field name="discount_rates" />
+                            <field name="property_account_position" />
+                            <field name="property_payment_term" />
+                            <field name="property_product_pricelist" />
+                            <field name="sql_customer_code" />
+                            <field name="sql_supplier_code" />
+                            <field name="sql_destination_code" />
+                            <field name="is_agent" />
+                            <field name="agent_id" />
+                            <field name="sql_agent_code" />
+                            <field name="is_private" />
+                            <field name="private_name" />
+                            <field name="private_surname" />
+                            <field name="fiscalcode" />
                         </group>
                     </sheet>        
                 </form>
@@ -66,7 +92,7 @@
                 <form string="String" version="7.0">        
                     <sheet>
                         <group col="4" colspan="4">
-                            <field name="name" />                            
+                            <field name="name" />
                         </group>
                     </sheet>        
                 </form>                
