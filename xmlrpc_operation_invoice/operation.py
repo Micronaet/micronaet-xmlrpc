@@ -86,6 +86,7 @@ class AccountInvoice(orm.Model):
         ''' Remove sync status
         '''
         assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
+        _logger.warning('Reset sync invoice: %s' % ids[0])
         return self.write(cr, uid, ids, {
             'xmlrpc_sync': False}, context=context)
 
