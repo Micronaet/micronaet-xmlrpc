@@ -82,6 +82,13 @@ class AccountInvoice(orm.Model):
         '''
         return True
         
+    def reset_xmlrpc_export_invoice(self, cr, uid, ids, context=None):
+        ''' Remove sync status
+        '''
+        assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
+        return self.write(cr, uid, ids, {
+            'xmlrpc_sync': False}, context=context)
+
     def xmlrpc_export_invoice(self, cr, uid, ids, context=None):
         ''' Export current invoice 
             # TODO manage list of invoices?
@@ -178,7 +185,7 @@ class AccountInvoice(orm.Model):
                             # TODO bank
                             ))
 
-        res =  self.pool.get('xmlrpc.operation').execute_operation(
+        res = self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'invoice', parameter=parameter, context=context)
             
         result_string_file = res.get('result_string_file', False)
