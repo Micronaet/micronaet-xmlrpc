@@ -248,8 +248,8 @@ class ResPartner(orm.Model):
                     (partner.private_surname or '')[:40],                        
                     agent_code,
                     payment_id,
-                    zone_name, 
-                    statistic_category,
+                    zone_name[:12], 
+                    statistic_category[:12],
                     ))
 
         _logger.info('Data: %s' % (parameter, ))
