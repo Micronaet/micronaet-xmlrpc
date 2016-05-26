@@ -250,6 +250,7 @@ class ResPartner(orm.Model):
                     payment_id,
                     zone_name[:12], 
                     statistic_category[:12],
+                    # TODO partner code for update
                     ))
 
         _logger.info('Data: %s' % (parameter, ))
