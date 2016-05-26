@@ -107,7 +107,7 @@ class ResPartner(orm.Model):
         parameter = {}
         
         # Generate string for export file:
-        mask = '%1s%1s%1s%-60s%-15s%-16s%-40s%-5s%-40s%-4s%-40s%1s%-40s%-40s%-40s%-40s%-40s%-40s%-12s%-5s%1s%-40s%-40s\n' # Win CR
+        mask = '%1s%1s%1s%-60s%-15s%-16s%-40s%-5s%-40s%-4s%-40s%1s%-40s%-40s%-40s%-40s%-40s%-40s%-12s%-5s%1s%-40s%-40s%-8s%-3s%-24s%-24s\n' # Win CR
         parameter['input_file_string'] = ''
         
         partner = self.browse(cr, uid, ids, context=context)
@@ -186,6 +186,35 @@ class ResPartner(orm.Model):
             esention = partner.property_account_position.esention_ref or ''
             cei = partner.property_account_position.cei_ref or ''
         
+        # Agent part:
+        try:
+            agent_code = partner.agent_id.sql_agent_code or \
+                partner.agent_id.sql_supplier_code or '' 
+        except:
+            agent_code = ''
+
+        # Payment part:
+        try:
+            if customer:
+                payment_id = partner.property_payment_term.import_id or ''
+            else:    
+                payment_id = \
+                    partner.property_supplier_payment_term.import_id or ''
+        except:
+            payment_id = ''
+
+        # Zone:
+        try:
+            zone_name = partner.zone_id.name or '' 
+        except:
+            zone_name = ''
+
+        # Statistic category:
+        try:
+            statistic_category = partner.statistic_category.name or '' 
+        except:
+            statistic_category = ''
+            
         # ------------------
         # Create parameters:
         # ------------------
@@ -217,6 +246,10 @@ class ResPartner(orm.Model):
                     'S' if partner.is_private else 'N',
                     (partner.private_name or '')[:40],
                     (partner.private_surname or '')[:40],                        
+                    agent_code,
+                    payment_id,
+                    zone_name, 
+                    statistic_category,
                     ))
 
         _logger.info('Data: %s' % (parameter, ))
