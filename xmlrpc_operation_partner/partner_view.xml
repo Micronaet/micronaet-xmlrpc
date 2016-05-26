@@ -32,6 +32,7 @@
                             <field name="email" />
                             <field name="lang" />
                             <field name="statistic_category_id" />
+                            <field name="zone_id" />
                             <field name="discount_rates" />
                             <field name="property_account_position" />
                             <field name="property_payment_term" />
@@ -65,8 +66,7 @@
             id="menu_insert_res_partner" 
             action="action_insert_res_partner"
             string="Syncro partner"
-            />
-        
+            />        
         
         <record model="ir.ui.view" id="view_res_partner_sync_export_form">
             <field name="name">res.partner.form</field>
