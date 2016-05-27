@@ -47,6 +47,8 @@
                             <field name="private_name" />
                             <field name="private_surname" />
                             <field name="fiscalcode" />
+                            <field name="is_company" />
+                            <field name="is_address" />
                         </group>
                     </sheet>        
                 </form>
