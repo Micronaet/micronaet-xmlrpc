@@ -109,7 +109,7 @@ class AccountInvoice(orm.Model):
         # Generate string for export file:
         mask = '%s%s%s%s' % ( #3 block for readability:
             '%-2s%-2s%-6s%-8s%-2s%-8s%-8s', #header
-            '%-1s%-16s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s', #row
+            '%-1s%-16s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s%1s', #row
             '%-3s', #foot
             '\r\n', # Win CR
             )
@@ -122,6 +122,10 @@ class AccountInvoice(orm.Model):
                     _('Invoice must be validated!'))
                 
             for line in invoice.invoice_line:
+                try: # Module: invoice_payment_cost (not in dep.)
+                    refund_line = 'S' if line.refund_line else ' '
+                except:
+                    refund_line = ' '    
                 parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
                         mask % (                        
@@ -176,6 +180,8 @@ class AccountInvoice(orm.Model):
                             line.discount or '',
                             # Account (8)
                             line.account_id.account_ref or '', 
+                            # Refund (1)
+                            refund_line,
 
                             # -------------------------------------------------
                             #                     Foot:
