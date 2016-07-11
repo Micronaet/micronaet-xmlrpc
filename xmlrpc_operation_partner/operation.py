@@ -107,7 +107,9 @@ class ResPartner(orm.Model):
         parameter = {}
         
         # Generate string for export file:
-        mask = '%1s%1s%1s%-60s%-15s%-16s%-40s%-5s%-40s%-4s%-40s%1s%-40s%-40s%-40s%-40s%-40s%-40s%-12s%-5s%1s%-40s%-40s%-8s%-3s%-24s%-24s%-2s%-2s%-2s%-3s%-2s%-3s        \n' # Win CR
+        mask = '%1s%1s%1s%-60s%-15s%-16s%-40s%-5s%-40s%-4s%-40s%1s%-40s%' + \
+            '-40s%-40s%-40s%-40s%-40s%-12s%-5s%1s%-40s%-40s%-8s%-3s%-24s' + \
+            '%-24s%-2s%-2s%-2s%-3s%-2s%-3s        \n' # Win CR
         parameter['input_file_string'] = ''
         
         partner = self.browse(cr, uid, ids, context=context)
