@@ -107,7 +107,7 @@ class ResPartner(orm.Model):
         parameter = {}
         
         # Generate string for export file:
-        mask = '%1s%1s%1s%-60s%-15s%-16s%-40s%-5s%-40s%-4s%-40s%1s%-40s%-40s%-40s%-40s%-40s%-40s%-12s%-5s%1s%-40s%-40s%-8s%-3s%-24s%-24s        \n' # Win CR
+        mask = '%1s%1s%1s%-60s%-15s%-16s%-40s%-5s%-40s%-4s%-40s%1s%-40s%-40s%-40s%-40s%-40s%-40s%-12s%-5s%1s%-40s%-40s%-8s%-3s%-24s%-24s%-2s%-2s%-2s%-3s%-2s%-3s        \n' # Win CR
         parameter['input_file_string'] = ''
         
         partner = self.browse(cr, uid, ids, context=context)
@@ -215,15 +215,35 @@ class ResPartner(orm.Model):
         except:
             statistic_category = ''
             
+        # Extra payment days:
+        try:
+            pay_days_fix_delivery = partner.pay_days_fix_delivery or ''
+            pay_days_fix_delivery_extra = \
+                partner.pay_days_fix_delivery_extra or ''
+            pay_days_m1 = partner.pay_days_m1 or ''
+            pay_days_m1_days = partner.pay_days_m1_days or ''
+            pay_days_m2 = partner.pay_days_m2 or ''
+            pay_days_m2_days = partner.pay_days_m2_days or ''
+        except:
+            pay_days_fix_delivery = ''
+            pay_days_fix_delivery_extra = ''
+            pay_days_m1 = ''
+            pay_days_m1_days = ''
+            pay_days_m2 = ''
+            pay_days_m2_days = ''
+           
         # ------------------
         # Create parameters:
         # ------------------
         parameter['input_file_string'] += self.pool.get(
             'xmlrpc.server').clean_as_ascii(
-                mask % (                        
+                mask % (                   
+                    # Check data:     
                     'X' if customer_x else '',
                     'X' if supplier_x else '',
                     'X' if destination_x else '',
+                    
+                    # Anagraphic data:
                     partner.name[:60],
                     (partner.vat or '')[:15],
                     (partner.fiscalcode or '')[:16],
@@ -240,16 +260,27 @@ class ResPartner(orm.Model):
                     (partner.mobile or '')[:40],
                     (partner.fax or '')[:40],
                     (partner.email or '')[:40],
+                    
                     (partner.discount_rates or '')[:40],
                     (parent_code or '')[:12],
                     (esention or '')[:5],
                     'S' if partner.is_private else 'N',
                     (partner.private_name or '')[:40],
                     (partner.private_surname or '')[:40],                        
+                    
                     agent_code,
                     payment_id,
                     zone_name[:12], 
                     statistic_category[:12],
+                    
+                    # Payment extra data:
+                    pay_days_fix_delivery,
+                    pay_days_fix_delivery_extra,
+                    pay_days_m1,
+                    pay_days_m1_days,
+                    pay_days_m2,
+                    pay_days_m2_days,
+                                        
                     # TODO partner code for update
                     ))
 
