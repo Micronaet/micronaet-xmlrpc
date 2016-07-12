@@ -114,7 +114,7 @@ class ResPartner(orm.Model):
         mask = '%1s%1s%1s%-60s%-15s%-16s%-40s%-5s%-40s%-4s%-40s%1s%-40s%' + \
             '-40s%-40s%-40s%-40s%-40s%-12s%-5s%1s%-40s%-40s%-8s%-3s%-24s' + \
             '%-24s%-2s%-2s%-2s%-3s%-2s%-3s' + \
-            '%272s' + \ # Bank mask x 4
+            '%272s' + \
             '%-8s\n' # Win CR
         
         parameter['input_file_string'] = ''
@@ -259,6 +259,7 @@ class ResPartner(orm.Model):
                 _('Sync error:'), 
                 _('Bank must be <= %s in partner!!!') % bank_limit,
                 )
+                
         tot_bank = 0
         bank_block = ''
         for bank in partner.bank_ids:
@@ -275,7 +276,7 @@ class ResPartner(orm.Model):
                 )
         remain_block = bank_limit - tot_bank
         bank_block += ' ' * 68        
-               
+
         # ------------------
         # Create parameters:
         # ------------------

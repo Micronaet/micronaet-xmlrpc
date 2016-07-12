@@ -33,6 +33,7 @@
         'sql_partner', # for fields to update
         'l10n_it_private', # private info
         'mx_partner_zone', # zone
+        # 'l10n_it_iban_cin'
         ],
     'init_xml': [],
     'demo': [],
