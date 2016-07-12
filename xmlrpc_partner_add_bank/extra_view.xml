@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_res_partner_extra_banks_field_form">
+            <field name="name">res.partner.extra.deadline.field.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="xmlrpc_operation_partner.view_insert_res_partner_form"/>
+            <field name="arch" type="xml">
+                <field name="zone_id"  position="after">
+                    <newline/>
+                    <separator string="Bank (max: 4):" colspan="4"/>
+                    <field name="bank_ids" context="{'default_state':'bank'}">
+                        <tree string="Bank" editable="bottom">
+                            <field name="state" invisible="1"/>
+                            <field name="bank_name" />
+                            <field name="bank_name" />
+                            <field name="nation_code" />
+                            <field name="cin_code" />
+                            <field name="cin_letter" />
+                            <field name="bank_abi" />
+                            <field name="bank_cab" />
+                            <field name="acc_number" />
+                            <field name="bank_bic" />
+                        </tree>
+                    </field>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>
+
