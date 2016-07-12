@@ -16,6 +16,9 @@
                     </header>    
                     <sheet>
                         <group col="4" colspan="4">
+                            <separator string="Anagrafic:" colspan="4"/>
+                            <field name="is_company" />
+                            <field name="is_address" />
                             <field name="name" />
                             <field name="vat" />
                             <field name="street" />
@@ -24,31 +27,35 @@
                             <field name="city" />
                             <field name="state_id" />
                             <field name="country_id" />
-                            <field name="zone_id" />
+                            <field name="lang" />
                             <field name="website" />
+                            
+                            <separator string="Rference:" colspan="4"/>
+                            <field name="sql_customer_code" />
+                            <field name="sql_supplier_code" />
+                            <field name="sql_destination_code" />
+                            <field name="sql_agent_code" />
+
+                            <separator string="Contact:" colspan="4"/>
                             <field name="phone" />
                             <field name="mobile" />
                             <field name="fax" />
                             <field name="email" />
-                            <field name="lang" />
+
                             <field name="statistic_category_id" />
                             <field name="zone_id" />
-                            <field name="discount_rates" />
-                            <field name="property_account_position" />
-                            <field name="property_payment_term" />
-                            <field name="property_product_pricelist" />
-                            <field name="sql_customer_code" />
-                            <field name="sql_supplier_code" />
-                            <field name="sql_destination_code" />
-                            <field name="is_agent" />
-                            <field name="agent_id" />
-                            <field name="sql_agent_code" />
+
+                            <separator string="Accounting:" colspan="4"/>
                             <field name="is_private" />
                             <field name="private_name" />
                             <field name="private_surname" />
                             <field name="fiscalcode" />
-                            <field name="is_company" />
-                            <field name="is_address" />
+                            <field name="discount_rates" />
+                            <field name="property_account_position" />
+                            <field name="property_payment_term" />
+                            <field name="property_product_pricelist" />
+                            <field name="is_agent" />
+                            <field name="agent_id" />
                         </group>
                     </sheet>        
                 </form>
