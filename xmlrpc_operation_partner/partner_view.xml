@@ -53,6 +53,7 @@
                             <field name="discount_rates" />
                             <field name="property_account_position" />
                             <field name="property_payment_term" />
+                            <field name="property_supplier_payment_term" />
                             <field name="property_product_pricelist" />
                             <field name="is_agent" />
                             <field name="agent_id" />

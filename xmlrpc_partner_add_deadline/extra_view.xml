@@ -6,7 +6,7 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="xmlrpc_operation_partner.view_insert_res_partner_form"/>
             <field name="arch" type="xml">
-                <field name="property_payment_term" position="after">
+                <field name="property_supplier_payment_term" position="after">
                     <newline/>
                     <!--<separator string="Payment days part." colspan="4"/>-->
                     <field name="pay_days_fix_delivery"/>
