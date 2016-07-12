@@ -95,7 +95,10 @@ class ResPartner(orm.Model):
             raise osv.except_osv(
                 _('XMLRPC sync error'), 
                 _('Error on button sync type (no customer or supplier)'))
-            
+
+        # PARAMETERS: # TODO put in module
+        bank_limit = 4 # max
+                    
         customer = context.get('sync_type', False) == 'customer'
         
         # Set X state:
@@ -107,15 +110,19 @@ class ResPartner(orm.Model):
         parameter = {}
         
         # Generate string for export file:
+        bank_mask = '%-30s%-2s%-2s%-1s%-5s%-5s%-12s%-11s' # 68 x block 272
         mask = '%1s%1s%1s%-60s%-15s%-16s%-40s%-5s%-40s%-4s%-40s%1s%-40s%' + \
             '-40s%-40s%-40s%-40s%-40s%-12s%-5s%1s%-40s%-40s%-8s%-3s%-24s' + \
-            '%-24s%-2s%-2s%-2s%-3s%-2s%-3s        \n' # Win CR
+            '%-24s%-2s%-2s%-2s%-3s%-2s%-3s' + \
+            '%272s' + \ # Bank mask x 4
+            '%-8s\n' # Win CR
+        
         parameter['input_file_string'] = ''
         
         partner = self.browse(cr, uid, ids, context=context)
-        # --------------------------
-        # Check manatory parameters:
-        # --------------------------
+        # ---------------------------------------------------------------------
+        #                     Check manatory parameters:
+        # ---------------------------------------------------------------------
         # yet sync
         if partner.xmlrpc_sync:
             raise osv.except_osv(
@@ -188,14 +195,18 @@ class ResPartner(orm.Model):
             esention = partner.property_account_position.esention_ref or ''
             cei = partner.property_account_position.cei_ref or ''
         
+        # ---------------------------------------------------------------------
         # Agent part:
+        # ---------------------------------------------------------------------
         try:
             agent_code = partner.agent_id.sql_agent_code or \
                 partner.agent_id.sql_supplier_code or '' 
         except:
             agent_code = ''
 
+        # ---------------------------------------------------------------------
         # Payment part:
+        # ---------------------------------------------------------------------
         try:
             if customer:
                 payment_id = partner.property_payment_term.import_id or ''
@@ -205,19 +216,25 @@ class ResPartner(orm.Model):
         except:
             payment_id = ''
 
+        # ---------------------------------------------------------------------
         # Zone:
+        # ---------------------------------------------------------------------
         try:
             zone_name = partner.zone_id.name or '' 
         except:
             zone_name = ''
 
+        # ---------------------------------------------------------------------
         # Statistic category:
+        # ---------------------------------------------------------------------
         try:
             statistic_category = partner.statistic_category.name or '' 
         except:
             statistic_category = ''
             
+        # ---------------------------------------------------------------------
         # Extra payment days:
+        # ---------------------------------------------------------------------
         try:
             pay_days_fix_delivery = partner.pay_days_fix_delivery or ''
             pay_days_fix_delivery_extra = \
@@ -234,6 +251,31 @@ class ResPartner(orm.Model):
             pay_days_m2 = ''
             pay_days_m2_days = ''
            
+        # ---------------------------------------------------------------------
+        # Bank block:
+        # ---------------------------------------------------------------------
+        if len(partner.bank_ids) > bank_limit:
+            raise osv.except_osv(
+                _('Sync error:'), 
+                _('Bank must be <= %s in partner!!!') % bank_limit,
+                )
+        tot_bank = 0
+        bank_block = ''
+        for bank in partner.bank_ids:
+            tot_bank += 1
+            bank_blocks += bank_mask % (
+                (bank.bank_name or '')[:30],
+                (bank.nation_code or '')[:2],
+                (bank.cin_code or '')[:2],
+                (bank.cin_letter or '')[:1],
+                (bank.bank_abi or '')[:5],
+                (bank.bank_cab or '')[:5],
+                (bank.acc_number or '')[:12], 
+                (bank.bank_bic or '')[:11],                
+                )
+        remain_block = bank_limit - tot_bank
+        bank_block += ' ' * 68        
+               
         # ------------------
         # Create parameters:
         # ------------------
@@ -282,8 +324,12 @@ class ResPartner(orm.Model):
                     pay_days_m1_days,
                     pay_days_m2,
                     pay_days_m2_days,
-                                        
+                    
+                    # Bank blocks:
+                    bank_block,                                        
+                    
                     # TODO partner code for update
+                    '        ', 
                     ))
 
         _logger.info('Data: %s' % (parameter, ))
