@@ -264,7 +264,7 @@ class ResPartner(orm.Model):
         bank_block = ''
         for bank in partner.bank_ids:
             tot_bank += 1
-            bank_blocks += bank_mask % (
+            bank_block += bank_mask % (
                 (bank.bank_name or '')[:30],
                 (bank.nation_code or '')[:2],
                 (bank.cin_code or '')[:2],
