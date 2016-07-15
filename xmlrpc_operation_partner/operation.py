@@ -275,7 +275,7 @@ class ResPartner(orm.Model):
                 (bank.bank_bic or '')[:11],                
                 )
         remain_block = bank_limit - tot_bank
-        bank_block += ' ' * 68        
+        bank_block += ' ' * (remain_block * 68)
 
         # ------------------
         # Create parameters:
