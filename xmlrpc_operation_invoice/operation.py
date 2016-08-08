@@ -125,7 +125,15 @@ class AccountInvoice(orm.Model):
                 try: # Module: invoice_payment_cost (not in dep.)
                     refund_line = 'S' if line.refund_line else ' '
                 except:
-                    refund_line = ' '    
+                    refund_line = ' '
+                    
+                if invoice.mx_agent_id: # Agent set up in document
+                    agent_code = invoice.mx_agent_id.sql_agent_code or \
+                        invoice.mx_agent_id.sql_supplier_code or ''
+                else: # use partner one's
+                    agent_code = invoice.partner_id.agent_id.sql_agent_code \
+                         or invoice.partner_id.agent_id.sql_supplier_code or ''
+                
                 parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
                         mask % (                        
@@ -149,8 +157,7 @@ class AccountInvoice(orm.Model):
                             # Customer code (8)
                             invoice.partner_id.sql_customer_code or '', 
                             # Agent code (8)
-                            invoice.mx_agent_id.sql_agent_code or \
-                                invoice.mx_agent_id.sql_supplier_code or '',
+                            agent_code,
 
                             # -------------------------------------------------
                             #                    Detail:
