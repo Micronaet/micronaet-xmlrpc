@@ -172,6 +172,9 @@ class ResPartner(orm.Model):
                     cr, uid, invoice_ids, context=context):                    
                 number = invoice.number # TODO parse!
 
+                untaxed = invoice.amount_untaxed or 0.0
+                tax = invoice.amount_tax or 0.0
+                total = invoice.amount_total or 0.0
                 if invoice.type == 'out_refund':
                     number = number.replace('FT', 'NC')
                     untaxed = -(untaxed)
@@ -179,18 +182,16 @@ class ResPartner(orm.Model):
                     total = -(total)
 
                 # From Account:
+                approx = 0.0             
                 if number in acc_invoice:
                     row = acc_invoice[number]
-                    approx = -(
-                        row[3]) if invoice.type == 'out_refund' else row[3]
+                    if row[3]:
+                        if invoice.type == 'out_refund':
+                            approx = -(row[3])
+                        else:
+                            approx = row[3]    
                 else:    
                     row = ()
-                    approx = 0.0
-
-                untaxed = invoice.amount_untaxed or 0.0
-                tax = invoice.amount_tax or 0.0
-                total = invoice.amount_total or 0.0
-                
 
                 partner_code = invoice.partner_id.sql_customer_code
                 pay_code = '%s' % (invoice.payment_term.import_id or '')
@@ -208,42 +209,32 @@ class ResPartner(orm.Model):
                 # Check elements:
                 # -------------------------------------------------------------                
                 status = ''
-                gravity = ''
                 if state not in ('open', 'paid'): # State check for confirmed
                     status = '(Status: %s)' % state
                 elif number not in acc_invoice: # Check presence:
                     status = '(No invoice)'
-                    gravity = 'GRAVE'
                 else:
-                    if approx and abs(total + approx - row[2]) > diff:
-                            # Difference on totals:
-                            status = '(Total)'                        
+                    if approx and abs(total - approx - row[2]) > diff:
+                        # XXX Difference on totals:
+                        status = '(Total approx)'
                         
                     elif abs(untaxed - row[0]) > diff or \
                             abs(tax - row[1]) > diff \
                             or abs(total - row[2]) > diff:
                         # Difference on totals:
                         status = '(Total)'
-                        gravity = 'NORMALE'
-                        #_logger.warning((
-                        #    'Untax', untaxed, row[0], 
-                        #    'Tax', tax, row[1],
-                        #    'Total', total, row[2]))
                         
                     if pay_code != row[4]: # Agent test
                         status += '(Payment)'
-                        gravity = 'GRAVE'
                         
                     if agent_code != row[5]: # Agent test
                         status += '(Agent)'
-                        gravity = 'NORMALE'
 
                 if row:
                     f_out.write(
-                        '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;\n' % (
+                        '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;\n' % (
                             number,
                             status,
-                            gravity,
                             
                             untaxed, # ODOO
                             row[0], # Accounting
