@@ -94,16 +94,22 @@ class ResPartner(orm.Model):
         parameter = {}
         parameter['input_file_string'] = ''
 
-        res =  self.pool.get('xmlrpc.operation').execute_operation(
-            cr, uid, 'checkinvoice', parameter=parameter, context=context)
+        # TODO remove after debug:
+        result_string_file
+        for row in open('/home/thebrush/Scrivania/fattureGPB.csv'):
+            result_string_file += row
             
-        result_string_file = res.get('result_string_file', False)
+        #res = self.pool.get('xmlrpc.operation').execute_operation(
+        #    cr, uid, 'checkinvoice', parameter=parameter, context=context)            
+        #result_string_file = res.get('result_string_file', False)
+        
+        
+        import pdb; pdb.set_trace()
         if result_string_file:
             # -----------------------------------------------------------------
             # Read invoice data from file:
             # -----------------------------------------------------------------
             acc_invoice = {}
-            import pdb; pdb.set_trace()
             year = '2016' # TODO change
             for line in result_string_file.split('\n'):
                 if not line.strip():
