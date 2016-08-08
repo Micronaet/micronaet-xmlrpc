@@ -119,7 +119,7 @@ class ResPartner(orm.Model):
             for line in result_string_file.split('\n'):            
                 if not line.strip():
                     continue # jump empty line
-                
+
                 # -------------------------------------------------------------
                 # Parser the line:
                 # -------------------------------------------------------------
@@ -132,7 +132,7 @@ class ResPartner(orm.Model):
                 partner_code = line[3].strip()
                 amount = get_float(line[4])
                 vat = get_float(line[5])
-                bank_expense = get_float(line[6])
+                bank_expence = get_float(line[6])
                 total = get_float(line[7])
                 approx = get_float(line[8])
                 pay_code = line[9].strip()
@@ -143,7 +143,7 @@ class ResPartner(orm.Model):
                     vat, # 1
                     total, # 2 
                     approx, # 3 
-                    bank_expense, # 4
+                    bank_expence, # 4
                     pay_code, # 5
                     agent_code, # 6
                     )
@@ -169,41 +169,55 @@ class ResPartner(orm.Model):
                 untaxed = invoice.amount_untaxed or 0.0
                 tax = invoice.amount_tax or 0.0
                 total = invoice.amount_total or 0.0
+                
+                if invoice.type == 'out_refund':
+                    number = number.replace('FT', 'NC')
+                    untaxed = -(untaxed)
+                    tax = -(tax)
+                    total = -(total)
+
                 partner_code = invoice.partner_id.sql_customer_code
                 pay_code = '%s' % (invoice.payment_term.import_id or '')
+                # TODO 2 test need to be eliminated and put in nc agent
                 agent_code = (
                     invoice.mx_agent_id.sql_agent_code or \
                     invoice.mx_agent_id.sql_supplier_code or \
-                    #invoice.partner_id.sql_agent_code or \
-                    #invoice.partner_id.sql_customer_code or \
+                    invoice.partner_id.sql_agent_code or \
+                    invoice.partner_id.sql_customer_code or \
                     ''
-                    )
-                state = invoice.state                
+                    )                    
+                state = invoice.state
                 
                 # -------------------------------------------------------------
                 # Check elements:
                 # -------------------------------------------------------------
                 row = acc_invoice.get(number, ())
                 
+                status = ''
                 if state not in ('open', 'paid'): # State check for confirmed
-                    status = 'Status'
-
-                if number not in acc_invoice: # Check presence:
-                    status = 'No invoice'
-
-                elif abs(untaxed - row[0]) > diff or abs(tax - row[1]) > diff \
-                        or abs(total - row[2]) > diff:
-                    # Difference on totals:
-                    status = 'Total'
-                    
-                elif pay_code != row[5]: # Agent test
-                    status = 'Payment'    
-
-                elif agent_code != row[6]: # Agent test
-                    status = 'Agent'
-                
-                else:
-                    status = ''    
+                    status = '(Status: %s)' % state
+                elif number not in acc_invoice: # Check presence:
+                    status = '(No invoice)'
+                else:    
+                    # Data used:
+                    approx = row[3]
+                    bank_expence = row[4]
+                    if bank_expence:  
+                        if abs(total - row[2]) > diff:
+                            # check only total no net and vat
+                            status += 'Total + bank'
+                        # TODO check with vat and net?
+                            
+                    elif abs(untaxed - row[0]) > diff or \
+                            abs(tax - row[1]) > diff \
+                            or abs(total - row[2]) > diff:
+                        # Difference on totals:
+                        status = '(Total)'
+                        
+                    if pay_code != row[5]: # Agent test
+                        status += '(Payment)'
+                    if agent_code != row[6]: # Agent test
+                        status += '(Agent)'
                 
                 if row:
                     f_out.write(
@@ -220,8 +234,8 @@ class ResPartner(orm.Model):
                             total, # ODOO
                             row[2], # Accounting
                             
-                            row[3], # Approx only account
-                            row[4], # Bank expence
+                            approx, # Approx only account
+                            bank_expence, # Bank expence
                            
                             pay_code, # ODOO
                             row[5], # Pay
