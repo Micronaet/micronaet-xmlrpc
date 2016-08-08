@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <!--Customer res.partner-->
+        <!-- Short view for partner -->
+        <record model="ir.ui.view" id="view_insert_product_product_form">
+            <field name="name">product.product.insert.form</field>
+            <field name="model">product.product</field>
+            <field name="priority" eval="40" />
+            <field name="arch" type="xml">
+                <form string="Syncro product" version="7.0">        
+                    <header>
+                        <button name="xmlrpc_export_product" string="Sync Product" type="object" icon="gtk-refresh"/>
+                        <field name="xmlrpc_sync" invisible="1"/>
+                    </header>    
+                    <sheet>
+                        <group col="4" colspan="4">
+                            <separator string="Personal data:" colspan="4"/>
+                            <field name="name" />
+                            <!--TODO-->
+                        </group>
+                    </sheet>        
+                </form>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="action_insert_product_product">
+            <field name="name">Syncro partner</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="view_insert_product_product_form"/>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+        </record>
+        <!--TODO-->
+        <menuitem
+            parent="base.menu_partner_form" 
+            id="menu_insert_product_product" 
+            action="action_insert_product_product"
+            string="Syncro product"
+            />        
+        
+        <!--inherit-->
+        <!--<record model="ir.ui.view" id="view_product_product_sync_export_form">
+            <field name="name">res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet" position="before">
+                    <header>
+                        <button name="xmlrpc_export_product" string="Sync Product" type="object" icon="gtk-refresh"/>
+                        <field name="xmlrpc_sync" invisible="1"/>
+                    </header>    
+                </xpath>
+            </field>
+        </record>-->
+    </data>
+</openerp>
