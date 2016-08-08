@@ -99,15 +99,17 @@ class ResPartner(orm.Model):
         invoice_pool = self.pool.get('account.invoice')
         parameter = {}
         parameter['input_file_string'] = ''
-        f_out = open('/home/thebrush/Scrivania/fatture_check.csv', 'w')
+        filepath = '/home/administrator/photo/xls/check' # TODO parametrize
+        f_out = open(
+            os.path.join(filepath, 'fatture_check.csv'), 'w')
 
         result_string_file = ''
         # TODO remove after debug:
-        for row in open('/home/thebrush/Scrivania/fattureGPB.csv'):
-            result_string_file += row            
-        #res = self.pool.get('xmlrpc.operation').execute_operation(
-        #    cr, uid, 'checkinvoice', parameter=parameter, context=context)            
-        #result_string_file = res.get('result_string_file', False)
+        #for row in open('/home/thebrush/Scrivania/fattureGPB.csv'):
+        #    result_string_file += row            
+        res = self.pool.get('xmlrpc.operation').execute_operation(
+            cr, uid, 'checkinvoice', parameter=parameter, context=context)            
+        result_string_file = res.get('result_string_file', False)
                 
         if result_string_file:
             # -----------------------------------------------------------------
@@ -132,20 +134,19 @@ class ResPartner(orm.Model):
                 partner_code = line[3].strip()
                 amount = get_float(line[4])
                 vat = get_float(line[5])
-                bank_expence = get_float(line[6])
-                total = get_float(line[7])
-                approx = get_float(line[8])
-                pay_code = line[9].strip()
-                agent_code = line[10].strip()
+                #bank_expence = get_float(line[6])
+                total = get_float(line[6])
+                approx = get_float(line[7])
+                pay_code = line[8].strip()
+                agent_code = line[9].strip()
                 
                 acc_invoice[invoice] = (
                     amount, # 0
                     vat, # 1
                     total, # 2 
                     approx, # 3 
-                    bank_expence, # 4
-                    pay_code, # 5
-                    agent_code, # 6
+                    pay_code, # 4
+                    agent_code, # 5
                     )
 
             # --------------------------
@@ -161,8 +162,8 @@ class ResPartner(orm.Model):
             f_out.write(
                 'Number;Status;Imp. (ODOO);Imp. (Mx);Tax (ODOO);Tax (Mx);' + \
                 'Total (ODOO);Total (Mx);Approx (Mx);' + \
-                'Bank expence (Mx);Pay (ODOO);Pay(Mx);Agent (ODOO);' + \
-                'Agent(Mx)')
+                'Pay (ODOO);Pay(Mx);Agent (ODOO);Agent(Mx)'
+                )
             for invoice in invoice_pool.browse(
                     cr, uid, invoice_ids, context=context):                    
                 number = invoice.number # TODO parse!
@@ -201,27 +202,21 @@ class ResPartner(orm.Model):
                 else:    
                     # Data used:
                     approx = row[3]
-                    bank_expence = row[4]
-                    if bank_expence:  
-                        if abs(total - row[2]) > diff:
-                            # check only total no net and vat
-                            status += 'Total + bank'
-                        # TODO check with vat and net?
-                            
-                    elif abs(untaxed - row[0]) > diff or \
+                    if abs(untaxed - row[0]) > diff or \
                             abs(tax - row[1]) > diff \
                             or abs(total - row[2]) > diff:
                         # Difference on totals:
                         status = '(Total)'
                         
-                    if pay_code != row[5]: # Agent test
+                    if pay_code != row[4]: # Agent test
                         status += '(Payment)'
-                    if agent_code != row[6]: # Agent test
+                        
+                    if agent_code != row[5]: # Agent test
                         status += '(Agent)'
-                
+
                 if row:
                     f_out.write(
-                        '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;\n' % (
+                        '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;\n' % (
                             number,
                             status,
                             
@@ -235,8 +230,7 @@ class ResPartner(orm.Model):
                             row[2], # Accounting
                             
                             approx, # Approx only account
-                            bank_expence, # Bank expence
-                           
+
                             pay_code, # ODOO
                             row[5], # Pay
                             
