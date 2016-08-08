@@ -103,7 +103,7 @@ class ResPartner(orm.Model):
             # Read invoice data from file:
             # -----------------------------------------------------------------
             acc_invoice = {}
-            import pdb; pdb.set_trace()            
+            import pdb; pdb.set_trace()
             year = '2016' # TODO change
             for line in result_string_file.split('\n'):
                 if not line.strip():
@@ -118,12 +118,18 @@ class ResPartner(orm.Model):
                 number = line[2].strip()                
                 invoice = '%s/%s/%s/%04d' % (doc, series, year, number)
 
-                partner_code = float(line[3].strip())                
+                partner_code = line[3].strip()
                 amount = float(line[4].strip().replace(',', '.') or '0')
                 vat = float(line[5].strip().replace(',', '.') or '0')
                 total = float(line[6].strip().replace(',', '.') or '0')
                 approx = float(line[7].strip() or '0')
-                acc_invoice[invoice] = (amount, vat, total, approx)
+                pay_code = line[8].strip()
+                agent_code = line[9].strip()
+                
+                acc_invoice[invoice] = (
+                    amount, vat, total, approx, 
+                    #pay_code, agent_code,
+                    )
 
             # --------------------------
             # Compare with invoice ODOO:
