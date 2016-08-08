@@ -87,6 +87,12 @@ class ResPartner(orm.Model):
         ''' Export current invoice 
             # TODO manage list of invoices?
         '''
+        # Utility:
+        def get_float(value):
+            ''' Get value from file
+            '''
+            return float(value.strip().replace(',', '.') or '0')
+        
         assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
 
         # Pool used:
@@ -95,23 +101,20 @@ class ResPartner(orm.Model):
         parameter['input_file_string'] = ''
 
         # TODO remove after debug:
-        result_string_file
+        result_string_file = ''
         for row in open('/home/thebrush/Scrivania/fattureGPB.csv'):
-            result_string_file += row
-            
+            result_string_file += row            
         #res = self.pool.get('xmlrpc.operation').execute_operation(
         #    cr, uid, 'checkinvoice', parameter=parameter, context=context)            
         #result_string_file = res.get('result_string_file', False)
-        
-        
-        import pdb; pdb.set_trace()
+                
         if result_string_file:
             # -----------------------------------------------------------------
             # Read invoice data from file:
             # -----------------------------------------------------------------
             acc_invoice = {}
             year = '2016' # TODO change
-            for line in result_string_file.split('\n'):
+            for line in result_string_file.split('\n'):            
                 if not line.strip():
                     continue # jump empty line
                 
@@ -119,22 +122,28 @@ class ResPartner(orm.Model):
                 # Parser the line:
                 # -------------------------------------------------------------
                 line = line.split(';')
+                
                 doc = line[0].strip()
                 series = line[1].strip()
-                number = line[2].strip()                
+                number = int(line[2].strip())
                 invoice = '%s/%s/%s/%04d' % (doc, series, year, number)
-
                 partner_code = line[3].strip()
-                amount = float(line[4].strip().replace(',', '.') or '0')
-                vat = float(line[5].strip().replace(',', '.') or '0')
-                total = float(line[6].strip().replace(',', '.') or '0')
-                approx = float(line[7].strip() or '0')
-                pay_code = line[8].strip()
-                agent_code = line[9].strip()
+                amount = get_float(line[4])
+                vat = get_float(line[5])
+                bank_expense = get_float(line[6])
+                total = get_float(line[7])
+                approx = get_float(line[8])
+                pay_code = line[9].strip()
+                agent_code = line[10].strip()
                 
                 acc_invoice[invoice] = (
-                    amount, vat, total, approx, 
-                    #pay_code, agent_code,
+                    amount, # 0
+                    vat, # 1
+                    total, # 2 
+                    approx, # 3 
+                    bank_expense, # 4
+                    pay_code, # 5
+                    agent_code, # 6
                     )
 
             # --------------------------
@@ -143,32 +152,77 @@ class ResPartner(orm.Model):
             # Control list:
             error = []
             
-            invoice_ids = invoice_pool.search(cr, uid, [], context=context)
+            invoice_ids = invoice_pool.search(cr, uid, [
+                #('state', 'in', ('open', 'paid'))
+                ], context=context)
             for invoice in invoice_pool.browse(
-                    cr, uid, invoice_ids, context=context):
-                name = invoice.name # TODO parse!
-                untaxed = invoice.amount_untaxed
-                tax = invoice.amount_tax
-                if name not in acc_invoice:
-                    error += '%s not present in account\n' % name
-                    continue
-                if untaxed != acc_invoice[name][0] or \
-                        tax != acc_invoice[name][0]:
-                    error += '%s. difference: [%s - %s] [%s - %s]\n' % (
-                        name,
-                        'TODO', # TODO
-                        'TODO', # TODO
-                        'TODO', # TODO
-                        'TODO', # TODO
-                        )
+                    cr, uid, invoice_ids, context=context):                    
+                number = invoice.number # TODO parse!
+                untaxed = invoice.amount_untaxed or 0.0
+                tax = invoice.amount_tax or 0.0
+                total = invoice.amount_total or 0.0
+                partner_code = invoice.partner_id.sql_customer_code
+                pay_code = invoice.payment_term.account_ref or ''
+                agent_code = (
+                    invoice.mx_agent_id.sql_agent_code or \
+                    invoice.mx_agent_id.sql_supplier_code #or \
+                    #invoice.partner_id.sql_agent_code or \
+                    #invoice.partner_id.sql_customer_code or \
+                    #''
+                    )
+                state = invoice.state                
+                
+                # -------------------------------------------------------------
+                # Check elements:
+                # -------------------------------------------------------------
+                row = acc_invoice.get(number, ())
+                
+                if state not in ('open', 'paid'): # State check for confirmed
+                    status = 'ODOO invoice not confirmed'
 
-                    invoice_different.append(name) # TODO better data!
+                if number not in acc_invoice: # Check presence:
+                    status = 'No invoice in account'
+
+                elif untaxed != row[0] or tax != row[1] or total != row[2]:
+                    # Difference on totals:
+                    status = 'Net or tax or total difference'
                     
-            # Compare with invoice in odoo
-            #if len(res) != 3:
-            #    raise osv.except_osv(
-            #        _('XMLRPC sync error'), 
-            #        _('Error reading result operation!'))
+                elif pay_code != row[5]: # Agent test
+                    status = 'Different payment code'    
+
+                elif agent_code != row[6]: # Agent test
+                    status = 'Different agent'                    
+                
+                if row:
+                    _logger.error(
+                        '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;' % (
+                            number,
+                            status,
+                            
+                            untaxed, # ODOO
+                            row[0], # Accounting
+                            
+                            tax, # ODOO
+                            row[1], # Accounting
+                            
+                            total, # ODOO
+                            row[2], # Accounting
+                            
+                            row[3], # Approx only account
+                            row[4], # Bank expence
+                           
+                            pay_code, # ODOO
+                            row[5], # Pay
+                            
+                            agent_code, # ODOO
+                            row[6], # Agent                            
+                            ))
+                            
+                else: # row not present:
+                    _logger.error('%s;%s;' % (
+                        number,
+                        status,
+                    ))
             return True
 
         else: # raise error passed:
