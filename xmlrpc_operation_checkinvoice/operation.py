@@ -99,9 +99,10 @@ class ResPartner(orm.Model):
         invoice_pool = self.pool.get('account.invoice')
         parameter = {}
         parameter['input_file_string'] = ''
+        f_out = open('/home/thebrush/Scrivania/fatture_check.csv', 'w')
 
-        # TODO remove after debug:
         result_string_file = ''
+        # TODO remove after debug:
         for row in open('/home/thebrush/Scrivania/fattureGPB.csv'):
             result_string_file += row            
         #res = self.pool.get('xmlrpc.operation').execute_operation(
@@ -113,6 +114,7 @@ class ResPartner(orm.Model):
             # Read invoice data from file:
             # -----------------------------------------------------------------
             acc_invoice = {}
+            diff = 0.00001 # min diff for consider equal
             year = '2016' # TODO change
             for line in result_string_file.split('\n'):            
                 if not line.strip():
@@ -155,6 +157,12 @@ class ResPartner(orm.Model):
             invoice_ids = invoice_pool.search(cr, uid, [
                 #('state', 'in', ('open', 'paid'))
                 ], context=context)
+            
+            f_out.write(
+                'Number;Status;Imp. (ODOO);Imp. (Mx);Tax (ODOO);Tax (Mx);' + \
+                'Total (ODOO);Total (Mx);Approx (Mx);' + \
+                'Bank expence (Mx);Pay (ODOO);Pay(Mx);Agent (ODOO);' + \
+                'Agent(Mx)')
             for invoice in invoice_pool.browse(
                     cr, uid, invoice_ids, context=context):                    
                 number = invoice.number # TODO parse!
@@ -162,13 +170,13 @@ class ResPartner(orm.Model):
                 tax = invoice.amount_tax or 0.0
                 total = invoice.amount_total or 0.0
                 partner_code = invoice.partner_id.sql_customer_code
-                pay_code = invoice.payment_term.account_ref or ''
+                pay_code = '%s' % (invoice.payment_term.import_id or '')
                 agent_code = (
                     invoice.mx_agent_id.sql_agent_code or \
-                    invoice.mx_agent_id.sql_supplier_code #or \
+                    invoice.mx_agent_id.sql_supplier_code or \
                     #invoice.partner_id.sql_agent_code or \
                     #invoice.partner_id.sql_customer_code or \
-                    #''
+                    ''
                     )
                 state = invoice.state                
                 
@@ -178,24 +186,28 @@ class ResPartner(orm.Model):
                 row = acc_invoice.get(number, ())
                 
                 if state not in ('open', 'paid'): # State check for confirmed
-                    status = 'ODOO invoice not confirmed'
+                    status = 'Status'
 
                 if number not in acc_invoice: # Check presence:
-                    status = 'No invoice in account'
+                    status = 'No invoice'
 
-                elif untaxed != row[0] or tax != row[1] or total != row[2]:
+                elif abs(untaxed - row[0]) > diff or abs(tax - row[1]) > diff \
+                        or abs(total - row[2]) > diff:
                     # Difference on totals:
-                    status = 'Net or tax or total difference'
+                    status = 'Total'
                     
                 elif pay_code != row[5]: # Agent test
-                    status = 'Different payment code'    
+                    status = 'Payment'    
 
                 elif agent_code != row[6]: # Agent test
-                    status = 'Different agent'                    
+                    status = 'Agent'
+                
+                else:
+                    status = ''    
                 
                 if row:
-                    _logger.error(
-                        '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;' % (
+                    f_out.write(
+                        '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;\n' % (
                             number,
                             status,
                             
@@ -219,10 +231,10 @@ class ResPartner(orm.Model):
                             ))
                             
                 else: # row not present:
-                    _logger.error('%s;%s;' % (
+                    f_out.write('%s;%s;\n' % (
                         number,
                         status,
-                    ))
+                        ))
             return True
 
         else: # raise error passed:
