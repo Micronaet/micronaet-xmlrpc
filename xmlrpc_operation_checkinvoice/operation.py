@@ -105,11 +105,11 @@ class ResPartner(orm.Model):
 
         result_string_file = ''
         # TODO remove after debug:
-        #for row in open('/home/thebrush/Scrivania/fattureGPB.csv'):
-        #    result_string_file += row            
-        res = self.pool.get('xmlrpc.operation').execute_operation(
-            cr, uid, 'checkinvoice', parameter=parameter, context=context)            
-        result_string_file = res.get('result_string_file', False)
+        for row in open('/home/thebrush/Scrivania/fattureGPB.csv'):
+            result_string_file += row            
+        #res = self.pool.get('xmlrpc.operation').execute_operation(
+        #    cr, uid, 'checkinvoice', parameter=parameter, context=context)            
+        #result_string_file = res.get('result_string_file', False)
                 
         if result_string_file:
             # -----------------------------------------------------------------
@@ -139,7 +139,11 @@ class ResPartner(orm.Model):
                 approx = get_float(line[7])
                 pay_code = line[8].strip()
                 agent_code = line[9].strip()
-                
+                if doc == 'NC':
+                    vat = -(vat)
+                    amount = -(amount)
+                    total = -(total)
+                    
                 acc_invoice[invoice] = (
                     amount, # 0
                     vat, # 1
@@ -167,58 +171,79 @@ class ResPartner(orm.Model):
             for invoice in invoice_pool.browse(
                     cr, uid, invoice_ids, context=context):                    
                 number = invoice.number # TODO parse!
-                untaxed = invoice.amount_untaxed or 0.0
-                tax = invoice.amount_tax or 0.0
-                total = invoice.amount_total or 0.0
-                
+
                 if invoice.type == 'out_refund':
                     number = number.replace('FT', 'NC')
                     untaxed = -(untaxed)
                     tax = -(tax)
                     total = -(total)
 
+                # From Account:
+                if number in acc_invoice:
+                    row = acc_invoice[number]
+                    approx = -(
+                        row[3]) if invoice.type == 'out_refund' else row[3]
+                else:    
+                    row = ()
+                    approx = 0.0
+
+                untaxed = invoice.amount_untaxed or 0.0
+                tax = invoice.amount_tax or 0.0
+                total = invoice.amount_total or 0.0
+                
+
                 partner_code = invoice.partner_id.sql_customer_code
                 pay_code = '%s' % (invoice.payment_term.import_id or '')
                 # TODO 2 test need to be eliminated and put in nc agent
-                agent_code = (
+                agent_code = (                    
                     invoice.mx_agent_id.sql_agent_code or \
                     invoice.mx_agent_id.sql_supplier_code or \
-                    invoice.partner_id.sql_agent_code or \
-                    invoice.partner_id.sql_customer_code or \
+                    invoice.partner_id.agent_id.sql_agent_code or \
+                    invoice.partner_id.agent_id.sql_customer_code or \
                     ''
                     )                    
                 state = invoice.state
                 
                 # -------------------------------------------------------------
                 # Check elements:
-                # -------------------------------------------------------------
-                row = acc_invoice.get(number, ())
-                
+                # -------------------------------------------------------------                
                 status = ''
+                gravity = ''
                 if state not in ('open', 'paid'): # State check for confirmed
                     status = '(Status: %s)' % state
                 elif number not in acc_invoice: # Check presence:
                     status = '(No invoice)'
-                else:    
-                    # Data used:
-                    approx = row[3]
-                    if abs(untaxed - row[0]) > diff or \
+                    gravity = 'GRAVE'
+                else:
+                    if approx and abs(total + approx - row[2]) > diff:
+                            # Difference on totals:
+                            status = '(Total)'                        
+                        
+                    elif abs(untaxed - row[0]) > diff or \
                             abs(tax - row[1]) > diff \
                             or abs(total - row[2]) > diff:
                         # Difference on totals:
                         status = '(Total)'
+                        gravity = 'NORMALE'
+                        #_logger.warning((
+                        #    'Untax', untaxed, row[0], 
+                        #    'Tax', tax, row[1],
+                        #    'Total', total, row[2]))
                         
                     if pay_code != row[4]: # Agent test
                         status += '(Payment)'
+                        gravity = 'GRAVE'
                         
                     if agent_code != row[5]: # Agent test
                         status += '(Agent)'
+                        gravity = 'NORMALE'
 
                 if row:
                     f_out.write(
-                        '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;\n' % (
+                        '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;\n' % (
                             number,
                             status,
+                            gravity,
                             
                             untaxed, # ODOO
                             row[0], # Accounting
@@ -232,10 +257,10 @@ class ResPartner(orm.Model):
                             approx, # Approx only account
 
                             pay_code, # ODOO
-                            row[5], # Pay
+                            row[4], # Pay
                             
                             agent_code, # ODOO
-                            row[6], # Agent                            
+                            row[5], # Agent                            
                             ))
                             
                 else: # row not present:
