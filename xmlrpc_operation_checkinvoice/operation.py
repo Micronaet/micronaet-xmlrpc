@@ -114,7 +114,7 @@ class ResPartner(orm.Model):
             # Read invoice data from file:
             # -----------------------------------------------------------------
             acc_invoice = {}
-            diff = 0.00001 # min diff for consider equal
+            diff = 0.000001 # min diff for consider equal
             year = '2016' # TODO change
             for line in result_string_file.split('\n'):            
                 if not line.strip():
