@@ -99,8 +99,13 @@ class AccountInvoice(orm.Model):
             partner_ids.append(user.partner_id.id)
         
         partner_pool = self.pool.get('res.partner')
-        partner_pool.message_post(cr, uid, 1, body='<b>Ciao</b>', context=context)
-            
+        partner_pool.message_post(
+            cr, uid, 1, body='<b>Ciao</b>', subject='Check invoice mail:', 
+            context=context)
+        partner_pool.message_post(
+            cr, uid, 1, body=body, subject='Check invoice mail:', 
+            context=context)
+        return     
         return thread_pool.message_post(
             cr, uid, False,
             type='notification',
@@ -130,6 +135,8 @@ class AccountInvoice(orm.Model):
         # ---------------------------------------------------------------------
         #                            Procedure:
         # ---------------------------------------------------------------------
+        self.send_mail_checkinvoice_info(cr, uid, 'body', context=context)        
+        return 
         # Pool used:
         parameter = {}
         parameter['input_file_string'] = ''
