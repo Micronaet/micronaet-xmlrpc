@@ -122,8 +122,6 @@ class AccountInvoice(orm.Model):
         # ---------------------------------------------------------------------
         #                            Procedure:
         # ---------------------------------------------------------------------
-        self.send_mail_checkinvoice_info(cr, uid, 'body', context=context)
-        return 
         # Pool used:
         parameter = {}
         parameter['input_file_string'] = ''
@@ -279,6 +277,6 @@ class AccountInvoice(orm.Model):
                 
             body += row_item    
             f_out.write(row_item)
-        self.send_mail_checkinvoice_info(cr, uid, 'body', context=context)
+        self.send_mail_checkinvoice_info(cr, uid, body, context=context)
         return True
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
