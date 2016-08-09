@@ -87,7 +87,14 @@ class ResPartner(orm.Model):
         ''' Export current invoice 
             # TODO manage list of invoices?
         '''
-        # Utility:
+        # Parameter:
+        only_error = True
+        diff = 0.000001 # min diff for consider equal
+        year = '2016' # TODO change
+        
+        # ---------------------------------------------------------------------
+        #                            Utility:
+        # ---------------------------------------------------------------------
         def get_float(value):
             ''' Get value from file
             '''
@@ -111,163 +118,156 @@ class ResPartner(orm.Model):
         #    cr, uid, 'checkinvoice', parameter=parameter, context=context)            
         #result_string_file = res.get('result_string_file', False)
                 
-        if result_string_file:
-            # -----------------------------------------------------------------
-            # Read invoice data from file:
-            # -----------------------------------------------------------------
-            acc_invoice = {}
-            diff = 0.000001 # min diff for consider equal
-            year = '2016' # TODO change
-            for line in result_string_file.split('\n'):            
-                if not line.strip():
-                    continue # jump empty line
-
-                # -------------------------------------------------------------
-                # Parser the line:
-                # -------------------------------------------------------------
-                line = line.split(';')
-                
-                doc = line[0].strip()
-                series = line[1].strip()
-                number = int(line[2].strip())
-                invoice = '%s/%s/%s/%04d' % (doc, series, year, number)
-                partner_code = line[3].strip()
-                amount = get_float(line[4])
-                vat = get_float(line[5])
-                #bank_expence = get_float(line[6])
-                total = get_float(line[6])
-                approx = get_float(line[7])
-                pay_code = line[8].strip()
-                agent_code = line[9].strip()
-                if doc == 'NC':
-                    vat = -(vat)
-                    amount = -(amount)
-                    total = -(total)
-                    
-                acc_invoice[invoice] = (
-                    amount, # 0
-                    vat, # 1
-                    total, # 2 
-                    approx, # 3 
-                    pay_code, # 4
-                    agent_code, # 5
-                    )
-
-            # --------------------------
-            # Compare with invoice ODOO:
-            # --------------------------
-            # Control list:
-            error = []
-            
-            invoice_ids = invoice_pool.search(cr, uid, [
-                #('state', 'in', ('open', 'paid'))
-                ], context=context)
-            
-            f_out.write(
-                'Number;Status;Imp. (ODOO);Imp. (Mx);Tax (ODOO);Tax (Mx);' + \
-                'Total (ODOO);Total (Mx);Approx (Mx);' + \
-                'Pay (ODOO);Pay(Mx);Agent (ODOO);Agent(Mx)'
-                )
-            for invoice in invoice_pool.browse(
-                    cr, uid, invoice_ids, context=context):                    
-                number = invoice.number # TODO parse!
-
-                untaxed = invoice.amount_untaxed or 0.0
-                tax = invoice.amount_tax or 0.0
-                total = invoice.amount_total or 0.0
-                if invoice.type == 'out_refund':
-                    number = number.replace('FT', 'NC')
-                    untaxed = -(untaxed)
-                    tax = -(tax)
-                    total = -(total)
-
-                # From Account:
-                approx = 0.0             
-                if number in acc_invoice:
-                    row = acc_invoice[number]
-                    if row[3]:
-                        if invoice.type == 'out_refund':
-                            approx = -(row[3])
-                        else:
-                            approx = row[3]    
-                else:    
-                    row = ()
-
-                partner_code = invoice.partner_id.sql_customer_code
-                pay_code = '%s' % (invoice.payment_term.import_id or '')
-                # TODO 2 test need to be eliminated and put in nc agent
-                agent_code = (                    
-                    invoice.mx_agent_id.sql_agent_code or \
-                    invoice.mx_agent_id.sql_supplier_code or \
-                    invoice.partner_id.agent_id.sql_agent_code or \
-                    invoice.partner_id.agent_id.sql_customer_code or \
-                    ''
-                    )                    
-                state = invoice.state
-                
-                # -------------------------------------------------------------
-                # Check elements:
-                # -------------------------------------------------------------                
-                status = ''
-                if state not in ('open', 'paid'): # State check for confirmed
-                    status = '(Status: %s)' % state
-                elif number not in acc_invoice: # Check presence:
-                    status = '(No invoice)'
-                else:
-                    if approx and abs(total - approx - row[2]) > diff:
-                        # XXX Difference on totals:
-                        status = '(Total approx)'
-                        
-                    elif abs(untaxed - row[0]) > diff or \
-                            abs(tax - row[1]) > diff \
-                            or abs(total - row[2]) > diff:
-                        # Difference on totals:
-                        status = '(Total)'
-                        
-                    if pay_code != row[4]: # Agent test
-                        status += '(Payment)'
-                        
-                    if agent_code != row[5]: # Agent test
-                        status += '(Agent)'
-
-                if row:
-                    f_out.write(
-                        '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;\n' % (
-                            number,
-                            status,
-                            
-                            untaxed, # ODOO
-                            row[0], # Accounting
-                            
-                            tax, # ODOO
-                            row[1], # Accounting
-                            
-                            total, # ODOO
-                            row[2], # Accounting
-                            
-                            approx, # Approx only account
-
-                            pay_code, # ODOO
-                            row[4], # Pay
-                            
-                            agent_code, # ODOO
-                            row[5], # Agent                            
-                            ))
-                            
-                else: # row not present:
-                    f_out.write('%s;%s;\n' % (
-                        number,
-                        status,
-                        ))
-            return True
-
-        else: # raise error passed:
+        if not result_string_file:
             raise osv.except_osv(
                 _('Sync error:'), 
                 _('Returned data: %s') % res,
                 )                    
             return False
-    
+
+        # -----------------------------------------------------------------
+        # Read invoice data from file:
+        # -----------------------------------------------------------------
+        acc_invoice = {}
+        for line in result_string_file.split('\n'):            
+            if not line.strip():
+                continue # jump empty line
+
+            # Parser the line:
+            line = line.split(';')
+            
+            doc = line[0].strip()
+            series = line[1].strip()
+            number = int(line[2].strip())
+            invoice = '%s/%s/%s/%04d' % (doc, series, year, number)
+            partner_code = line[3].strip()
+            amount = get_float(line[4])
+            vat = get_float(line[5])
+            #bank_expence = get_float(line[6])
+            total = get_float(line[6])
+            approx = get_float(line[7])
+            pay_code = line[8].strip()
+            agent_code = line[9].strip()
+            if doc == 'NC':
+                vat = -(vat)
+                amount = -(amount)
+                total = -(total)
+                
+            acc_invoice[invoice] = (
+                amount, vat, total, approx, pay_code, agent_code)
+
+        # -----------------------------------------------------------------
+        # Compare with invoice ODOO:
+        # -----------------------------------------------------------------
+        # Control list:
+        error = []
+        
+        invoice_ids = invoice_pool.search(cr, uid, [
+            #('state', 'in', ('open', 'paid'))
+            ], context=context)
+        
+        f_out.write(
+            'Number;Status;Imp. (ODOO);Imp. (Mx);Tax (ODOO);Tax (Mx);' + \
+            'Total (ODOO);Total (Mx);Approx (Mx);' + \
+            'Pay (ODOO);Pay(Mx);Agent (ODOO);Agent(Mx)'
+            )
+        for invoice in invoice_pool.browse(
+                cr, uid, invoice_ids, context=context):                    
+            number = invoice.number # TODO parse!
+
+            untaxed = invoice.amount_untaxed or 0.0
+            tax = invoice.amount_tax or 0.0
+            total = invoice.amount_total or 0.0
+            if invoice.type == 'out_refund':
+                number = number.replace('FT', 'NC')
+                untaxed = -(untaxed)
+                tax = -(tax)
+                total = -(total)
+
+            # From Account:
+            approx = 0.0             
+            if number in acc_invoice:
+                row = acc_invoice[number]
+                if row[3]:
+                    if invoice.type == 'out_refund':
+                        approx = -(row[3])
+                    else:
+                        approx = row[3]    
+            else:    
+                row = ()
+
+            partner_code = invoice.partner_id.sql_customer_code
+            pay_code = '%s' % (invoice.payment_term.import_id or '')
+            # TODO 2 test need to be eliminated and put in nc agent
+            agent_code = (                    
+                invoice.mx_agent_id.sql_agent_code or \
+                invoice.mx_agent_id.sql_supplier_code or \
+                invoice.partner_id.agent_id.sql_agent_code or \
+                invoice.partner_id.agent_id.sql_customer_code or \
+                ''
+                )                    
+            state = invoice.state
+            
+            # -------------------------------------------------------------
+            # Check elements:
+            # -------------------------------------------------------------                
+            status = ''
+            if state not in ('open', 'paid'): # State check for confirmed
+                status = '(Status: %s)' % state
+            elif number not in acc_invoice: # Check presence:
+                status = '(No invoice)'
+            else:
+                if approx and abs(total - approx - row[2]) > diff:
+                    # XXX Difference on totals:
+                    status = '(Total approx)'
+                    
+                elif abs(untaxed - row[0]) > diff or \
+                        abs(tax - row[1]) > diff \
+                        or abs(total - row[2]) > diff:
+                    # Difference on totals:
+                    status = '(Total)'
+                    
+                if pay_code != row[4]: # Agent test
+                    status += '(Payment)'
+                    
+                if agent_code != row[5]: # Agent test
+                    status += '(Agent)'
+
+            if only_error and not status:
+                continue # no error so jump write
+                
+            if row:
+                f_out.write(
+                    '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;\n' % (
+                        invoice.id,
+                        number,
+                        status,
+                        
+                        untaxed, # ODOO
+                        row[0], # Accounting
+                        
+                        tax, # ODOO
+                        row[1], # Accounting
+                        
+                        total, # ODOO
+                        row[2], # Accounting
+                        
+                        approx, # Approx only account
+
+                        pay_code, # ODOO
+                        row[4], # Pay
+                        
+                        agent_code, # ODOO
+                        row[5], # Agent                            
+                        ))
+                        
+            else: # row not present:
+                f_out.write('%s;%s;\n' % (
+                    number,
+                    status,
+                    ))
+        return True
+
     _columns = {
         'xmlrpc_sync': fields.boolean('XMLRPC syncronized'),        
         }    
