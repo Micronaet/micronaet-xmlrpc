@@ -72,10 +72,10 @@ class XmlrpcOperation(orm.Model):
                 _('Connect error:'), _('XMLRPC connecting server'))
         return res
     
-class ResPartner(orm.Model):
+class AccountInvoice(orm.Model):
     ''' Add export function to invoice obj
     '''    
-    _inherit = 'res.partner' # TODO change or ... not...
+    _inherit = 'account.invoice'
   
     def dummy_button(self, cr, uid, ids, context=None):
         ''' For show an icon as a button
@@ -104,7 +104,6 @@ class ResPartner(orm.Model):
         assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
 
         # Pool used:
-        invoice_pool = self.pool.get('account.invoice')
         parameter = {}
         parameter['input_file_string'] = ''
         filepath = '/home/administrator/photo/xls/check' # TODO parametrize
@@ -164,7 +163,7 @@ class ResPartner(orm.Model):
         # Control list:
         error = []
         
-        invoice_ids = invoice_pool.search(cr, uid, [
+        invoice_ids = self.search(cr, uid, [
             ('type', 'in', ('out_invoice', 'out_refund')),
             # TODO check state? 
             ], context=context)
@@ -174,7 +173,7 @@ class ResPartner(orm.Model):
             'Total (ODOO);Total (Mx);Approx (Mx);' + \
             'Pay (ODOO);Pay(Mx);Agent (ODOO);Agent(Mx)\n'
             )
-        for invoice in invoice_pool.browse(
+        for invoice in self.browse(
                 cr, uid, invoice_ids, context=context):                    
             number = invoice.number # TODO parse!
 

@@ -29,6 +29,7 @@
     'license': 'AGPL-3',
     'depends': [
         'base',
+        'account',
         'xmlrpc_base',
         ],
     'init_xml': [],

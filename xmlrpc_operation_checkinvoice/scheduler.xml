@@ -13,7 +13,7 @@
 			<field eval="1" name="active"/>
 			<field name="args">('2016', 0.000001, True)</field>
 			<field eval="1" name="interval_number"/>
-			<field eval="&quot;&quot;&quot;res.partner&quot;&quot;&quot;" name="model"/>
+			<field eval="&quot;&quot;&quot;account.invoice&quot;&quot;&quot;" name="model"/>
 		</record>
 	</data>
 </openerp>

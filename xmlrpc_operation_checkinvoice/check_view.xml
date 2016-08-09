@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>    
-        <!--<record model="ir.ui.view" id="view_res_partner_sync_export_form">
-            <field name="name">res.partner.form</field>
-            <field name="model">res.partner</field>
-            <field name="inherit_id" ref="base.view_partner_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="/form/sheet/notebook" position="before">
-                    <button name="xmlrpc_export_checkinvoice" string="Invoice stat" type="object"/>
-                </xpath>
-            </field>
-        </record>-->
     </data>
 </openerp>
