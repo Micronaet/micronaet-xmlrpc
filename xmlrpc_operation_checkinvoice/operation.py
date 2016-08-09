@@ -89,7 +89,7 @@ class AccountInvoice(orm.Model):
         model_pool = self.pool.get('ir.model.data')
         user_pool = self.pool.get('res.users')
 
-        user_proxy = user_pool.search(cr, uid, uid, context=context)        
+        user_proxy = user_pool.browse(cr, uid, uid, context=context)        
         recipient_ids = [user_proxy.partner_id.id]
 
         recipient_links = [(6, 0, recipient_ids)]
