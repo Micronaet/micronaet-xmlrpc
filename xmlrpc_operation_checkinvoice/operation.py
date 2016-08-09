@@ -108,7 +108,10 @@ class ResPartner(orm.Model):
         parameter['input_file_string'] = ''
         filepath = '/home/administrator/photo/xls/check' # TODO parametrize
         f_out = open(
-            os.path.join(filepath, 'fatture_check.csv'), 'w')
+            os.path.join(filepath, '%s_invoice_check_%s.csv' % (
+                cr.dbname,
+                'error' if only_error else 'all',
+                )), 'w')
 
         result_string_file = ''
         # TODO remove after debug:
