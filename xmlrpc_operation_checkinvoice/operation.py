@@ -85,6 +85,7 @@ class AccountInvoice(orm.Model):
     def send_mail_checkinvoice_info(self, cr, uid, body, context=None):
         ''' Send mail message with body element passed
         '''
+        import pdb; pdb.set_trace()            
         # Pool used:
         group_pool = self.pool.get('res.groups')
         model_pool = self.pool.get('ir.model.data')
@@ -97,7 +98,6 @@ class AccountInvoice(orm.Model):
         for user in group_pool.browse(
                 cr, uid, group_id, context=context).users:
             partner_ids.append(user.partner_id.id)
-                    
         return thread_pool.message_post(
             cr, uid, False,
             type='notification',
@@ -127,7 +127,6 @@ class AccountInvoice(orm.Model):
         # ---------------------------------------------------------------------
         #                            Procedure:
         # ---------------------------------------------------------------------
-        self.send_mail_checkinvoice_info(cr, uid, 'start', context=context)
         # Pool used:
         parameter = {}
         parameter['input_file_string'] = ''
@@ -138,10 +137,8 @@ class AccountInvoice(orm.Model):
                 'error' if only_error else 'all',
                 )), 'w')
 
-        result_string_file = ''
-        # TODO remove after debug:
         res = self.pool.get('xmlrpc.operation').execute_operation(
-            cr, uid, 'checkinvoice', parameter=parameter, context=context)            
+            cr, uid, 'checkinvoice', parameter=parameter, context=context)
         result_string_file = res.get('result_string_file', False)
                 
         if not result_string_file:
@@ -198,7 +195,7 @@ class AccountInvoice(orm.Model):
             'Total (ODOO);Total (Mx);Approx (Mx);' + \
             'Pay (ODOO);Pay(Mx);Agent (ODOO);Agent(Mx)\n'
             )
-        body = ''    
+        body = ''  
         for invoice in self.browse(
                 cr, uid, invoice_ids, context=context):                    
             number = invoice.number # TODO parse!
