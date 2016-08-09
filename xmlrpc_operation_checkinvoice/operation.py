@@ -82,16 +82,14 @@ class ResPartner(orm.Model):
         '''
         return True
 
-    # Button:    
-    def xmlrpc_export_checkinvoice(self, cr, uid, ids, context=None):
+    # -------------------------------------------------------------------------
+    #                            Scheduled event:
+    # -------------------------------------------------------------------------
+    def xmlrpc_export_checkinvoice(self, cr, uid, ids, year='2016', 
+            diff= 0.000001, only_error=True, context=None):
         ''' Export current invoice 
             # TODO manage list of invoices?
         '''
-        # Parameter:
-        only_error = True
-        diff = 0.000001 # min diff for consider equal
-        year = '2016' # TODO change
-        
         # ---------------------------------------------------------------------
         #                            Utility:
         # ---------------------------------------------------------------------
@@ -100,6 +98,9 @@ class ResPartner(orm.Model):
             '''
             return float(value.strip().replace(',', '.') or '0')
         
+        # ---------------------------------------------------------------------
+        #                            Procedure:
+        # ---------------------------------------------------------------------
         assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
 
         # Pool used:

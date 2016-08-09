@@ -37,6 +37,7 @@
         ##'operation.xml',        
         'check_view.xml',
         'data/operation.xml',
+        'scheduler.xml',
         ],
     'active': False,
     'installable': True,
