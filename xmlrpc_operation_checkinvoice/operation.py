@@ -97,6 +97,10 @@ class AccountInvoice(orm.Model):
         for user in group_pool.browse(
                 cr, uid, group_id, context=context).users:
             partner_ids.append(user.partner_id.id)
+        
+        partner_pool = self.pool.get('res.partner')
+        partner_pool.message_post(cr, uid, 1, body='<b>Ciao</b>', context=context)
+            
         return thread_pool.message_post(
             cr, uid, False,
             type='notification',
