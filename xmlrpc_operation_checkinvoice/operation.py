@@ -127,6 +127,7 @@ class AccountInvoice(orm.Model):
         # ---------------------------------------------------------------------
         #                            Procedure:
         # ---------------------------------------------------------------------
+        self.send_mail_checkinvoice_info(cr, uid, 'start', context=context)
         # Pool used:
         parameter = {}
         parameter['input_file_string'] = ''
