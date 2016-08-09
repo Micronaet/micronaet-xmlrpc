@@ -278,7 +278,7 @@ class AccountInvoice(orm.Model):
                     row[4], # Pay                        
                     agent_code, # ODOO
                     row[5], # Agent                            
-                    ))
+                    )
                         
             else: # row not present:
                 row_item = '%s;%s;%s;\n' % (invoice.id, number, status)
