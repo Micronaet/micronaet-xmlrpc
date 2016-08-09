@@ -82,6 +82,33 @@ class AccountInvoice(orm.Model):
         '''
         return True
 
+    def send_mail_checkinvoice_info(self, cr, uid, body, context=None):
+        ''' Send mail message with body element passed
+        '''
+        msg_pool = self.pool.get('mail.message')
+        model_pool = self.pool.get('ir.model.data')
+        user_pool = self.pool.get('res.users')
+
+        user_proxy = user_pool.search(cr, uid, uid, context=context)        
+        recipient_ids = [user_proxy.partner_id.id]
+
+        recipient_links = [(6, 0, recipient_ids)]
+        ref = model_pool.get_object_reference(cr, uid, 'mail', 'mt_comment')
+
+        msg_pool.create(cr, uid, {
+            'type': 'notification',
+            'subject': 'Invoice daily check:',
+            'body': body,
+            'partner_ids': recipient_links,
+            'subtype_id': ref,
+            }, context=context)
+        return True
+        #followers = records[ids[0]]['message_follower_ids']
+        #self.message_post(cr, uid, ids, body=body,
+        #subtype='mt_comment',
+        #partner_ids=followers,
+        #context=context)
+        
     # -------------------------------------------------------------------------
     #                            Scheduled event:
     # -------------------------------------------------------------------------
@@ -171,6 +198,7 @@ class AccountInvoice(orm.Model):
             'Total (ODOO);Total (Mx);Approx (Mx);' + \
             'Pay (ODOO);Pay(Mx);Agent (ODOO);Agent(Mx)\n'
             )
+        body = ''    
         for invoice in self.browse(
                 cr, uid, invoice_ids, context=context):                    
             number = invoice.number # TODO parse!
@@ -235,25 +263,28 @@ class AccountInvoice(orm.Model):
                 continue # no error so jump write
                 
             if row:
-                f_out.write(
-                    '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;\n' % (
-                        invoice.id,
-                        number,
-                        status,                        
-                        untaxed, # ODOO
-                        row[0], # Accounting                        
-                        tax, # ODOO
-                        row[1], # Accounting                        
-                        total, # ODOO
-                        row[2], # Accounting                        
-                        approx, # Approx only account
-                        pay_code, # ODOO
-                        row[4], # Pay                        
-                        agent_code, # ODOO
-                        row[5], # Agent                            
-                        ))
+                row_item = '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;\n' % (
+                    invoice.id,
+                    number,
+                    status,                        
+                    untaxed, # ODOO
+                    row[0], # Accounting                        
+                    tax, # ODOO
+                    row[1], # Accounting                        
+                    total, # ODOO
+                    row[2], # Accounting                        
+                    approx, # Approx only account
+                    pay_code, # ODOO
+                    row[4], # Pay                        
+                    agent_code, # ODOO
+                    row[5], # Agent                            
+                    ))
                         
             else: # row not present:
-                f_out.write('%s;%s;%s;\n' % (invoice.id, number, status))
+                row_item = '%s;%s;%s;\n' % (invoice.id, number, status)
+                
+            body += row_item    
+            f_out.write(row_item)
+        self.send_mail_checkinvoice_info(cr, uid, body, context=context)
         return True
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
