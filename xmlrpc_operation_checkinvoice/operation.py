@@ -85,7 +85,7 @@ class AccountInvoice(orm.Model):
     # -------------------------------------------------------------------------
     #                            Scheduled event:
     # -------------------------------------------------------------------------
-    def xmlrpc_export_checkinvoice(self, cr, uid, ids, year='2016', 
+    def xmlrpc_export_checkinvoice(self, cr, uid, year='2016', 
             diff= 0.000001, only_error=True, context=None):
         ''' Export current invoice 
             # TODO manage list of invoices?
@@ -101,8 +101,6 @@ class AccountInvoice(orm.Model):
         # ---------------------------------------------------------------------
         #                            Procedure:
         # ---------------------------------------------------------------------
-        assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
-
         # Pool used:
         parameter = {}
         parameter['input_file_string'] = ''
