@@ -71,7 +71,7 @@ class XmlrpcOperation(orm.Model):
             raise osv.except_osv(
                 _('Connect error:'), _('XMLRPC connecting server'))
         return res
-    
+
 class AccountInvoice(orm.Model):
     ''' Add export function to invoice obj
     '''    
@@ -85,20 +85,28 @@ class AccountInvoice(orm.Model):
     def send_mail_checkinvoice_info(self, cr, uid, body, context=None):
         ''' Send mail message with body element passed
         '''
-        msg_pool = self.pool.get('mail.message')
+        # Pool used:
+        group_pool = self.pool.get('res.groups')
         model_pool = self.pool.get('ir.model.data')
-        user_pool = self.pool.get('res.users')
+        thread_pool = self.pool.get('mail.thread')
 
-        user_proxy = user_pool.browse(cr, uid, uid, context=context)        
-        follower_ids = [user_proxy.partner_id.id]
-
-        self.message_post(cr, uid, False, 
-            body=body,
+        group_id = model_pool.get_object_reference(
+            cr, uid, 'xmlrpc_operation_checkinvoice', 'group_checkinvoice')[1]
+    
+        partner_ids = []
+        for user in group_pool.browse(
+                cr, uid, group_id, context=context).users:
+            partner_ids.append(user.partner_id.id)
+                    
+        return thread_pool.message_post(
+            cr, uid, False,
+            type='notification',
             subtype='mt_comment',
-            partner_ids=follower_ids,
+            subject='Invoice daily check:',
+            body=body,
+            partner_ids=[(6, 0, partner_ids)],
             context=context,
             )
-        return True
         
     # -------------------------------------------------------------------------
     #                            Scheduled event:
@@ -254,7 +262,7 @@ class AccountInvoice(orm.Model):
                 continue # no error so jump write
                 
             if row:
-                row_item = '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;\n' % (
+                row_item = '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n' % (
                     invoice.id,
                     number,
                     status,                        
@@ -272,7 +280,7 @@ class AccountInvoice(orm.Model):
                     )
                         
             else: # row not present:
-                row_item = '%s;%s;%s;\n' % (invoice.id, number, status)
+                row_item = '%s;%s;%s\n' % (invoice.id, number, status)
                 
             body += row_item    
             f_out.write(row_item)

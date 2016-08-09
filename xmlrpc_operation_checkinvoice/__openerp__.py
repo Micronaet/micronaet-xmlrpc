@@ -35,7 +35,8 @@
     'init_xml': [],
     'demo': [],
     'data': [
-        ##'operation.xml',        
+        'security/xml_groups.xml',
+        
         'check_view.xml',
         'data/operation.xml',
         'scheduler.xml',
