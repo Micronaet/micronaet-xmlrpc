@@ -98,23 +98,10 @@ class AccountInvoice(orm.Model):
                 cr, uid, group_id, context=context).users:
             partner_ids.append(user.partner_id.id)
         
-        partner_pool = self.pool.get('res.partner')
-        #partner_pool.message_post(
-        #    cr, uid, 1, body='<b>Ciao</b>', subject='Check invoice mail:', 
-        #    partner_ids=[(6, 0, partner_ids)], context=context)
         thread_pool.message_post(
-            cr, uid, False, body='Thread', partner_ids=[(6, 0, partner_ids)],
+            cr, uid, False, body=body, partner_ids=[(6, 0, partner_ids)],
             subject='Check invoice mail:', context=context)
         return     
-        #return thread_pool.message_post(
-        #    cr, uid, False,
-        #    type='notification',
-        #    subtype='mt_comment',
-        #    subject='Invoice daily check:',
-        #    body=body,
-        #    partner_ids=[(6, 0, partner_ids)],
-        #    context=context,
-        #    )
         
     # -------------------------------------------------------------------------
     #                            Scheduled event:
@@ -135,8 +122,6 @@ class AccountInvoice(orm.Model):
         # ---------------------------------------------------------------------
         #                            Procedure:
         # ---------------------------------------------------------------------
-        self.send_mail_checkinvoice_info(cr, uid, 'body', context=context)        
-        return 
         # Pool used:
         parameter = {}
         parameter['input_file_string'] = ''
