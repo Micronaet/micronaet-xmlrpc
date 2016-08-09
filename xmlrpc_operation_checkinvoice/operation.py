@@ -90,13 +90,13 @@ class AccountInvoice(orm.Model):
         model_pool = self.pool.get('ir.model.data')
         thread_pool = self.pool.get('mail.thread')
 
-        group_id = model_pool.get_object_reference(
-            cr, uid, 'xmlrpc_operation_checkinvoice', 'group_checkinvoice')[1]
+        #group_id = model_pool.get_object_reference(
+        #    cr, uid, 'xmlrpc_operation_checkinvoice', 'group_checkinvoice')[1]
     
-        partner_ids = []
-        for user in group_pool.browse(
-                cr, uid, group_id, context=context).users:
-            partner_ids.append(user.partner_id.id)
+        partner_ids = [1]
+        #for user in group_pool.browse(
+        #        cr, uid, group_id, context=context).users:
+        #    partner_ids.append(user.partner_id.id)
         
         thread_pool.message_post(
             cr, uid, False, body=body, partner_ids=[(6, 0, partner_ids)],
