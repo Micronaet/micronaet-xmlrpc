@@ -99,22 +99,22 @@ class AccountInvoice(orm.Model):
             partner_ids.append(user.partner_id.id)
         
         partner_pool = self.pool.get('res.partner')
-        partner_pool.message_post(
-            cr, uid, 1, body='<b>Ciao</b>', subject='Check invoice mail:', 
-            context=context)
-        partner_pool.message_post(
-            cr, uid, 1, body=body, subject='Check invoice mail:', 
-            context=context)
+        #partner_pool.message_post(
+        #    cr, uid, 1, body='<b>Ciao</b>', subject='Check invoice mail:', 
+        #    partner_ids=[(6, 0, partner_ids)], context=context)
+        thread_pool.message_post(
+            cr, uid, False, body='Thread', partner_ids=[(6, 0, partner_ids)],
+            subject='Check invoice mail:', context=context)
         return     
-        return thread_pool.message_post(
-            cr, uid, False,
-            type='notification',
-            subtype='mt_comment',
-            subject='Invoice daily check:',
-            body=body,
-            partner_ids=[(6, 0, partner_ids)],
-            context=context,
-            )
+        #return thread_pool.message_post(
+        #    cr, uid, False,
+        #    type='notification',
+        #    subtype='mt_comment',
+        #    subject='Invoice daily check:',
+        #    body=body,
+        #    partner_ids=[(6, 0, partner_ids)],
+        #    context=context,
+        #    )
         
     # -------------------------------------------------------------------------
     #                            Scheduled event:
