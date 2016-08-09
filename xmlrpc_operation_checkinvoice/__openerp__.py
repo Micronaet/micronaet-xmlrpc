@@ -30,6 +30,7 @@
     'depends': [
         'base',
         'account',
+        'mail',
         'xmlrpc_base',
         ],
     'init_xml': [],
