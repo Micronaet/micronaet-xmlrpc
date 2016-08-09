@@ -94,6 +94,7 @@ class AccountInvoice(orm.Model):
 
         recipient_links = [(6, 0, recipient_ids)]
         ref = model_pool.get_object_reference(cr, uid, 'mail', 'mt_comment')
+        import pdb; pdb.set_trace()
 
         msg_pool.create(cr, uid, {
             'type': 'notification',
