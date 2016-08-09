@@ -90,25 +90,15 @@ class AccountInvoice(orm.Model):
         user_pool = self.pool.get('res.users')
 
         user_proxy = user_pool.browse(cr, uid, uid, context=context)        
-        recipient_ids = [user_proxy.partner_id.id]
+        follower_ids = [user_proxy.partner_id.id]
 
-        recipient_links = [(6, 0, recipient_ids)]
-        ref = model_pool.get_object_reference(cr, uid, 'mail', 'mt_comment')
-        import pdb; pdb.set_trace()
-
-        msg_pool.create(cr, uid, {
-            'type': 'notification',
-            'subject': 'Invoice daily check:',
-            'body': body,
-            'partner_ids': recipient_links,
-            'subtype_id': ref,
-            }, context=context)
+        self.message_post(cr, uid, False, 
+            body=body,
+            subtype='mt_comment',
+            partner_ids=followers,
+            context=context,
+            )
         return True
-        #followers = records[ids[0]]['message_follower_ids']
-        #self.message_post(cr, uid, ids, body=body,
-        #subtype='mt_comment',
-        #partner_ids=followers,
-        #context=context)
         
     # -------------------------------------------------------------------------
     #                            Scheduled event:
