@@ -85,7 +85,6 @@ class AccountInvoice(orm.Model):
     def send_mail_checkinvoice_info(self, cr, uid, body, context=None):
         ''' Send mail message with body element passed
         '''
-        import pdb; pdb.set_trace()            
         # Pool used:
         group_pool = self.pool.get('res.groups')
         model_pool = self.pool.get('ir.model.data')
