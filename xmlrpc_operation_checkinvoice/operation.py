@@ -99,7 +99,7 @@ class AccountInvoice(orm.Model):
         #    partner_ids.append(user.partner_id.id)
         
         thread_pool.message_post(
-            cr, uid, False, body=body, partner_ids=[(6, 0, partner_ids)],
+            cr, uid, 1, body=body, partner_ids=[(6, 0, partner_ids)],
             subject='Check invoice mail:', context=context)
         return     
         
