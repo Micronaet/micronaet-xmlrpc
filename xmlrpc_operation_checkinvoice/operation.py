@@ -163,13 +163,14 @@ class ResPartner(orm.Model):
         error = []
         
         invoice_ids = invoice_pool.search(cr, uid, [
-            #('state', 'in', ('open', 'paid'))
+            ('type', 'in', ('out_invoice', 'out_refund')),
+            # TODO check state? 
             ], context=context)
         
         f_out.write(
-            'Number;Status;Imp. (ODOO);Imp. (Mx);Tax (ODOO);Tax (Mx);' + \
+            'ID;Number;Status;Imp. (ODOO);Imp. (Mx);Tax (ODOO);Tax (Mx);' + \
             'Total (ODOO);Total (Mx);Approx (Mx);' + \
-            'Pay (ODOO);Pay(Mx);Agent (ODOO);Agent(Mx)'
+            'Pay (ODOO);Pay(Mx);Agent (ODOO);Agent(Mx)\n'
             )
         for invoice in invoice_pool.browse(
                 cr, uid, invoice_ids, context=context):                    
@@ -185,15 +186,13 @@ class ResPartner(orm.Model):
                 total = -(total)
 
             # From Account:
-            approx = 0.0             
             if number in acc_invoice:
                 row = acc_invoice[number]
-                if row[3]:
-                    if invoice.type == 'out_refund':
-                        approx = -(row[3])
-                    else:
-                        approx = row[3]    
+                approx = row[3]
+                if approx and invoice.type == 'out_refund': # NC
+                    approx = -(approx)
             else:    
+                approx = 0.0        
                 row = ()
 
             partner_code = invoice.partner_id.sql_customer_code
@@ -217,9 +216,9 @@ class ResPartner(orm.Model):
             elif number not in acc_invoice: # Check presence:
                 status = '(No invoice)'
             else:
-                if approx and abs(total - approx - row[2]) > diff:
-                    # XXX Difference on totals:
-                    status = '(Total approx)'
+                if approx:
+                    if abs(row[2] -approx - total) > diff:
+                        status = '(Total approx)'
                     
                 elif abs(untaxed - row[0]) > diff or \
                         abs(tax - row[1]) > diff \
@@ -256,6 +255,6 @@ class ResPartner(orm.Model):
                         ))
                         
             else: # row not present:
-                f_out.write('%s;%s;\n' % (number, status))
+                f_out.write('%s;%s;%s;\n' % (invoice.id, number, status))
         return True
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
