@@ -125,9 +125,9 @@ class ResPartner(orm.Model):
                 )                    
             return False
 
-        # -----------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Read invoice data from file:
-        # -----------------------------------------------------------------
+        # ---------------------------------------------------------------------
         acc_invoice = {}
         for line in result_string_file.split('\n'):            
             if not line.strip():
@@ -156,9 +156,9 @@ class ResPartner(orm.Model):
             acc_invoice[invoice] = (
                 amount, vat, total, approx, pay_code, agent_code)
 
-        # -----------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Compare with invoice ODOO:
-        # -----------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Control list:
         error = []
         
@@ -208,9 +208,9 @@ class ResPartner(orm.Model):
                 )                    
             state = invoice.state
             
-            # -------------------------------------------------------------
+            # -----------------------------------------------------------------
             # Check elements:
-            # -------------------------------------------------------------                
+            # -----------------------------------------------------------------               
             status = ''
             if state not in ('open', 'paid'): # State check for confirmed
                 status = '(Status: %s)' % state
@@ -241,35 +241,21 @@ class ResPartner(orm.Model):
                     '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;\n' % (
                         invoice.id,
                         number,
-                        status,
-                        
+                        status,                        
                         untaxed, # ODOO
-                        row[0], # Accounting
-                        
+                        row[0], # Accounting                        
                         tax, # ODOO
-                        row[1], # Accounting
-                        
+                        row[1], # Accounting                        
                         total, # ODOO
-                        row[2], # Accounting
-                        
+                        row[2], # Accounting                        
                         approx, # Approx only account
-
                         pay_code, # ODOO
-                        row[4], # Pay
-                        
+                        row[4], # Pay                        
                         agent_code, # ODOO
                         row[5], # Agent                            
                         ))
                         
             else: # row not present:
-                f_out.write('%s;%s;\n' % (
-                    number,
-                    status,
-                    ))
+                f_out.write('%s;%s;\n' % (number, status))
         return True
-
-    _columns = {
-        'xmlrpc_sync': fields.boolean('XMLRPC syncronized'),        
-        }    
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
