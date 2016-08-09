@@ -90,19 +90,18 @@ class AccountInvoice(orm.Model):
         model_pool = self.pool.get('ir.model.data')
         thread_pool = self.pool.get('mail.thread')
 
-        #group_id = model_pool.get_object_reference(
-        #    cr, uid, 'xmlrpc_operation_checkinvoice', 'group_checkinvoice')[1]
+        group_id = model_pool.get_object_reference(
+            cr, uid, 'xmlrpc_operation_checkinvoice', 'group_checkinvoice')[1]
     
-        partner_ids = [1]
-        #for user in group_pool.browse(
-        #        cr, uid, group_id, context=context).users:
-        #    partner_ids.append(user.partner_id.id)
+        partner_ids = []
+        for user in group_pool.browse(
+                cr, uid, group_id, context=context).users:
+            partner_ids.append(user.partner_id.id)
         
-        #thread_pool
-        self.pool.get('res.partner').message_post(
-            cr, uid, [1], body=body, #partner_ids=[(6, 0, partner_ids)],
+        thread_pool.message_post(
+            cr, uid, [1], body=body, partner_ids=[(6, 0, partner_ids)],
             subject='Check invoice mail:', context=context)
-        return     
+        return
         
     # -------------------------------------------------------------------------
     #                            Scheduled event:
@@ -123,6 +122,8 @@ class AccountInvoice(orm.Model):
         # ---------------------------------------------------------------------
         #                            Procedure:
         # ---------------------------------------------------------------------
+        self.send_mail_checkinvoice_info(cr, uid, 'body', context=context)
+        return 
         # Pool used:
         parameter = {}
         parameter['input_file_string'] = ''
