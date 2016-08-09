@@ -115,11 +115,9 @@ class ResPartner(orm.Model):
 
         result_string_file = ''
         # TODO remove after debug:
-        for row in open('/home/thebrush/Scrivania/fattureFIA.csv'):
-            result_string_file += row            
-        #res = self.pool.get('xmlrpc.operation').execute_operation(
-        #    cr, uid, 'checkinvoice', parameter=parameter, context=context)            
-        #result_string_file = res.get('result_string_file', False)
+        res = self.pool.get('xmlrpc.operation').execute_operation(
+            cr, uid, 'checkinvoice', parameter=parameter, context=context)            
+        result_string_file = res.get('result_string_file', False)
                 
         if not result_string_file:
             raise osv.except_osv(
