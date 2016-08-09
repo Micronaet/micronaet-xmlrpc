@@ -95,7 +95,7 @@ class AccountInvoice(orm.Model):
         self.message_post(cr, uid, False, 
             body=body,
             subtype='mt_comment',
-            partner_ids=followers,
+            partner_ids=follower_ids,
             context=context,
             )
         return True
