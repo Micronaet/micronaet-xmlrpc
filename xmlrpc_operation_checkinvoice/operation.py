@@ -194,7 +194,7 @@ class AccountInvoice(orm.Model):
         body_html = '''
             <table>
                 <th><td>%s</td></th>%s
-            </table>'''' % (
+            </table>''' % (
                 header.replace(';', '</td></td>'),
                 '%s',
                 )
