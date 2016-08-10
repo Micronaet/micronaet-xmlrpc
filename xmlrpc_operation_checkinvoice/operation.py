@@ -24,6 +24,7 @@ import openerp
 import xmlrpclib
 import openerp.netsvc as netsvc
 import openerp.addons.decimal_precision as dp
+from psycopg2.extensions import ISOLATION_LEVEL_READ_COMMITTED
 from openerp.osv import fields, osv, expression, orm
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -270,6 +271,7 @@ class AccountInvoice(orm.Model):
             body += row_item    
             f_out.write(row_item)
         f_out.close()
+        cr._cnx.set_isolation_level(ISOLATION_LEVEL_READ_COMMITTED)
         self.send_mail_checkinvoice_info(cr, uid, body, context=context)
         return True
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
