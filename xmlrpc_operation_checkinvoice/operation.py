@@ -186,12 +186,19 @@ class AccountInvoice(orm.Model):
             # TODO check state? 
             ], context=context)
         
-        f_out.write(
-            'ID;Number;Status;Approx (Mx);Imp. (ODOO);Imp. (Mx);Tax (ODOO);Tax (Mx);' + \
+        header = 'ID;Number;Status;Approx (Mx);Imp. (ODOO);Imp. (Mx);' + \
+            'Tax (ODOO);Tax (Mx);' + \
             'Total (ODOO);Total (Mx);' + \
             'Pay (ODOO);Pay(Mx);Agent (ODOO);Agent(Mx)\n'
-            )
-        body = ''  
+        f_out.write(header)
+        body_html = '''
+            <table>
+                <th><td>%s</td></th>%s
+            </table>'''' % (
+                header.replace(';', '</td></td>'),
+                '%s',
+                )
+        body = ''
         for invoice in self.browse(
                 cr, uid, invoice_ids, context=context):                    
             number = invoice.number # TODO parse!
@@ -268,10 +275,12 @@ class AccountInvoice(orm.Model):
             else: # row not present:
                 row_item = '%s;%s;%s\n' % (invoice.id, number, status)
                 
-            body += row_item    
+            body += '<tr><td>%s</td></tr>' % row_item.replace(';', '</td><td>')
             f_out.write(row_item)
         f_out.close()
+        # For problem of concurrent write:
         cr._cnx.set_isolation_level(ISOLATION_LEVEL_READ_COMMITTED)
-        self.send_mail_checkinvoice_info(cr, uid, body, context=context)
+        body_html % body
+        self.send_mail_checkinvoice_info(cr, uid, body_html, context=context)
         return True
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
