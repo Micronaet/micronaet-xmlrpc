@@ -280,7 +280,7 @@ class AccountInvoice(orm.Model):
         f_out.close()
         # For problem of concurrent write:
         cr._cnx.set_isolation_level(ISOLATION_LEVEL_READ_COMMITTED)
-        body_html % body
+        body_html = body_html % body
         self.send_mail_checkinvoice_info(cr, uid, body_html, context=context)
         return True
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
