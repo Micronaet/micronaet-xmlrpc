@@ -123,6 +123,7 @@ class AccountInvoice(orm.Model):
         #                            Procedure:
         # ---------------------------------------------------------------------
         # Pool used:
+        self.send_mail_checkinvoice_info(cr, uid, 'start', context=context)
         parameter = {}
         parameter['input_file_string'] = ''
         filepath = '/home/administrator/photo/xls/check' # TODO parametrize
