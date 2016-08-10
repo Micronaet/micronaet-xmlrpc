@@ -65,7 +65,7 @@ class XmlrpcOperation(orm.Model):
             if res.get('error', False):
                 _logger.error(res['error'])
                 # TODO raise
-            # TODO confirm export!    
+            # TODO confirm export!   
         except:    
             _logger.error(sys.exc_info())
             raise osv.except_osv(
@@ -123,8 +123,6 @@ class AccountInvoice(orm.Model):
         #                            Procedure:
         # ---------------------------------------------------------------------
         # Pool used:
-        self.send_mail_checkinvoice_info(cr, uid, 'start', context=context)
-        return
         parameter = {}
         parameter['input_file_string'] = ''
         filepath = '/home/administrator/photo/xls/check' # TODO parametrize
@@ -188,8 +186,8 @@ class AccountInvoice(orm.Model):
             ], context=context)
         
         f_out.write(
-            'ID;Number;Status;Imp. (ODOO);Imp. (Mx);Tax (ODOO);Tax (Mx);' + \
-            'Total (ODOO);Total (Mx);Approx (Mx);' + \
+            'ID;Number;Status;Approx (Mx);Imp. (ODOO);Imp. (Mx);Tax (ODOO);Tax (Mx);' + \
+            'Total (ODOO);Total (Mx);' + \
             'Pay (ODOO);Pay(Mx);Agent (ODOO);Agent(Mx)\n'
             )
         body = ''  
@@ -238,7 +236,7 @@ class AccountInvoice(orm.Model):
                 status = '(No invoice)'
             else:
                 if approx:
-                    if abs(row[2] -approx - total) > diff:
+                    if abs(row[2] - approx - total) > diff:
                         status = '(Total approx)'
                     
                 elif abs(untaxed - row[0]) > diff or \
@@ -258,20 +256,12 @@ class AccountInvoice(orm.Model):
                 
             if row:
                 row_item = '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n' % (
-                    invoice.id,
-                    number,
-                    status,                        
-                    untaxed, # ODOO
-                    row[0], # Accounting                        
-                    tax, # ODOO
-                    row[1], # Accounting                        
-                    total, # ODOO
-                    row[2], # Accounting                        
-                    approx, # Approx only account
-                    pay_code, # ODOO
-                    row[4], # Pay                        
-                    agent_code, # ODOO
-                    row[5], # Agent                            
+                    invoice.id, number, status, approx,
+                    untaxed, row[0],
+                    tax, row[1],
+                    total, row[2],                     
+                    pay_code, row[4],
+                    agent_code, row[5],
                     )
                         
             else: # row not present:
@@ -279,6 +269,7 @@ class AccountInvoice(orm.Model):
                 
             body += row_item    
             f_out.write(row_item)
+        f_out.close()
         self.send_mail_checkinvoice_info(cr, uid, body, context=context)
         return True
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
