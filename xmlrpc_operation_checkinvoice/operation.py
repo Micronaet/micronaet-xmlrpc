@@ -186,10 +186,10 @@ class AccountInvoice(orm.Model):
             # TODO check state? 
             ], context=context)
         
-        header = 'ID;Number;Status;Approx (Mx);Imp. (ODOO);Imp. (Mx);' + \
-            'Tax (ODOO);Tax (Mx);' + \
-            'Total (ODOO);Total (Mx);' + \
-            'Pay (ODOO);Pay(Mx);Agent (ODOO);Agent(Mx)\n'
+        header = 'ID|Number;Status|Approx (Mx)|Imp. (ODOO)|Imp. (Mx)|' + \
+            'Tax (ODOO)|Tax (Mx);' + \
+            'Total (ODOO)|Total (Mx)|' + \
+            'Pay (ODOO)|Pay(Mx)|Agent (ODOO)|Agent(Mx)\n'
             
         f_out.write(header)
         body_html = '''
@@ -212,7 +212,7 @@ class AccountInvoice(orm.Model):
                 </table>
             </div>
             ''' % (
-                header.replace(';', '</td></td>'),
+                header.replace('|', '</td></td>'),
                 '%s',
                 )
         body = ''
@@ -280,7 +280,7 @@ class AccountInvoice(orm.Model):
                 continue # no error so jump write
                 
             if row:
-                row_item = '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n' % (
+                row_item = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' % (
                     invoice.id, number, status, approx,
                     untaxed, row[0],
                     tax, row[1],
@@ -290,9 +290,9 @@ class AccountInvoice(orm.Model):
                     )
                         
             else: # row not present:
-                row_item = '%s;%s;%s\n' % (invoice.id, number, status)
+                row_item = '%s|%s|%s\n' % (invoice.id, number, status)
                 
-            body += '<tr><td>%s</td></tr>' % row_item.replace(';', '</td><td>')
+            body += '<tr><td>%s</td></tr>' % row_item.replace('|', '</td><td>')
             f_out.write(row_item)
         f_out.close()
 
