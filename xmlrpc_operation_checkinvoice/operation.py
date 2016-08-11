@@ -234,9 +234,8 @@ class AccountInvoice(orm.Model):
 
             partner_code = invoice.partner_id.sql_customer_code
             pay_code = '%s' % (invoice.payment_term.import_id or '')
-            # TODO 2 test need to be eliminated and put in nc agent
             partner_code = invoice.partner_id.sql_customer_code or ''
-                )                    
+            # TODO 2 test need to be eliminated and put in nc agent
             agent_code = (                    
                 invoice.mx_agent_id.sql_agent_code or \
                 invoice.mx_agent_id.sql_supplier_code or \
