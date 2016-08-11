@@ -292,7 +292,7 @@ class AccountInvoice(orm.Model):
                 
             if row:
                 row_item = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' % (
-                    invoice.id, number, invoice.invoice_date, status, approx,
+                    invoice.id, number, invoice.date_invoice, status, approx,
                     untaxed, row[0],
                     tax, row[1],
                     total, row[2],                     
@@ -304,7 +304,7 @@ class AccountInvoice(orm.Model):
                         
             else: # row not present:
                 row_item = '%s|%s|%s|%s\n' % (
-                    invoice.id, number, invoice.invoice_date, status)
+                    invoice.id, number, invoice.date_invoice, status)
                 
             body += '<tr><td class="oe_list_field_cell">%s</td></tr>' % (
                 row_item.replace('|', '</td><td class="oe_list_field_cell">'))
