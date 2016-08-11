@@ -101,7 +101,8 @@ class AccountInvoice(orm.Model):
         
         thread_pool.message_post(
             cr, uid, False, body=body, partner_ids=[(6, 0, partner_ids)],
-            subject='Check invoice mail:', context=context)
+            subject='Check invoice mail:', type='email',
+            context=context)
         return
         
     # -------------------------------------------------------------------------
@@ -112,6 +113,8 @@ class AccountInvoice(orm.Model):
         ''' Export current invoice 
             # TODO manage list of invoices?
         '''
+        self.send_mail_checkinvoice_info(cr, uid, 'prova', context=context)
+        return 
         # ---------------------------------------------------------------------
         #                            Utility:
         # ---------------------------------------------------------------------
