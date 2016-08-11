@@ -346,8 +346,7 @@ class ResPartner(orm.Model):
                         _('XMLRPC sync error'), 
                         _('Error reading result operation!'))
 
-                code = ''    
-                field = ''
+                code = field = ''
                 if res[1].strip():
                     field = 'sql_customer_code'
                     code = res[1].strip()
@@ -361,15 +360,10 @@ class ResPartner(orm.Model):
                     code = res[3].strip()
                     message = _('Account sync for dest., code: %s') % res[3] 
 
-                data = {
-                    #'xmlrpc_sync': False, # XXX not used
-                    field: code,
-                    }
-
                 try:
                     # TODO RAISE ERROR (see with isolation level:
                     cr._cnx.set_isolation_level(ISOLATION_LEVEL_READ_COMMITTED)
-                    self.write(cr, uid, ids, data, context=context)
+                    self.write(cr, uid, ids, {field: code}, context=context)
                 except:                    
                     raise osv.except_osv(
                         _('Sync error:'), 

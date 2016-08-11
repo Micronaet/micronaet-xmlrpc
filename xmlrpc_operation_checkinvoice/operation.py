@@ -192,9 +192,25 @@ class AccountInvoice(orm.Model):
             'Pay (ODOO);Pay(Mx);Agent (ODOO);Agent(Mx)\n'
         f_out.write(header)
         body_html = '''
-            <table>
-                <th><td>%s</td></th>%s
-            </table>''' % (
+            <style>
+                table {
+                    border-collapse: collapse;
+                    width: 100%;
+                    }
+
+                th, td {
+                    text-align: left;
+                    padding: 8px;
+                    }
+
+                tr:nth-child(even){background-color: #f2f2f2}
+            </style>
+            <div style="overflow-x:auto;">
+                <table>
+                    <th><td>%s</td></th>%s
+                </table>
+            </div>
+            ''' % (
                 header.replace(';', '</td></td>'),
                 '%s',
                 )
