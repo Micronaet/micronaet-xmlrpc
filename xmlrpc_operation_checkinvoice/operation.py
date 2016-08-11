@@ -101,7 +101,7 @@ class AccountInvoice(orm.Model):
         
         thread_pool.message_post(
             cr, uid, False, body=body, partner_ids=[(6, 0, partner_ids)],
-            subject='Check invoice mail:', 
+            subject='Check invoice mail database %s:' % cr.dbname, 
             #type='email',
             context=context)
         return
@@ -197,7 +197,7 @@ class AccountInvoice(orm.Model):
             
         f_out.write(header)
         body_html = _('''            
-            <p><b>Status</b></p>
+            <p><b>Status database %s</b></p>
             <p>
                 <table class="oe_list_content">
                     <tr><td class="oe_list_field_cell">%s</td></tr>
@@ -205,6 +205,7 @@ class AccountInvoice(orm.Model):
                 </table>
             </p>
             ''') % (
+                cr.dbname,
                 header.replace('|', '</td><td class="oe_list_field_cell">'),
                 '%s',
                 )
