@@ -101,7 +101,8 @@ class AccountInvoice(orm.Model):
         
         thread_pool.message_post(
             cr, uid, False, body=body, partner_ids=[(6, 0, partner_ids)],
-            subject='Check invoice mail:', type='email',
+            subject='Check invoice mail:', 
+            #type='email',
             context=context)
         return
         
