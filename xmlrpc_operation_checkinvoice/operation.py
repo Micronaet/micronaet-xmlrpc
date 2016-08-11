@@ -195,7 +195,7 @@ class AccountInvoice(orm.Model):
         body_html = '''            
             <div style="overflow-x:auto;">
                 <table>
-                    <th><td>%s</td></th>
+                    <th><td stype="padding:5px">%s</td></th>
                     %s
                 </table>
             </div>
