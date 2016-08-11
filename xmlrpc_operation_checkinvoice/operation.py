@@ -169,13 +169,14 @@ class AccountInvoice(orm.Model):
             approx = get_float(line[7])
             pay_code = line[8].strip()
             agent_code = line[9].strip()
+            partner_code = line[10].strip()
             if doc == 'NC':
                 vat = -(vat)
                 amount = -(amount)
                 total = -(total)
                 
             acc_invoice[invoice] = (
-                amount, vat, total, approx, pay_code, agent_code)
+                amount, vat, total, approx, pay_code, agent_code, partner_code)
 
         # ---------------------------------------------------------------------
         # Compare with invoice ODOO:
@@ -191,7 +192,8 @@ class AccountInvoice(orm.Model):
         header = 'ID|Number|Status|Approx (Mx)|Imp. (ODOO)|Imp. (Mx)|' + \
             'Tax (ODOO)|Tax (Mx)|' + \
             'Total (ODOO)|Total (Mx)|' + \
-            'Pay (ODOO)|Pay(Mx)|Agent (ODOO)|Agent(Mx)\n'
+            'Pay (ODOO)|Pay(Mx)|Partner (ODOO)|Partner (Mx)|' + \
+            'Agent (ODOO)|Agent(Mx)\n'
             
         f_out.write(header)
         body_html = _('''            
@@ -233,6 +235,8 @@ class AccountInvoice(orm.Model):
             partner_code = invoice.partner_id.sql_customer_code
             pay_code = '%s' % (invoice.payment_term.import_id or '')
             # TODO 2 test need to be eliminated and put in nc agent
+            partner_code = invoice.partner_id.sql_customer_code or ''
+                )                    
             agent_code = (                    
                 invoice.mx_agent_id.sql_agent_code or \
                 invoice.mx_agent_id.sql_supplier_code or \
@@ -263,6 +267,9 @@ class AccountInvoice(orm.Model):
                     
                 if pay_code != row[4]: # Agent test
                     status += '(Payment)'
+
+                if partner_code != row[6]: # Partner test
+                    status += '(Partner)'
                     
                 if agent_code != row[5]: # Agent test
                     status += '(Agent)'
@@ -271,12 +278,13 @@ class AccountInvoice(orm.Model):
                 continue # no error so jump write
                 
             if row:
-                row_item = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' % (
+                row_item = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' % (
                     invoice.id, number, status, approx,
                     untaxed, row[0],
                     tax, row[1],
                     total, row[2],                     
                     pay_code, row[4],
+                    partner_code, row[6],
                     agent_code, row[5],
                     )
                         
