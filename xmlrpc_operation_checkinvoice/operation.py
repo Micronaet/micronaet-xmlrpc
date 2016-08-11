@@ -190,6 +190,7 @@ class AccountInvoice(orm.Model):
             'Tax (ODOO);Tax (Mx);' + \
             'Total (ODOO);Total (Mx);' + \
             'Pay (ODOO);Pay(Mx);Agent (ODOO);Agent(Mx)\n'
+            
         f_out.write(header)
         body_html = '''
             <style>
