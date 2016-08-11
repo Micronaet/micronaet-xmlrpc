@@ -278,6 +278,7 @@ class AccountInvoice(orm.Model):
             body += '<tr><td>%s</td></tr>' % row_item.replace(';', '</td><td>')
             f_out.write(row_item)
         f_out.close()
+
         # For problem of concurrent write:
         cr._cnx.set_isolation_level(ISOLATION_LEVEL_READ_COMMITTED)
         body_html = body_html % body

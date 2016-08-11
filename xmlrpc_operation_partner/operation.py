@@ -24,6 +24,7 @@ import openerp
 import xmlrpclib
 import openerp.netsvc as netsvc
 import openerp.addons.decimal_precision as dp
+from psycopg2.extensions import ISOLATION_LEVEL_READ_COMMITTED
 from openerp.osv import fields, osv, expression, orm
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -366,7 +367,8 @@ class ResPartner(orm.Model):
                     }
 
                 try:
-                    # XXX RAISE ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    # TODO RAISE ERROR (see with isolation level:
+                    cr._cnx.set_isolation_level(ISOLATION_LEVEL_READ_COMMITTED)
                     self.write(cr, uid, ids, data, context=context)
                 except:                    
                     raise osv.except_osv(
