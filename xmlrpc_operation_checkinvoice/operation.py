@@ -194,14 +194,12 @@ class AccountInvoice(orm.Model):
         f_out.write(header)
         body_html = _('''            
             <p><b>Status</b></p>
-            <div style="overflow-x:auto;">
-                <table>
-                    <th><td stype="padding:5px">%s</td></th>
-                    %s
-                </table>
-            </div>
+            <table class="oe_list_content">
+                <th><td class="oe_list_field_cell">%s</td></th>
+                %s
+            </table>
             ''') % (
-                header.replace('|', '</td></td>'),
+                header.replace('|', '</td><td class="oe_list_field_cell">'),
                 '%s',
                 )
         body = ''
@@ -281,7 +279,8 @@ class AccountInvoice(orm.Model):
             else: # row not present:
                 row_item = '%s|%s|%s\n' % (invoice.id, number, status)
                 
-            body += '<tr><td>%s</td></tr>' % row_item.replace('|', '</td><td>')
+            body += '<tr><td class="oe_list_field_cell">%s</td></tr>' % (
+                row_item.replace('|', '</td><td class="oe_list_field_cell">'))
             f_out.write(row_item)
         f_out.close()
 
