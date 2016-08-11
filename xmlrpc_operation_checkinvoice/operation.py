@@ -194,10 +194,12 @@ class AccountInvoice(orm.Model):
         f_out.write(header)
         body_html = _('''            
             <p><b>Status</b></p>
-            <table class="oe_list_content">
-                <th><td class="oe_list_field_cell">%s</td></th>
-                %s
-            </table>
+            <p>
+                <table class="oe_list_content">
+                    <tr><td class="oe_list_field_cell">%s</td></tr>
+                    %s
+                </table>
+            </p>
             ''') % (
                 header.replace('|', '</td><td class="oe_list_field_cell">'),
                 '%s',
