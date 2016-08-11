@@ -192,14 +192,15 @@ class AccountInvoice(orm.Model):
             'Pay (ODOO)|Pay(Mx)|Agent (ODOO)|Agent(Mx)\n'
             
         f_out.write(header)
-        body_html = '''            
+        body_html = _('''            
+            <p><b>Status</b></p>
             <div style="overflow-x:auto;">
                 <table>
                     <th><td stype="padding:5px">%s</td></th>
                     %s
                 </table>
             </div>
-            ''' % (
+            ''') % (
                 header.replace('|', '</td></td>'),
                 '%s',
                 )
