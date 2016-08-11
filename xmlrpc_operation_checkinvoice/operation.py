@@ -198,7 +198,7 @@ class AccountInvoice(orm.Model):
             # TODO check state? 
             ], context=context)
         
-        header = 'ID|Number|Status|Approx (Mx)|Imp. (ODOO)|Imp. (Mx)|' + \
+        header = 'ID|Number|Date|Status|Approx (Mx)|Imp. (ODOO)|Imp. (Mx)|' + \
             'Tax (ODOO)|Tax (Mx)|' + \
             'Total (ODOO)|Total (Mx)|' + \
             'Pay (ODOO)|Pay(Mx)|Partner (ODOO)|Partner (Mx)|' + \
@@ -291,8 +291,8 @@ class AccountInvoice(orm.Model):
                 continue # no error so jump write
                 
             if row:
-                row_item = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' % (
-                    invoice.id, number, status, approx,
+                row_item = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' % (
+                    invoice.id, number, invoice.invoice_date, status, approx,
                     untaxed, row[0],
                     tax, row[1],
                     total, row[2],                     
@@ -303,7 +303,8 @@ class AccountInvoice(orm.Model):
                     )
                         
             else: # row not present:
-                row_item = '%s|%s|%s\n' % (invoice.id, number, status)
+                row_item = '%s|%s|%s|%s\n' % (
+                    invoice.id, number, invoice.invoice_date, status)
                 
             body += '<tr><td class="oe_list_field_cell">%s</td></tr>' % (
                 row_item.replace('|', '</td><td class="oe_list_field_cell">'))
