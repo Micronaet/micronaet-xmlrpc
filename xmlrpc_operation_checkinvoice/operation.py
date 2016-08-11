@@ -113,8 +113,6 @@ class AccountInvoice(orm.Model):
         ''' Export current invoice 
             # TODO manage list of invoices?
         '''
-        self.send_mail_checkinvoice_info(cr, uid, 'prova', context=context)
-        return 
         # ---------------------------------------------------------------------
         #                            Utility:
         # ---------------------------------------------------------------------
