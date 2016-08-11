@@ -284,7 +284,7 @@ class AccountInvoice(orm.Model):
                 if agent_code != row[5]: # Agent test
                     status += '(Agent)'
 
-                if not no_tax: # Line tax
+                if no_tax: # Line tax
                     status += '(Tax line)'
 
             if only_error and not status:
