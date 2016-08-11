@@ -265,6 +265,9 @@ class AccountInvoice(orm.Model):
             elif number not in acc_invoice: # Check presence:
                 status = '(No invoice)'
             else:
+                if no_tax: # Line tax
+                    status += '(Tax line)'
+
                 if approx:
                     if abs(row[2] - approx - total) > diff:
                         status = '(Total approx)'
@@ -283,9 +286,6 @@ class AccountInvoice(orm.Model):
                     
                 if agent_code != row[5]: # Agent test
                     status += '(Agent)'
-
-                if no_tax: # Line tax
-                    status += '(Tax line)'
 
             if only_error and not status:
                 continue # no error so jump write
