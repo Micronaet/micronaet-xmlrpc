@@ -186,8 +186,8 @@ class AccountInvoice(orm.Model):
             # TODO check state? 
             ], context=context)
         
-        header = 'ID|Number;Status|Approx (Mx)|Imp. (ODOO)|Imp. (Mx)|' + \
-            'Tax (ODOO)|Tax (Mx);' + \
+        header = 'ID|Number|Status|Approx (Mx)|Imp. (ODOO)|Imp. (Mx)|' + \
+            'Tax (ODOO)|Tax (Mx)|' + \
             'Total (ODOO)|Total (Mx)|' + \
             'Pay (ODOO)|Pay(Mx)|Agent (ODOO)|Agent(Mx)\n'
             
