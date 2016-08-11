@@ -121,6 +121,15 @@ class AccountInvoice(orm.Model):
             ''' Get value from file
             '''
             return float(value.strip().replace(',', '.') or '0')
+        
+        def check_invoice(lines):
+            ''' Check line if tax is present
+            '''
+            no_tax = 0
+            for line in lines:
+                if not line.invoice_line_tax_id:
+                    no_tax += 1                    
+            return no_tax
 
         # ---------------------------------------------------------------------
         #                            Procedure:
@@ -193,7 +202,7 @@ class AccountInvoice(orm.Model):
             'Tax (ODOO)|Tax (Mx)|' + \
             'Total (ODOO)|Total (Mx)|' + \
             'Pay (ODOO)|Pay(Mx)|Partner (ODOO)|Partner (Mx)|' + \
-            'Agent (ODOO)|Agent(Mx)\n'
+            'Agent (ODOO)|Agent(Mx)|No tax\n'
             
         f_out.write(header)
         body_html = _('''            
@@ -243,7 +252,8 @@ class AccountInvoice(orm.Model):
                 invoice.partner_id.agent_id.sql_agent_code or \
                 invoice.partner_id.agent_id.sql_customer_code or \
                 ''
-                )                    
+                )
+            no_tax = self.check_invoice(invoice.invoice_line)
             state = invoice.state
             
             # -----------------------------------------------------------------
@@ -274,11 +284,14 @@ class AccountInvoice(orm.Model):
                 if agent_code != row[5]: # Agent test
                     status += '(Agent)'
 
+                if not no_tax: # Line tax
+                    status += '(Tax line)'
+
             if only_error and not status:
                 continue # no error so jump write
                 
             if row:
-                row_item = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' % (
+                row_item = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' % (
                     invoice.id, number, status, approx,
                     untaxed, row[0],
                     tax, row[1],
@@ -286,6 +299,7 @@ class AccountInvoice(orm.Model):
                     pay_code, row[4],
                     partner_code, row[6],
                     agent_code, row[5],
+                    no_tax,
                     )
                         
             else: # row not present:
