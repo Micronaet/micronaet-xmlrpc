@@ -193,17 +193,6 @@ class AccountInvoice(orm.Model):
             
         f_out.write(header)
         body_html = '''            
-            <style>
-                table {
-                    width: 100%
-                    }
-
-                th, td {
-                    padding: 8px
-                    }
-
-                tr:nth-child(even){background-color: #f2f2f2}
-            </style>
             <div style="overflow-x:auto;">
                 <table>
                     <th><td>%s</td></th>
