@@ -253,7 +253,7 @@ class AccountInvoice(orm.Model):
                 invoice.partner_id.agent_id.sql_customer_code or \
                 ''
                 )
-            no_tax = self.check_invoice(invoice.invoice_line)
+            no_tax = check_invoice(invoice.invoice_line)
             state = invoice.state
             
             # -----------------------------------------------------------------
