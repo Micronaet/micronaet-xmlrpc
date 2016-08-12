@@ -198,7 +198,7 @@ class AccountInvoice(orm.Model):
             # TODO check state? 
             ], context=context)
         
-        header = 'ID|Number|Date|Status|Approx (Mx)|Imp. (ODOO)|Imp. (Mx)|' + \
+        header = 'Number|ID|Date|Status|Approx (Mx)|Imp. (ODOO)|Imp. (Mx)|' + \
             'Tax (ODOO)|Tax (Mx)|' + \
             'Total (ODOO)|Total (Mx)|' + \
             'Pay (ODOO)|Pay(Mx)|Partner (ODOO)|Partner (Mx)|' + \
@@ -260,52 +260,68 @@ class AccountInvoice(orm.Model):
             # Check elements:
             # -----------------------------------------------------------------               
             status = ''
-            if state not in ('open', 'paid'): # State check for confirmed
-                status = '(Status: %s)' % state
-            elif number not in acc_invoice: # Check presence:
-                status = '(No invoice)'
-            else:
-                if no_tax: # Line tax
-                    status += '(Tax line)'
+            
+            # Isolated control:
+            if no_tax: # Line tax
+                status += '(Tax line)'
 
+            # Exclusive control:
+            if state not in ('open', 'paid'): 
+                # State check for confirmed (no other check)
+                status += '(Status: %s)' % state
+            elif number not in acc_invoice: 
+                # Check presence (no other check):
+                status += '(No invoice)'
+            else:
+                # Total control:
                 if approx:
+                    # With approx:
                     if abs(row[2] - approx - total) > diff:
-                        status = '(Total approx)'
-                    
-                elif abs(untaxed - row[0]) > diff or \
+                        status = '(Total approx)'                    
+                elif abs(untaxed - row[0]) > diff or \                
                         abs(tax - row[1]) > diff or \
                         abs(total - row[2]) > diff:
-                    # Difference on totals:
+                    # Without approx:    
                     status = '(Total)'
-                    
-                if pay_code != row[4]: # Agent test
+                
+                # Add in controls:    
+                if pay_code != row[4]: 
+                    # Agent test
                     status += '(Payment)'
 
-                if partner_code != row[6]: # Partner test
+                if partner_code != row[6]: 
+                    # Partner test
                     status += '(Partner)'
                     
-                if agent_code != row[5]: # Agent test
+                if agent_code != row[5]: 
+                    # Agent test
                     status += '(Agent)'
 
             if only_error and not status:
                 continue # no error so jump write
                 
             if row:
-                row_item = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' % (
-                    invoice.id, number, invoice.date_invoice, status, approx,
-                    untaxed, row[0],
-                    tax, row[1],
-                    total, row[2],                     
-                    pay_code, row[4],
-                    partner_code, row[6],
-                    agent_code, row[5],
-                    no_tax,
-                    )
+                row_item = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|' + \
+                    '%s|%s|%s\n' % (
+                        # Header data:
+                        number, invoice.id, invoice.date_invoice, 
+                        status, approx,
                         
-            else: # row not present:
+                        # Check data:
+                        untaxed, row[0],
+                        tax, row[1],
+                        total, row[2],                     
+                        pay_code, row[4],
+                        partner_code, row[6],
+                        agent_code, row[5],
+                        no_tax,
+                        )
+                        
+            else: 
+                # Not present:
                 row_item = '%s|%s|%s|%s\n' % (
-                    invoice.id, number, invoice.date_invoice, status)
-                
+                    number, invoice.id, invoice.date_invoice, status)
+
             body += '<tr><td class="oe_list_field_cell">%s</td></tr>' % (
                 row_item.replace('|', '</td><td class="oe_list_field_cell">'))
             f_out.write(row_item)
