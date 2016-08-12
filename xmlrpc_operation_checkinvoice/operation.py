@@ -122,15 +122,6 @@ class AccountInvoice(orm.Model):
             '''
             return float(value.strip().replace(',', '.') or '0')
         
-        def check_invoice(lines):
-            ''' Check line if tax is present
-            '''
-            no_tax = 0
-            for line in lines:
-                if not line.invoice_line_tax_id:
-                    no_tax += 1                    
-            return no_tax
-
         # ---------------------------------------------------------------------
         #                            Procedure:
         # ---------------------------------------------------------------------
@@ -255,7 +246,7 @@ class AccountInvoice(orm.Model):
                 invoice.partner_id.agent_id.sql_customer_code or \
                 ''
                 )
-            no_tax = check_invoice(invoice.invoice_line)
+            no_tax = self.check_invoice(invoice.invoice_line)
             state = invoice.state
             
             # -----------------------------------------------------------------

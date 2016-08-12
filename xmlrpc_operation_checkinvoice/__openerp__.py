@@ -32,6 +32,7 @@
         'account',
         'mail',
         'xmlrpc_base',
+        'invoice_vat_check',
         ],
     'init_xml': [],
     'demo': [],
