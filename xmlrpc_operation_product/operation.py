@@ -95,23 +95,24 @@ class ProductProduct(orm.Model):
             raise osv.except_osv(
                 _('XMLRPC sync error'), 
                 _('Error on button sync product'))
-
         parameter = {}
         
         # Generate string for export file:        
-        mask = '%-60s\n' # Win CR # TODO
-        
+        mask = '%16s%16s%40s%40s%60s%60s%60s%1s%5s%2s%2s%12s' + \
+            '%6s%15.3f%8s%8s%3s%3s%8s%8s%8s%15.2f%60s%60s\n'
+
         parameter['input_file_string'] = ''        
         product = self.browse(cr, uid, ids, context=context)
 
         # ---------------------------------------------------------------------
         #                     Check manatory parameters:
         # ---------------------------------------------------------------------
-        # yet sync
-        if product.xmlrpc_sync:
+        if product.default_code:
             raise osv.except_osv(
                 _('XMLRPC sync error'), 
-                _('Product yet sync!'))
+                _('Product need to have default code!'))
+        # TODO check for multiple code in ODOO database!
+                
         # TODO other check for product manatory fields?
 
         # ------------------
@@ -121,14 +122,41 @@ class ProductProduct(orm.Model):
             'xmlrpc.server').clean_as_ascii(
                 mask % (                   
                     # Anagraphic data:
-                    product.name[:60],
-                    # TODO
+                    product.default_code[:16], # default code
+                    '', # alterative code (16)
+                    product.name[:40], # description
+                    product.name[:40], # extra description
+                    
+                    # Language part:
+                    '', # TODO description eng. (60)
+                    '', # TODO description fr. (60)
+                    '', # TODO description ted. (60)
+                    
+                    # Detail:
+                    0, # TODO decimal (1)
+                    '', # VAT (5), 
+                    '', # UM1 (2)
+                    '', # UM2 (2)
+                    0.0, # Conversione (12)
+                    product.q_x_pack, #Q x pack (6)
+                    0.0, # Last cost (15)
+                    '', # Supplier 1 (8)
+                    '', # Supplier 2 (8)
+                    '', # Statistic cat. (3)
+                    '', # Stock number (3)
+                    '', # Revenue ledger (8)
+                    '', # Cost ledger (8)
+                    '', # Duty number (8)
+                    product.weight or 0.0, # Weight (15.2)
+                    (product.note or '')[:60], # Note1 (60)
+                    '', # Note2 (60)
                     ))
 
         _logger.info('Data: %s' % (parameter, ))
         res = self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'product', parameter=parameter, context=context)
         result_string_file = res.get('result_string_file', False)
+        
         if not result_string_file:
             raise osv.except_osv(
                 _('Sync error:'), 
@@ -136,6 +164,8 @@ class ProductProduct(orm.Model):
                 )
         
         if result_string_file.startswith('OK'):
+            # TODO get code for testing!
+            
             message = 'Product sync in accounting'
             self.message_post(cr, uid, ids, message, context=context)
             # TODO send email to accounting people    
