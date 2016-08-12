@@ -86,7 +86,7 @@ class ProductProduct(orm.Model):
         ''' Export current invoice 
             # TODO manage list of invoices?
         '''
-        assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
+        assert len(ids) == 1, 'No multi product export for now' # TODO 
         context = context or {}
 
         _logger.info('Start XMLRPC sync for product')
@@ -96,20 +96,14 @@ class ProductProduct(orm.Model):
                 _('XMLRPC sync error'), 
                 _('Error on button sync product'))
 
-        # TODO use with validate trigger for get the number
         parameter = {}
         
-        # Generate string for export file:
-        # TODO
-        mask = '%1s%1s%1s%-60s%-15s%-16s%-40s%-5s%-40s%-4s%-40s%1s%-40s%' + \
-            '-40s%-40s%-40s%-40s%-40s%-12s%-5s%1s%-40s%-40s%-8s%-3s%-24s' + \
-            '%-24s%-2s%-2s%-2s%-3s%-2s%-3s' + \
-            '%272s' + \
-            '%-8s\n' # Win CR
+        # Generate string for export file:        
+        mask = '%-60s\n' # Win CR # TODO
         
-        parameter['input_file_string'] = ''
-        
+        parameter['input_file_string'] = ''        
         product = self.browse(cr, uid, ids, context=context)
+
         # ---------------------------------------------------------------------
         #                     Check manatory parameters:
         # ---------------------------------------------------------------------
@@ -118,7 +112,7 @@ class ProductProduct(orm.Model):
             raise osv.except_osv(
                 _('XMLRPC sync error'), 
                 _('Product yet sync!'))
-        # TODO other check?
+        # TODO other check for product manatory fields?
 
         # ------------------
         # Create parameters:
@@ -132,7 +126,7 @@ class ProductProduct(orm.Model):
                     ))
 
         _logger.info('Data: %s' % (parameter, ))
-        res =  self.pool.get('xmlrpc.operation').execute_operation(
+        res = self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'product', parameter=parameter, context=context)
         result_string_file = res.get('result_string_file', False)
         if not result_string_file:
@@ -142,6 +136,7 @@ class ProductProduct(orm.Model):
                 )
         
         if result_string_file.startswith('OK'):
+            message = 'Product sync in accounting'
             self.message_post(cr, uid, ids, message, context=context)
             # TODO send email to accounting people    
             #post_vars = {'subject': "Message subject",
