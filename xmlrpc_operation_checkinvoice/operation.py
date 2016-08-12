@@ -278,7 +278,8 @@ class AccountInvoice(orm.Model):
                     # With approx:
                     if abs(row[2] - approx - total) > diff:
                         status = '(Total approx)'                    
-                elif abs(untaxed - row[0]) > diff or abs(tax - row[1]) > diff or abs(total - row[2]) > diff:
+                elif abs(untaxed - row[0]) > diff or abs(tax - row[1]) > diff \
+                        or abs(total - row[2]) > diff:
                     # Without approx:    
                     status = '(Total)'
                 
