@@ -203,6 +203,8 @@ class AccountInvoice(orm.Model):
             'Total (ODOO)|Total (Mx)|' + \
             'Pay (ODOO)|Pay(Mx)|Partner (ODOO)|Partner (Mx)|' + \
             'Agent (ODOO)|Agent(Mx)|No tax\n'
+        mask = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' # row
+        mask_no = '%s|%s|%s|%s\n' # no row
             
         f_out.write(header)
         body_html = _('''            
@@ -299,26 +301,24 @@ class AccountInvoice(orm.Model):
             if only_error and not status:
                 continue # no error so jump write
                 
-            if row:
-                row_item = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|' + \
-                    '%s|%s|%s\n' % (
-                        # Header data:
-                        number, invoice.id, invoice.date_invoice, 
-                        status, approx,
-                        
-                        # Check data:
-                        untaxed, row[0],
-                        tax, row[1],
-                        total, row[2],                     
-                        pay_code, row[4],
-                        partner_code, row[6],
-                        agent_code, row[5],
-                        no_tax,
-                        )
+            if row:                
+                row_item = mask % (
+                    # Header data:
+                    number, invoice.id, invoice.date_invoice,
+                    status, approx,
+                    # Check data:
+                    untaxed, row[0],
+                    tax, row[1],
+                    total, row[2],              
+                    pay_code, row[4],
+                    partner_code, row[6],
+                    agent_code, row[5],
+                    no_tax,
+                    )
                         
             else: 
                 # Not present:
-                row_item = '%s|%s|%s|%s\n' % (
+                row_item = mask_no % (
                     number, invoice.id, invoice.date_invoice, status)
 
             body += '<tr><td class="oe_list_field_cell">%s</td></tr>' % (
