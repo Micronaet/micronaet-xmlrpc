@@ -15,9 +15,29 @@
                     </header>    
                     <sheet>
                         <group col="4" colspan="4">
-                            <separator string="Personal data:" colspan="4"/>
+                            <separator string="Product info:" colspan="4" col="4"/>
+                            <field name="default_code" />
                             <field name="name" />
-                            <!--TODO-->
+                            <field name="uom_id" />
+                            <field name="statistic_category" />
+
+                            <notebook colspan="4">
+                                <page string="Info">
+                                    <!--<field name="uom_id" />
+                                    <field name="uom_conversion" />
+                                    <field name="decimal" />-->
+                                    <field name="ean13" />
+                                    <field name="ean13_auto" />
+                                    <button name="generate_barcore_ean13" string="Generate barcode" type="object" />
+                                    <field name="q_x_pack" />
+                                    <field name="duty_code" />
+                                </page>
+                                <page string="Dimension">
+                                    <field name="height" />
+                                    <field name="width" />
+                                    <field name="length" />                            
+                                </page>
+                            </notebook>
                         </group>
                     </sheet>        
                 </form>
@@ -25,7 +45,7 @@
         </record>
         <record model="ir.actions.act_window" id="action_insert_product_product">
             <field name="name">Syncro partner</field>
-            <field name="res_model">res.partner</field>
+            <field name="res_model">product.product</field>
             <field name="view_type">form</field>
             <field name="view_mode">form,tree</field>
             <field name="view_id" ref="view_insert_product_product_form"/>

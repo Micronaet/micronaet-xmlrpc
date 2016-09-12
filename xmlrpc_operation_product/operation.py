@@ -102,15 +102,15 @@ class ProductProduct(orm.Model):
             '%6s%15.3f%8s%8s%3s%3s%8s%8s%8s%15.2f%60s%60s\n'
 
         parameter['input_file_string'] = ''        
-        product = self.browse(cr, uid, ids, context=context)
+        product = self.browse(cr, uid, ids, context=context)[0]
 
         # ---------------------------------------------------------------------
         #                     Check manatory parameters:
         # ---------------------------------------------------------------------
-        if product.default_code:
-            raise osv.except_osv(
-                _('XMLRPC sync error'), 
-                _('Product need to have default code!'))
+        #if product.default_code:
+        #    raise osv.except_osv(
+        #        _('XMLRPC sync error'), 
+        #        _('Product need to have default code!'))
         # TODO check for multiple code in ODOO database!
                 
         # TODO other check for product manatory fields?
@@ -125,7 +125,7 @@ class ProductProduct(orm.Model):
                     product.default_code[:16], # default code
                     '', # alterative code (16)
                     product.name[:40], # description
-                    product.name[:40], # extra description
+                    product.name[40:], # extra description
                     
                     # Language part:
                     '', # TODO description eng. (60)
