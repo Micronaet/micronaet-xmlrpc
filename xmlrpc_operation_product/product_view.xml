@@ -40,12 +40,12 @@
                                         <newline/>
                                         <field name="internal_manufacture" />
                                         
-                                        <separator string="Accounting:" colspan="4" />
+                                        <separator string="Accounting:" colspan="5" />
                                         <field name="property_account_income" />
                                         <field name="property_account_expense" />
                                         <newline/>
-                                        <field name="taxes_id" />
-                                        <field name="supplier_taxes_id" />
+                                        <field name="taxes_id" widget="many2many_tags"/>
+                                        <field name="supplier_taxes_id" widget="many2many_tags" />
                                         <newline/>
                                     </group>
                                 </page>
