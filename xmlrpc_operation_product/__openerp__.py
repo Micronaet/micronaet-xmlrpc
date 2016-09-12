@@ -31,6 +31,8 @@
         'base',
         'xmlrpc_base',
         'product',
+        'sql_product', # for statistic category
+        'base_accounting_program', # q x pack
         #'sql_partner', # for fields to update
         #'l10n_it_private', # private info
         #'mx_partner_zone', # zone

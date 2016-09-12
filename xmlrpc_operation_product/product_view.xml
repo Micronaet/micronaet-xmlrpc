@@ -23,19 +23,48 @@
 
                             <notebook colspan="4">
                                 <page string="Info">
-                                    <!--<field name="uom_id" />
-                                    <field name="uom_conversion" />
-                                    <field name="decimal" />-->
-                                    <field name="ean13" />
-                                    <field name="ean13_auto" />
-                                    <button name="generate_barcore_ean13" string="Generate barcode" type="object" />
-                                    <field name="q_x_pack" />
-                                    <field name="duty_code" />
+                                    <group col="5" colspan="4">
+                                        <!--<field name="uom_id" />
+                                        <field name="uom_conversion" />
+                                        <field name="decimal" />-->
+                                        <field name="ean13" />
+                                        <field name="ean13_auto" />
+                                        <button name="generate_barcore_ean13" string="Generate barcode" type="object" />
+                                        <newline/>
+
+                                        <field name="q_x_pack" />
+                                        <field name="colls" />
+                                        <newline/>
+                                        <field name="duty_code" />
+                                        <field name="first_supplier_id" />
+                                        <newline/>
+                                        <field name="internal_manufacture" />
+                                        
+                                        <separator string="Accounting:" colspan="4" />
+                                        <field name="property_account_income" />
+                                        <field name="property_account_expense" />
+                                        <newline/>
+                                        <field name="taxes_id" />
+                                        <field name="supplier_taxes_id" />
+                                        <newline/>
+                                    </group>
                                 </page>
                                 <page string="Dimension">
-                                    <field name="height" />
-                                    <field name="width" />
-                                    <field name="length" />                            
+                                    <group col="6" colspan="4">
+                                        <field name="height" />
+                                        <field name="width" />
+                                        <field name="length" />                            
+
+                                        <field name="pack_h" />
+                                        <field name="pack_l" />
+                                        <field name="pack_p" />                            
+
+                                        <field name="volume" />
+                                        <field name="weight" />
+                                        <field name="weight_net" />                            
+
+                                        <field name="linear_length" />
+                                    </group>
                                 </page>
                             </notebook>
                         </group>
@@ -44,7 +73,7 @@
             </field>
         </record>
         <record model="ir.actions.act_window" id="action_insert_product_product">
-            <field name="name">Syncro partner</field>
+            <field name="name">Syncro product</field>
             <field name="res_model">product.product</field>
             <field name="view_type">form</field>
             <field name="view_mode">form,tree</field>
@@ -54,8 +83,8 @@
         </record>
         <!--TODO-->
         <menuitem
-            parent="base.menu_partner_form" 
-            id="menu_insert_product_product" 
+            parent="product.menu_products" 
+            id="menu_insert_product_product_sync" 
             action="action_insert_product_product"
             string="Syncro product"
             />        
