@@ -34,6 +34,7 @@
         'l10n_it_private', # private info
         'mx_partner_zone', # zone
         # 'l10n_it_iban_cin'
+        'base_accounting_program', # for type_id field
         ],
     'init_xml': [],
     'demo': [],
