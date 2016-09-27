@@ -220,6 +220,8 @@ class AccountInvoice(orm.Model):
             tax = invoice.amount_tax or 0.0
             total = invoice.amount_total or 0.0
             if invoice.type == 'out_refund':
+                #if not number: # TODO
+                # XXX error if not number:    
                 number = number.replace('FT', 'NC')
                 untaxed = -(untaxed)
                 tax = -(tax)
