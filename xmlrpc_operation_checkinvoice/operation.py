@@ -109,7 +109,7 @@ class AccountInvoice(orm.Model):
     # -------------------------------------------------------------------------
     #                            Scheduled event:
     # -------------------------------------------------------------------------
-    def xmlrpc_export_checkinvoice(self, cr, uid, year='2016', 
+    def xmlrpc_export_checkinvoice(self, cr, uid, #year='2016', 
             diff= 0.000001, only_error=True, context=None):
         ''' Export current invoice 
             # TODO manage list of invoices?
@@ -160,7 +160,6 @@ class AccountInvoice(orm.Model):
             doc = line[0].strip()
             series = line[1].strip()
             number = int(line[2].strip())
-            invoice = '%s/%s/%s/%04d' % (doc, series, year, number)
             partner_code = line[3].strip()
             amount = get_float(line[4])
             vat = get_float(line[5])
@@ -170,6 +169,9 @@ class AccountInvoice(orm.Model):
             pay_code = line[8].strip()
             agent_code = line[9].strip()
             partner_code = line[10].strip()
+            year = line[11].strip()
+
+            invoice = '%s/%s/%s/%04d' % (doc, series, year, number)
             if doc == 'NC':
                 vat = -(vat)
                 amount = -(amount)
