@@ -211,6 +211,12 @@ class AccountInvoice(orm.Model):
                     'xmlrpc_sync': True,
                     }, context=context)
                 return True
+            else:    
+            raise osv.except_osv(
+                _('Error import invoice:'), 
+                _('Comment: %s' % result_string_file),
+                )
+            
         # TODO write better error
         raise osv.except_osv(
             _('Sync error:'), 
