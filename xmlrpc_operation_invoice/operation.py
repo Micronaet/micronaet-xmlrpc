@@ -212,10 +212,10 @@ class AccountInvoice(orm.Model):
                     }, context=context)
                 return True
             else:    
-            raise osv.except_osv(
-                _('Error import invoice:'), 
-                _('Comment: %s' % result_string_file),
-                )
+                raise osv.except_osv(
+                    _('Error import invoice:'), 
+                    _('Comment: %s' % result_string_file),
+                    )
             
         # TODO write better error
         raise osv.except_osv(
