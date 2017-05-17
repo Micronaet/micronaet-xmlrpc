@@ -243,12 +243,16 @@ class AccountInvoice(orm.Model):
             pay_code = '%s' % (invoice.payment_term.import_id or '')
             partner_code = invoice.partner_id.sql_customer_code or ''
             # TODO 2 test need to be eliminated and put in nc agent
-            agent_code = (                    
-                invoice.mx_agent_id.sql_agent_code or \
-                invoice.mx_agent_id.sql_supplier_code or \
-                invoice.partner_id.agent_id.sql_agent_code or \
-                invoice.partner_id.agent_id.sql_customer_code or \
-                ''
+            # Use a list of code (depend of what is used)
+            agent_code = (
+                invoice.mx_agent_id.sql_customer_code,
+                invoice.mx_agent_id.sql_supplier_code,
+                invoice.mx_agent_id.sql_agent_code,
+                )
+            agent_code_partner = (
+                invoice.partner_id.agent_id.sql_customer_code,
+                invoice.partner_id.agent_id.sql_supplier_code,
+                invoice.partner_id.agent_id.sql_agent_code,
                 )
             no_tax = self.check_invoice(invoice.invoice_line)
             state = invoice.state
@@ -288,10 +292,18 @@ class AccountInvoice(orm.Model):
                 if partner_code != row[6]: 
                     # Partner test
                     status += '(Partner)'
-                    
-                if agent_code != row[5]: 
-                    # Agent test
-                    status += '(Agent)'
+                
+                # Agent check:
+                if not row[5] and not invoice.mx_agent_id: 
+                    pass # ok no agent
+                else:    
+                    if row[5] if agent_code:
+                        pass # Agent present
+                    elif row[5] if agent_code_partner:
+                        # Agent test
+                        status += '(Agent: partner OK, invoice KO)'
+                    else:
+                        status += '(Agent)'                        
 
             if only_error and not status:
                 continue # no error so jump write
