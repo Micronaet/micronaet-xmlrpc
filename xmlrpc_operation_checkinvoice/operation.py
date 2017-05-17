@@ -245,14 +245,14 @@ class AccountInvoice(orm.Model):
             # TODO 2 test need to be eliminated and put in nc agent
             # Use a list of code (depend of what is used)
             agent_code = (
-                invoice.mx_agent_id.sql_customer_code,
-                invoice.mx_agent_id.sql_supplier_code,
-                invoice.mx_agent_id.sql_agent_code,
+                invoice.mx_agent_id.sql_customer_code or '',
+                invoice.mx_agent_id.sql_supplier_code or '',
+                invoice.mx_agent_id.sql_agent_code or '',
                 )
             agent_code_partner = (
-                invoice.partner_id.agent_id.sql_customer_code,
-                invoice.partner_id.agent_id.sql_supplier_code,
-                invoice.partner_id.agent_id.sql_agent_code,
+                invoice.partner_id.agent_id.sql_customer_code or '',
+                invoice.partner_id.agent_id.sql_supplier_code or '',
+                invoice.partner_id.agent_id.sql_agent_code or '',
                 )
             no_tax = self.check_invoice(invoice.invoice_line)
             state = invoice.state
@@ -319,7 +319,7 @@ class AccountInvoice(orm.Model):
                     total, row[2],              
                     pay_code, row[4],
                     partner_code, row[6],
-                    agent_code, row[5],
+                    filter(None, agent_code + agent_code_partner), row[5],
                     no_tax,
                     )
                         
