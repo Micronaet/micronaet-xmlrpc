@@ -264,34 +264,34 @@ class AccountInvoice(orm.Model):
             
             # Isolated control:
             if no_tax: # Line tax
-                status += '(Tax line)'
+                status += _('(Tax line)')
 
             # Exclusive control:
             if state not in ('open', 'paid'): 
                 # State check for confirmed (no other check)
-                status += '(Status: %s)' % state
+                status += _('(Status: %s)') % state
             elif number not in acc_invoice: 
                 # Check presence (no other check):
-                status += '(No invoice)'
+                status += _('(No invoice)')
             else:
                 # Total control:
                 if approx:
                     # With approx:
                     if abs(row[2] - approx - total) > diff:
-                        status = '(Total approx)'                    
+                        status = _('(Total approx)')
                 elif abs(untaxed - row[0]) > diff or abs(tax - row[1]) > diff \
                         or abs(total - row[2]) > diff:
                     # Without approx:    
-                    status = '(Total)'
+                    status = _('(Total)')
                 
                 # Add in controls:    
                 if pay_code != row[4]: 
                     # Agent test
-                    status += '(Payment)'
+                    status += _('(Payment)')
 
                 if partner_code != row[6]: 
                     # Partner test
-                    status += '(Partner)'
+                    status += _('(Partner)')
                 
                 # Agent check:
                 if not row[5] and not invoice.mx_agent_id: 
@@ -301,9 +301,9 @@ class AccountInvoice(orm.Model):
                         pass # Agent present
                     elif row[5] in agent_code_partner:
                         # Agent test
-                        status += '(Agent: partner OK, invoice KO)'
+                        status += _('(Agent:Cl.OK F.KO)')
                     else:
-                        status += '(Agent)'                        
+                        status += _('(Agent)')
 
             if only_error and not status:
                 continue # no error so jump write
