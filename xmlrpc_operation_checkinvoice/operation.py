@@ -297,9 +297,9 @@ class AccountInvoice(orm.Model):
                 if not row[5] and not invoice.mx_agent_id: 
                     pass # ok no agent
                 else:    
-                    if row[5] if agent_code:
+                    if row[5] in agent_code:
                         pass # Agent present
-                    elif row[5] if agent_code_partner:
+                    elif row[5] in agent_code_partner:
                         # Agent test
                         status += '(Agent: partner OK, invoice KO)'
                     else:
