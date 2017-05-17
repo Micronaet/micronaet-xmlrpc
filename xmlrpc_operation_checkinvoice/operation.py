@@ -301,7 +301,7 @@ class AccountInvoice(orm.Model):
                         pass # Agent present
                     elif row[5] in agent_code_partner:
                         # Agent test
-                        status += _('(Agent:Cl.OK F.KO)')
+                        status += _('(Agent inv.)')
                     else:
                         status += _('(Agent)')
 
