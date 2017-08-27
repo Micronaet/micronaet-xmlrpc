@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 8.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-29 12:39+0000\n"
-"PO-Revision-Date: 2016-03-29 14:46+0100\n"
+"POT-Creation-Date: 2017-07-27 16:32+0000\n"
+"PO-Revision-Date: 2017-08-09 00:16+0100\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,25 +18,36 @@ msgstr ""
 "X-Generator: Poedit 1.6.10\n"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:223
+#: code:addons/xmlrpc_operation_partner/operation.py:353
 #, python-format
 msgid "Account sync for customer, code: %s"
 msgstr "Conto sincronizzato per il cliente, codice: %s"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:229
+#: code:addons/xmlrpc_operation_partner/operation.py:361
 #, python-format
 msgid "Account sync for dest., code: %s"
 msgstr "Conto sincronizzato per la destinazione, codice: %s"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:226
+#: code:addons/xmlrpc_operation_partner/operation.py:357
 #, python-format
 msgid "Account sync for supplier, code: %s"
 msgstr "Conto sincronizzato per il fornitore, codice: %s"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:258
+#: view:res.partner:xmlrpc_operation_partner.view_insert_res_partner_form
+msgid "Accounting:"
+msgstr "Contabilità:"
+
+#. module: xmlrpc_operation_partner
+#: code:addons/xmlrpc_operation_partner/operation.py:261
+#, python-format
+msgid "Bank must be <= %s in partner!!!"
+msgstr "La banca deve essere <= %s nel partner!!!"
+
+#. module: xmlrpc_operation_partner
+#: code:addons/xmlrpc_operation_partner/operation.py:403
 #, python-format
 msgid "Cannot sync with accounting! (return esit not present)"
 msgstr ""
@@ -44,7 +55,7 @@ msgstr ""
 "trovata)"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:176
+#: code:addons/xmlrpc_operation_partner/operation.py:192
 #, python-format
 msgid "Check supplier or code in parent partner!"
 msgstr ""
@@ -52,41 +63,61 @@ msgstr ""
 "tutte le destinazioni)"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:72
+#: code:addons/xmlrpc_operation_partner/operation.py:73
 #, python-format
 msgid "Connect error:"
 msgstr "Errore di connessione:"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:132
+#: view:res.partner:xmlrpc_operation_partner.view_insert_res_partner_form
+msgid "Contact:"
+msgstr "Contatto:"
+
+#. module: xmlrpc_operation_partner
+#: code:addons/xmlrpc_operation_partner/operation.py:143
 #, python-format
 msgid "Customer with sync code present, need empty (SQL)!"
 msgstr ""
 "Codice cliente per la sincro già presente, non deve esserci (codice SQL)"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:96
+#: code:addons/xmlrpc_operation_partner/operation.py:98
 #, python-format
 msgid "Error on button sync type (no customer or supplier)"
 msgstr "Errore di sincro (nessun cliente o fornitore)"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:216
+#: code:addons/xmlrpc_operation_partner/operation.py:347
 #, python-format
 msgid "Error reading result operation!"
 msgstr "Errore leggendo l'esito operazione!"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:165
+#: code:addons/xmlrpc_operation_partner/operation.py:370
+#, python-format
+msgid ""
+"Error update DB, write manually: %s: %s\n"
+"%s"
+msgstr ""
+"Errore aggiornamento DBB, scrivere manualmente: %s: %s\n"
+"%s"
+
+#. module: xmlrpc_operation_partner
+#: code:addons/xmlrpc_operation_partner/operation.py:181
 #, python-format
 msgid "No customer code in parent partner!"
 msgstr "Non c'è il codice conto cliente nel partner padre"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:172
+#: code:addons/xmlrpc_operation_partner/operation.py:188
 #, python-format
 msgid "No supplier code in parent partner!"
 msgstr "Non c'è il codice contro fornitore nel partner padre"
+
+#. module: xmlrpc_operation_partner
+#: view:res.partner:xmlrpc_operation_partner.view_insert_res_partner_form
+msgid "Note"
+msgstr "Note"
 
 #. module: xmlrpc_operation_partner
 #: model:ir.model,name:xmlrpc_operation_partner.model_res_partner
@@ -94,31 +125,47 @@ msgid "Partner"
 msgstr "Partner"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:142
+#: code:addons/xmlrpc_operation_partner/operation.py:158
 #, python-format
-msgid "Partner mandatory field not present: vat!"
-msgstr "Campo obbligatorio non presente nel partner: P. IVA!"
+msgid "Partner mandatory field not present: Account position"
+msgstr "Campi obbligatori partner non presenti: Posizione conto"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:126
+#: code:addons/xmlrpc_operation_partner/operation.py:153
+#, python-format
+msgid "Partner mandatory field not present: vat"
+msgstr "Campi obbligatori mancanti: IVA"
+
+#. module: xmlrpc_operation_partner
+#: code:addons/xmlrpc_operation_partner/operation.py:137
 #, python-format
 msgid "Partner need to be company or address"
 msgstr "Il partner deve essere una azienda o un indirizzo!"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:157
+#: code:addons/xmlrpc_operation_partner/operation.py:173
 #, python-format
 msgid "Partner with sync code, need empty (SQL)!"
 msgstr "Il partner non deve avere il codice di importazione (SQL)!"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:120
+#: code:addons/xmlrpc_operation_partner/operation.py:131
 #, python-format
 msgid "Partner yet sync!"
 msgstr "Partner già sincronizzato!"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:252
+#: view:res.partner:xmlrpc_operation_partner.view_insert_res_partner_form
+msgid "Personal data:"
+msgstr "Dati personali:"
+
+#. module: xmlrpc_operation_partner
+#: view:res.partner:xmlrpc_operation_partner.view_insert_res_partner_form
+msgid "Reference:"
+msgstr "Riferimento:"
+
+#. module: xmlrpc_operation_partner
+#: code:addons/xmlrpc_operation_partner/operation.py:396
 #, python-format
 msgid "Returned data: %s"
 msgstr "Risposta ritornato: %s"
@@ -129,28 +176,39 @@ msgid "String"
 msgstr "Stringa"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:136
+#: code:addons/xmlrpc_operation_partner/operation.py:147
 #, python-format
 msgid "Supplier with sync code present, need empty (SQL)!"
 msgstr ""
 "Codice fornitore per la sincro già presente, non deve esserci (codice SQL)"
 
 #. module: xmlrpc_operation_partner
+#: view:res.partner:xmlrpc_operation_partner.view_insert_res_partner_form
 #: view:res.partner:xmlrpc_operation_partner.view_res_partner_sync_export_form
 msgid "Sync Customer"
 msgstr "Syncro cliente"
 
 #. module: xmlrpc_operation_partner
+#: view:res.partner:xmlrpc_operation_partner.view_insert_res_partner_form
 #: view:res.partner:xmlrpc_operation_partner.view_res_partner_sync_export_form
 msgid "Sync Supplier"
 msgstr "Sincro fornitore"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:251
-#: code:addons/xmlrpc_operation_partner/operation.py:257
+#: code:addons/xmlrpc_operation_partner/operation.py:260
+#: code:addons/xmlrpc_operation_partner/operation.py:369
+#: code:addons/xmlrpc_operation_partner/operation.py:395
+#: code:addons/xmlrpc_operation_partner/operation.py:402
 #, python-format
 msgid "Sync error:"
 msgstr "Errore sincronizzazione:"
+
+#. module: xmlrpc_operation_partner
+#: model:ir.actions.act_window,name:xmlrpc_operation_partner.action_insert_res_partner
+#: model:ir.ui.menu,name:xmlrpc_operation_partner.menu_insert_res_partner
+#: view:res.partner:xmlrpc_operation_partner.view_insert_res_partner_form
+msgid "Syncro partner"
+msgstr "Syncro partner"
 
 #. module: xmlrpc_operation_partner
 #: model:ir.model,name:xmlrpc_operation_partner.model_xmlrpc_operation
@@ -158,23 +216,24 @@ msgid "XMLRPC Operation"
 msgstr "XMLRPC Operazione "
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:72
+#: code:addons/xmlrpc_operation_partner/operation.py:73
 #, python-format
 msgid "XMLRPC connecting server"
 msgstr "XMLRPC connessione server"
 
 #. module: xmlrpc_operation_partner
-#: code:addons/xmlrpc_operation_partner/operation.py:95
-#: code:addons/xmlrpc_operation_partner/operation.py:119
-#: code:addons/xmlrpc_operation_partner/operation.py:125
-#: code:addons/xmlrpc_operation_partner/operation.py:131
-#: code:addons/xmlrpc_operation_partner/operation.py:135
-#: code:addons/xmlrpc_operation_partner/operation.py:141
-#: code:addons/xmlrpc_operation_partner/operation.py:156
-#: code:addons/xmlrpc_operation_partner/operation.py:164
-#: code:addons/xmlrpc_operation_partner/operation.py:171
-#: code:addons/xmlrpc_operation_partner/operation.py:175
-#: code:addons/xmlrpc_operation_partner/operation.py:215
+#: code:addons/xmlrpc_operation_partner/operation.py:97
+#: code:addons/xmlrpc_operation_partner/operation.py:130
+#: code:addons/xmlrpc_operation_partner/operation.py:136
+#: code:addons/xmlrpc_operation_partner/operation.py:142
+#: code:addons/xmlrpc_operation_partner/operation.py:146
+#: code:addons/xmlrpc_operation_partner/operation.py:152
+#: code:addons/xmlrpc_operation_partner/operation.py:157
+#: code:addons/xmlrpc_operation_partner/operation.py:172
+#: code:addons/xmlrpc_operation_partner/operation.py:180
+#: code:addons/xmlrpc_operation_partner/operation.py:187
+#: code:addons/xmlrpc_operation_partner/operation.py:191
+#: code:addons/xmlrpc_operation_partner/operation.py:346
 #, python-format
 msgid "XMLRPC sync error"
 msgstr "XMLRPC errore syncro"

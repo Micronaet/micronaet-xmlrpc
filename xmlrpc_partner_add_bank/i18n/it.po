@@ -1,0 +1,28 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* xmlrpc_partner_add_bank
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-07-27 16:32+0000\n"
+"PO-Revision-Date: 2017-08-09 00:14+0100\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: it\n"
+"X-Generator: Poedit 1.6.10\n"
+
+#. module: xmlrpc_partner_add_bank
+#: view:res.partner:xmlrpc_partner_add_bank.view_res_partner_extra_banks_field_form
+msgid "Bank"
+msgstr "Banca"
+
+#. module: xmlrpc_partner_add_bank
+#: view:res.partner:xmlrpc_partner_add_bank.view_res_partner_extra_banks_field_form
+msgid "Bank (max: 4):"
+msgstr "Banca (massimo: 4):"

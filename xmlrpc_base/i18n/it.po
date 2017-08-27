@@ -1,0 +1,125 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* xmlrpc_base
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-07-27 16:32+0000\n"
+"PO-Revision-Date: 2017-08-16 17:15+0100\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: it\n"
+"X-Generator: Poedit 1.6.10\n"
+
+#. module: xmlrpc_base
+#: field:xmlrpc.server,company_id:0
+msgid "Company"
+msgstr "Azienda"
+
+#. module: xmlrpc_base
+#: field:xmlrpc.operation,create_uid:0 field:xmlrpc.server,create_uid:0
+msgid "Created by"
+msgstr "Creato da"
+
+#. module: xmlrpc_base
+#: field:xmlrpc.operation,create_date:0 field:xmlrpc.server,create_date:0
+msgid "Created on"
+msgstr "Creato il"
+
+#. module: xmlrpc_base
+#: field:xmlrpc.operation,demo:0
+msgid "Demo mode"
+msgstr "Modalità demo"
+
+#. module: xmlrpc_base
+#: field:xmlrpc.operation,id:0 field:xmlrpc.server,id:0
+msgid "ID"
+msgstr "ID"
+
+#. module: xmlrpc_base
+#: field:xmlrpc.operation,input_filename:0 field:xmlrpc.server,host:0
+msgid "Input filename"
+msgstr "Nome file input"
+
+#. module: xmlrpc_base
+#: field:xmlrpc.operation,input_path:0
+msgid "Input path"
+msgstr "Percorso input"
+
+#. module: xmlrpc_base
+#: field:xmlrpc.operation,write_uid:0 field:xmlrpc.server,write_uid:0
+msgid "Last Updated by"
+msgstr "Aggiornato da"
+
+#. module: xmlrpc_base
+#: field:xmlrpc.operation,write_date:0 field:xmlrpc.server,write_date:0
+msgid "Last Updated on"
+msgstr "Aggiornato il"
+
+#. module: xmlrpc_base
+#: view:xmlrpc.operation:xmlrpc_base.view_xmlrpx_operation_form
+#: field:xmlrpc.operation,note:0 field:xmlrpc.server,note:0
+msgid "Note"
+msgstr "Note"
+
+#. module: xmlrpc_base
+#: model:ir.ui.menu,name:xmlrpc_base.menu_xmlrpc_operation
+#: field:xmlrpc.operation,name:0 field:xmlrpc.server,name:0
+msgid "Operation"
+msgstr "Operazione"
+
+#. module: xmlrpc_base
+#: field:xmlrpc.server,port:0
+msgid "Port"
+msgstr "Porta"
+
+#. module: xmlrpc_base
+#: field:xmlrpc.operation,result_filename:0
+msgid "Result filename"
+msgstr "Nome file risultante"
+
+#. module: xmlrpc_base
+#: field:xmlrpc.operation,result_path:0
+msgid "Result path"
+msgstr "Percorso risultante"
+
+#. module: xmlrpc_base
+#: model:ir.ui.menu,name:xmlrpc_base.menu_xmlrpc_server
+msgid "Server"
+msgstr "Server"
+
+#. module: xmlrpc_base
+#: field:xmlrpc.operation,shell_command:0
+msgid "Shell command"
+msgstr "Comando da eseguire"
+
+#. module: xmlrpc_base
+#: model:ir.ui.menu,name:xmlrpc_base.menu_xmlrpc_server_root
+msgid "XMLRPC Accounting server"
+msgstr "XMLRPC Server contabilità"
+
+#. module: xmlrpc_base
+#: model:ir.model,name:xmlrpc_base.model_xmlrpc_operation
+msgid "XMLRPC Operation"
+msgstr "XMLRPC Operazione "
+
+#. module: xmlrpc_base
+#: model:ir.actions.act_window,name:xmlrpc_base.action_xmlrpc_server
+#: model:ir.model,name:xmlrpc_base.model_xmlrpc_server
+#: view:xmlrpc.server:xmlrpc_base.view_xmlrpc_server_tree
+#: view:xmlrpc.server:xmlrpc_base.view_xmlrpx_server_form
+msgid "XMLRPC Server"
+msgstr "XMLRPC Server"
+
+#. module: xmlrpc_base
+#: model:ir.actions.act_window,name:xmlrpc_base.action_xmlrpc_operation
+#: view:xmlrpc.operation:xmlrpc_base.view_xmlrpc_operation_tree
+#: view:xmlrpc.operation:xmlrpc_base.view_xmlrpx_operation_form
+msgid "XMLRPC operation"
+msgstr "XMLRPC operazione"
