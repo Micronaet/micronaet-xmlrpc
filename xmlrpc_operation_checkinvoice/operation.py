@@ -121,7 +121,34 @@ class AccountInvoice(orm.Model):
             ''' Get value from file
             '''
             return float(value.strip().replace(',', '.') or '0')
+
+        def get_date(value):
+            ''' Get value from file
+            '''
+            if value:
+                return '%s-%s-%s' % (value[:4], value[4:6], value[6:8])
+            else:
+                return False    
         
+        def get_invoice_year(year, invoice_date, period_check):
+            ''' For company 1 the invoice period from 01/09/2017 start from 
+                this date so invoice will be: 2017S till 31/08/2017
+                else nothing happend
+                period_check for this case is '09' else '01'
+            '''
+            if period_check == '01' or invoice_date < '2017-09-01':
+                _logger.info('No S: %s, %s, %s' % (
+                    year, invoice_date, period_check))
+                return year # normal management
+
+            # case '09' and date >= start period 2017-01-01
+            if invoice_date[5:7] <= '12': # 09 >> 12 (current year)
+                year = '%sS' % year
+            else: # 01 > 09 (use last year)
+                year = '%sS' % (int(year) - 1, ) 
+            _logger.info('Yes S: %s, %s, %s' % (
+                year, invoice_date, period_check))
+            return year      
         # ---------------------------------------------------------------------
         #                            Procedure:
         # ---------------------------------------------------------------------
@@ -170,7 +197,12 @@ class AccountInvoice(orm.Model):
             pay_code = line[8].strip()
             agent_code = line[9].strip()
             partner_code = line[10].strip()
-            year = line[11].strip()
+            year = line[11].strip()            
+            # Manage fiscal year:
+            invoice_date = get_date(line[12])
+            period_check = line[13].strip()
+            
+            year = get_invoice_year(year, invoice_date, period_check)
 
             invoice = '%s/%s/%s/%04d' % (doc, series, year, number)
             if doc == 'NC':
