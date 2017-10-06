@@ -150,6 +150,7 @@ class AccountInvoice(orm.Model):
         # Read invoice data from file:
         # ---------------------------------------------------------------------
         acc_invoice = {}
+        import pdb; pdb.set_trace()
         for line in result_string_file.split('\n'):            
             if not line.strip():
                 continue # jump empty line
