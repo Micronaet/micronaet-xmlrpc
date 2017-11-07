@@ -346,13 +346,13 @@ class AccountInvoice(orm.Model):
                         status += _('(Agent)')
                         
                 # Difference account - stock in accounting prog.        
-                if row[14]: 
+                if row[7]: 
                     status += _('(Diff. cont/mag.)')
 
             if only_error and not status:
                 continue # no error so jump write
                 
-            if row:                
+            if row:
                 row_item = mask % (
                     # Header data:
                     number, invoice.id, invoice.date_invoice,
@@ -364,7 +364,7 @@ class AccountInvoice(orm.Model):
                     pay_code, row[4],
                     partner_code, row[6],
                     filter(None, agent_code + agent_code_partner), row[5],
-                    no_tax, row[14],
+                    no_tax, row[7],
                     )                        
             else: 
                 # Not present:
