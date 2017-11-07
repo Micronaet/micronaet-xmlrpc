@@ -200,7 +200,8 @@ class AccountInvoice(orm.Model):
             # Manage fiscal year:
             invoice_date = get_date(line[12])
             period_check = line[13].strip()
-            
+            difference_total = get_float(line[14])
+                        
             year = get_invoice_year(year, invoice_date, period_check)
 
             invoice = '%s/%s/%s/%04d' % (doc, series, year, number)
@@ -210,7 +211,10 @@ class AccountInvoice(orm.Model):
                 total = -(total)
                 
             acc_invoice[invoice] = (
-                amount, vat, total, approx, pay_code, agent_code, partner_code)
+                amount, vat, total, approx, pay_code, 
+                agent_code, partner_code,
+                difference_total,
+                )
 
         # ---------------------------------------------------------------------
         # Compare with invoice ODOO:
@@ -227,9 +231,13 @@ class AccountInvoice(orm.Model):
             'Tax (ODOO)|Tax (Mx)|' + \
             'Total (ODOO)|Total (Mx)|' + \
             'Pay (ODOO)|Pay(Mx)|Partner (ODOO)|Partner (Mx)|' + \
-            'Agent (ODOO)|Agent(Mx)|No tax\n'
-        mask = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' # row
-        mask_no = '%s|%s|%s|%s\n' # no row
+            'Agent (ODOO)|Agent(Mx)|No tax|Diff. (Cont./Mag.)\n'
+                    
+        # Normal row:    
+        mask = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n'
+        
+        # No row:
+        mask_no = '%s|%s|%s|%s\n'
             
         f_out.write(header)
         body_html = _('''            
@@ -336,6 +344,10 @@ class AccountInvoice(orm.Model):
                         status += _('(Agent inv.)')
                     else:
                         status += _('(Agent)')
+                        
+                # Difference account - stock in accounting prog.        
+                if row[14]: 
+                    status += _('(Diff. cont/mag.)')
 
             if only_error and not status:
                 continue # no error so jump write
@@ -352,9 +364,8 @@ class AccountInvoice(orm.Model):
                     pay_code, row[4],
                     partner_code, row[6],
                     filter(None, agent_code + agent_code_partner), row[5],
-                    no_tax,
-                    )
-                        
+                    no_tax, row[14],
+                    )                        
             else: 
                 # Not present:
                 row_item = mask_no % (
