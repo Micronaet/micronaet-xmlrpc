@@ -181,7 +181,7 @@ class AccountInvoice(orm.Model):
         # Read invoice data from file:
         # ---------------------------------------------------------------------
         acc_invoice = {}
-        for line in result_string_file.split('\n'):            
+        for line in result_string_file.split('\n'):
             if not line.strip():
                 continue # jump empty line
 
@@ -220,6 +220,8 @@ class AccountInvoice(orm.Model):
                 difference_total,
                 )
 
+        print acc_invoice
+        import pdb; pdb.set_trace()
         # ---------------------------------------------------------------------
         # Compare with invoice ODOO:
         # ---------------------------------------------------------------------
@@ -258,9 +260,12 @@ class AccountInvoice(orm.Model):
                 '%s',
                 )
         body = ''
+        
         for invoice in self.browse(
                 cr, uid, invoice_ids, context=context):                    
             number = invoice.number # TODO parse!
+            print number
+            import pdb; pdb.set_trace()
 
             untaxed = invoice.amount_untaxed or 0.0
             tax = invoice.amount_tax or 0.0
