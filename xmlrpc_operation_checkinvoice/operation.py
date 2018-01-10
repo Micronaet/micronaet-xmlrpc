@@ -220,8 +220,6 @@ class AccountInvoice(orm.Model):
                 difference_total,
                 )
 
-        print acc_invoice
-        import pdb; pdb.set_trace()
         # ---------------------------------------------------------------------
         # Compare with invoice ODOO:
         # ---------------------------------------------------------------------
@@ -264,8 +262,6 @@ class AccountInvoice(orm.Model):
         for invoice in self.browse(
                 cr, uid, invoice_ids, context=context):                    
             number = invoice.number # TODO parse!
-            print number
-            import pdb; pdb.set_trace()
 
             untaxed = invoice.amount_untaxed or 0.0
             tax = invoice.amount_tax or 0.0
