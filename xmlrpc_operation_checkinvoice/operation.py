@@ -262,8 +262,6 @@ class AccountInvoice(orm.Model):
         for invoice in self.browse(
                 cr, uid, invoice_ids, context=context):                                    
             number = invoice.number # TODO parse!
-            if '2018' in number:
-                import pdb; pdb.set_trace()
 
             untaxed = invoice.amount_untaxed or 0.0
             tax = invoice.amount_tax or 0.0
