@@ -139,8 +139,8 @@ class AccountInvoice(orm.Model):
                     for period check 09 use S in invoice in range:
                         01/09/2017 - 31/12/2017 after is normal year as before
             '''
-            if period_check == '01' or invoice_date < '2017-09-01'\
-                    or invoice_date > '2018-12-31':
+            if period_check == '01' or invoice_date < '2017-09-01':
+                #    or invoice_date > '2018-12-31':
                 _logger.info('No S: %s, %s, %s' % (
                     year, invoice_date, period_check))
                 return year # normal management
