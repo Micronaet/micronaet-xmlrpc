@@ -140,7 +140,7 @@ class AccountInvoice(orm.Model):
                         01/09/2017 - 31/12/2017 after is normal year as before
             '''
             if period_check == '01' or invoice_date < '2017-09-01' \
-                    or invoice_date > '2018-12-31':
+                    or invoice_date > '2017-12-31':
                 _logger.info('No S: %s, %s, %s' % (
                     year, invoice_date, period_check))
                 return year # normal management
@@ -262,8 +262,6 @@ class AccountInvoice(orm.Model):
         for invoice in self.browse(
                 cr, uid, invoice_ids, context=context):
             number = invoice.number # TODO parse!
-            if '2018' in invoice.number:
-                import pdb; pdb.set_trace()
 
             untaxed = invoice.amount_untaxed or 0.0
             tax = invoice.amount_tax or 0.0
