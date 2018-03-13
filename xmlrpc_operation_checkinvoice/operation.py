@@ -324,6 +324,9 @@ class AccountInvoice(orm.Model):
                     # With approx:
                     if abs(row[2] - approx - total) > diff:
                         status = _('(Total approx)')
+                    elif abs(tax - row[1]) > diff:
+                        status = _('(Total approx but VAT)')
+                        
                 elif abs(untaxed - row[0]) > diff or abs(tax - row[1]) > diff \
                         or abs(total - row[2]) > diff:
                     # Without approx:    
