@@ -261,7 +261,7 @@ class AccountInvoice(orm.Model):
         
         for invoice in self.browse(
                 cr, uid, invoice_ids, context=context):
-            number = invoice.number # TODO parse!
+            number = invoice.number or '' # TODO parse!
 
             untaxed = invoice.amount_untaxed or 0.0
             tax = invoice.amount_tax or 0.0
