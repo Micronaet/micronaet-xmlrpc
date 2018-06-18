@@ -27,7 +27,13 @@
                     <div style="background-color:green;text-align:center;font-weight:bold;color:white;">
                         <separator string="Account Sync" attrs="{'invisible': [('xmlrpc_sync', '=', False)]}" />
                     </div>
-                </xpath>                
+                </xpath>  
+                <xpath expr="//page[1]" position="after">
+                    <page string="XMLRPC" groups="xmlrpc_operation_invoice.sync_admin">
+                        <separator string="Sync Note" colspan="4"/>
+                        <field name="xmlrpc_note"  colspan="4" nolabel="1" />
+                    </page>
+                </xpath>
             </field>
         </record>
 

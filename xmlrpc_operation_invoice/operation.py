@@ -226,6 +226,7 @@ class AccountInvoice(orm.Model):
     
     _columns = {
         'xmlrpc_sync': fields.boolean('XMLRPC syncronized'),        
+        'xmlrpc_note': fields.text('XMLRPC note'),        
         }    
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

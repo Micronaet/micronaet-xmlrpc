@@ -238,7 +238,7 @@ class AccountInvoice(orm.Model):
             'Agent (ODOO)|Agent(Mx)|No tax|Diff. (Cont./Mag.)\n'
                     
         # Normal row:    
-        mask = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n'
+        mask = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n'
         
         # No row:
         mask_no = '%s|%s|%s|%s\n'
@@ -373,6 +373,7 @@ class AccountInvoice(orm.Model):
                     partner_code, row[6],
                     filter(None, agent_code + agent_code_partner), row[5],
                     no_tax, row[7],
+                    invoice.xmlrpc_note,
                     )                        
             else: 
                 # Not present:
