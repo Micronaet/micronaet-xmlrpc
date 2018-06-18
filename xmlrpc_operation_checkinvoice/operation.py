@@ -373,7 +373,7 @@ class AccountInvoice(orm.Model):
                     partner_code, row[6],
                     filter(None, agent_code + agent_code_partner), row[5],
                     no_tax, row[7],
-                    invoice.xmlrpc_note,
+                    invoice.xmlrpc_note or '',
                     )                        
             else: 
                 # Not present:
