@@ -181,10 +181,13 @@ class AccountInvoice(orm.Model):
                                 if line.invoice_line_tax_id else '', 
                             # Provv. (5)
                             0, 
+                            
+                            # Previous block discount:
                             # Discount (50)
                             line.multi_discount_rates or '',
                             # Discount numeric (10)
                             line.discount or '',
+
                             # Account (8)
                             line.account_id.account_ref or '', 
                             # Refund (1)
