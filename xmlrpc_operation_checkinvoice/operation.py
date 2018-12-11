@@ -235,7 +235,7 @@ class AccountInvoice(orm.Model):
             'Tax (ODOO)|Tax (Mx)|' + \
             'Total (ODOO)|Total (Mx)|' + \
             'Pay (ODOO)|Pay(Mx)|Partner (ODOO)|Partner (Mx)|' + \
-            'Agent (ODOO)|Agent(Mx)|No tax|Diff. (Cont./Mag.)\n'
+            'Agent (ODOO)|Agent(Mx)|No tax|Diff. (Cont./Mag.)|Note\n'
                     
         # Normal row:    
         mask = '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n'
