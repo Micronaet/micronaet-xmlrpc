@@ -186,7 +186,7 @@ class AccountInvoice(orm.Model):
                             # Discount (50)
                             line.multi_discount_rates or '',
                             # Discount numeric (10)
-                            '%s' % (line.discount or '').replace('.', ','),
+                            ('%s' % (line.discount or '')).replace('.', ','),
 
                             # Account (8)
                             line.account_id.account_ref or '', 
