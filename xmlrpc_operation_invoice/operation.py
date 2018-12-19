@@ -77,6 +77,17 @@ class AccountInvoice(orm.Model):
     '''    
     _inherit = 'account.invoice'
   
+    def _xmlrpc_clean_description(self, value, cut):
+        ''' Remove \n and \t and return first 60 char
+        ''' 
+        value = value.replace('\n', ' ')            
+        value = value.replace('\r', '')
+        value = value.replace('\t', ' ')
+        if cut:
+            return value[:cut]
+        else:
+            return value    
+
     def dummy_button(self, cr, uid, ids, context=None):
         ''' For show an icon as a button
         '''
@@ -95,7 +106,7 @@ class AccountInvoice(orm.Model):
             # TODO manage list of invoices?
         '''
         def get_comment_line(self, parameter, value):
-            ''' Split line in comment line max 40 char
+            ''' Split line in comment line max 60 char
             '''
             value = (value or '').strip()
             
@@ -103,22 +114,16 @@ class AccountInvoice(orm.Model):
                 # TODO change filler space
                 parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
-                        'D%53s%-60s%112s\r\n' % (
+                        '%36sD%16s%-60s%1242s\r\n' % (
                             '',
-                            clean_as_ascii(value[:60]), # Here for no \n remove
+                            '',
+                            self._xmlrpc_clean_description(
+                                value, 60),# Remove \n 
                             '',
                             ))
                 value = value[60:]
             return True
 
-        def clean_description(value):
-            ''' Remove \n and \t and return first 60 char
-            ''' 
-            value = value.replace('\n', ' ')            
-            value = value.replace('\r', '')
-            value = value.replace('\t', ' ') 
-            return value[:60]
-            
         assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
 
         # TODO use with validate trigger for get the number
@@ -127,19 +132,23 @@ class AccountInvoice(orm.Model):
         # ---------------------------------------------------------------------        
         # Access company record for extra parameters:
         # ---------------------------------------------------------------------        
+        picking_pool = self.pool.get('stock.picking')
         company_pool = self.pool.get('res.company')
+        
         company_ids = company_pool.search(cr, uid, [], context=context)
         company = company_pool.browse(cr, uid, company_ids, context=context)[0]
         
         # Generate string for export file:
-        mask = '%s%s%s%s' % ( #3 block for readability:
+        mask = '%s%s%s%s%s' % ( #3 block for readability:
             '%-2s%-2s%-6s%-8s%-2s%-8s%-8s', #header
             '%-1s%-16s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s%1s%-8s', #row
+            '%-220s%-220s%-220s%-220s%-220s%-20s%-10s', # Fattura PA
             '%-3s', #foot
             '\r\n', # Win CR
             )
 
         parameter['input_file_string'] = ''
+        last_picking = False # Last picking for reference:
         for invoice in self.browse(cr, uid, ids, context=context):
             if not invoice.number:
                 raise osv.except_osv(
@@ -149,16 +158,22 @@ class AccountInvoice(orm.Model):
             # -----------------------------------------------------------------                
             # Note pre document:
             # -----------------------------------------------------------------                
-            # TODO if invoice.text_note_pre:
-            #    get_comment_line(self, parameter, invoice.text_note_pre)
+            if invoice.text_note_pre:
+                get_comment_line(self, parameter, invoice.text_note_pre)
 
-            # -----------------------------------------------------------------                
-            # Order, Partner order, DDT reference:
-            # -----------------------------------------------------------------                
-            # TODO if check_pick_change(l):
-            #    get_comment_line(self, parameter, write_reference())
-
+            ddt_number = ddt_date = ''
             for line in invoice.invoice_line:
+                # -----------------------------------------------------------------                
+                # Order, Partner order, DDT reference:
+                # -----------------------------------------------------------------                
+                picking = line.generator_move_id.picking_id
+                if picking and (not last_picking or last_picking != picking):
+                    last_picking = picking # Save for not print again
+                    get_comment_line(self, parameter,
+                        picking_pool.write_reference_from_picking(picking))
+                    ddt_number = picking.ddt_id.name[:20]
+                    ddt_date = picking.ddt_id.date[:10]
+                
                 try: # Module: invoice_payment_cost (not in dep.)
                     refund_line = 'S' if line.refund_line else ' '
                 except:
@@ -174,8 +189,8 @@ class AccountInvoice(orm.Model):
                 # -----------------------------------------------------------------                
                 # Note pre line:
                 # -----------------------------------------------------------------                
-                #TODO if line.text_note_pre:
-                #    get_comment_line(self, parameter, line.text_note_pre)
+                if line.text_note_pre:
+                    get_comment_line(self, parameter, line.text_note_pre)
                 
                 # -------------------------------------------------------------
                 # Fattura PA extra fields:
@@ -186,7 +201,7 @@ class AccountInvoice(orm.Model):
                 if line.use_text_description:
                     description = line.name or ''  
                 else:
-                    description = product.name or '',
+                    description = product.name or ''
                 
                 # 2. Color:
                 colour = (product.colour or '').strip()[:220]
@@ -208,9 +223,10 @@ class AccountInvoice(orm.Model):
                 # 5. Partic:
                 if invoice.partner_id.use_partic:
                     partic = '' # TODO get_partic_description(
-                        invoice.partner_id.id, product.id)
+                    #    invoice.partner_id.id, product.id)
                 else:
                     partic = ''
+                
                 # -------------------------------------------------------------
                 
                 parameter['input_file_string'] += self.pool.get(
@@ -246,7 +262,7 @@ class AccountInvoice(orm.Model):
                             # Code (16)
                             product.default_code or '', 
                             # Description (60)
-                            clean_description(description),
+                            self._xmlrpc_clean_description(description, 60),
                             # UOM (2)
                             product.uom_id.account_ref or '',
                             # Q. 10N (2 dec.)
@@ -275,12 +291,14 @@ class AccountInvoice(orm.Model):
                             # Extra data for Fattura PA
                             # -------------------------------------------------
                             # TODO
-                            # description,
-                            # colour,
-                            # fsc,
-                            # pefc,
-                            # partic,                            
-                            
+                            self._xmlrpc_clean_description(description, 220),
+                            self._xmlrpc_clean_description(colour, 220),
+                            self._xmlrpc_clean_description(fsc, 220),
+                            self._xmlrpc_clean_description(pefc, 220),
+                            self._xmlrpc_clean_description(partic, 220),
+                            ddt_number,
+                            ddt_date,
+
                             # -------------------------------------------------
                             #                     Foot:
                             # -------------------------------------------------
@@ -293,15 +311,21 @@ class AccountInvoice(orm.Model):
                 # -----------------------------------------------------------------                
                 # Note pre line:
                 # -----------------------------------------------------------------                
-                #TODO if line.text_note_post:
-                #    get_comment_line(self, parameter, line.text_note_post)
+                if line.text_note_post:
+                    get_comment_line(self, parameter, line.text_note_post)
 
             # -----------------------------------------------------------------                
             # Note post document:
             # -----------------------------------------------------------------                
-            # TODO if invoice.text_note_post:
-            #    get_comment_line(self, parameter, invoice.text_note_post)
+            if invoice.text_note_post:
+                get_comment_line(self, parameter, invoice.text_note_post)
 
+        open('/home/thebrush/prova.csv', 'w').write(
+            parameter['input_file_string'])
+        return False
+        
+        
+        
         res = self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'invoice', parameter=parameter, context=context)
             
