@@ -94,17 +94,42 @@ class AccountInvoice(orm.Model):
         ''' Export current invoice 
             # TODO manage list of invoices?
         '''
+        def get_comment_line(self, parameter, value):
+            ''' Split line in comment line max 40 char
+            '''
+            value = (value or '').strip()
+            
+            while value: # Split in 60 char:
+                # TODO change filler space
+                parameter['input_file_string'] += self.pool.get(
+                    'xmlrpc.server').clean_as_ascii(
+                        'D%53s%-60s%112s\r\n' % (
+                            '',
+                            clean_as_ascii(value[:60]), # Here for no \n remove
+                            '',
+                            ))
+                value = value[60:]
+            return True
+
         def clean_description(value):
-            ''' Remove \n and \t and return first 40 char
+            ''' Remove \n and \t and return first 60 char
             ''' 
             value = value.replace('\n', ' ')            
+            value = value.replace('\r', '')
             value = value.replace('\t', ' ') 
-            return value[:40]
+            return value[:60]
             
         assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
 
         # TODO use with validate trigger for get the number
         parameter = {}
+
+        # ---------------------------------------------------------------------        
+        # Access company record for extra parameters:
+        # ---------------------------------------------------------------------        
+        company_pool = self.pool.get('res.company')
+        company_ids = company_pool.search(cr, uid, [], context=context)
+        company = company_pool.browse(cr, uid, company_ids, context=context)[0]
         
         # Generate string for export file:
         mask = '%s%s%s%s' % ( #3 block for readability:
@@ -120,7 +145,19 @@ class AccountInvoice(orm.Model):
                 raise osv.except_osv(
                     _('XMLRPC sync error'), 
                     _('Invoice must be validated!'))
-                
+    
+            # -----------------------------------------------------------------                
+            # Note pre document:
+            # -----------------------------------------------------------------                
+            # TODO if invoice.text_note_pre:
+            #    get_comment_line(self, parameter, invoice.text_note_pre)
+
+            # -----------------------------------------------------------------                
+            # Order, Partner order, DDT reference:
+            # -----------------------------------------------------------------                
+            # TODO if check_pick_change(l):
+            #    get_comment_line(self, parameter, write_reference())
+
             for line in invoice.invoice_line:
                 try: # Module: invoice_payment_cost (not in dep.)
                     refund_line = 'S' if line.refund_line else ' '
@@ -133,6 +170,48 @@ class AccountInvoice(orm.Model):
                 else: # use partner one's
                     agent_code = invoice.partner_id.agent_id.sql_agent_code \
                          or invoice.partner_id.agent_id.sql_supplier_code or ''
+
+                # -----------------------------------------------------------------                
+                # Note pre line:
+                # -----------------------------------------------------------------                
+                #TODO if line.text_note_pre:
+                #    get_comment_line(self, parameter, line.text_note_pre)
+                
+                # -------------------------------------------------------------
+                # Fattura PA extra fields:
+                # -------------------------------------------------------------
+                product = line.product_id
+                # Extra data for Fattura PA:
+                # 1. Description long:
+                if line.use_text_description:
+                    description = line.name or ''  
+                else:
+                    description = product.name or '',
+                
+                # 2. Color:
+                colour = (product.colour or '').strip()[:220]
+                
+                # 3. FSC Certified:
+                if product.fsc_certified_id and company.fsc_certified and \
+                        company.fsc_from_date<= invoice.date_invoice:
+                    fsc = product.fsc_certified_id.text or ''
+                else:
+                    fsc = ''
+
+                # 4. PEFC Certified:
+                if product.pefc_certified_id and company.pefc_certified and \
+                        company.pefc_from_date<= o.date_invoice:
+                    pefc = product.pefc_certified_id.text or ''
+                else:
+                    pefc = ''
+
+                # 5. Partic:
+                if invoice.partner_id.use_partic:
+                    partic = '' # TODO get_partic_description(
+                        invoice.partner_id.id, product.id)
+                else:
+                    partic = ''
+                # -------------------------------------------------------------
                 
                 parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
@@ -165,13 +244,11 @@ class AccountInvoice(orm.Model):
                             # Tipo di riga 1 (D, R, T)
                             'R',
                             # Code (16)
-                            line.product_id.default_code or '', 
+                            product.default_code or '', 
                             # Description (60)
-                            clean_description(
-                                line.name if line.use_text_description \
-                                    else line.product_id.name),
+                            clean_description(description),
                             # UOM (2)
-                            line.product_id.uom_id.account_ref or '',
+                            product.uom_id.account_ref or '',
                             # Q. 10N (2 dec.)
                             line.quantity, 
                             # Price 10N (3 dec.)
@@ -192,8 +269,18 @@ class AccountInvoice(orm.Model):
                             line.account_id.account_ref or '', 
                             # Refund (1)
                             refund_line,
-                            (line.product_id.duty_code or '')[:8], # Duty (8) 
+                            (product.duty_code or '')[:8], # Duty (8) 
 
+                            # -------------------------------------------------
+                            # Extra data for Fattura PA
+                            # -------------------------------------------------
+                            # TODO
+                            # description,
+                            # colour,
+                            # fsc,
+                            # pefc,
+                            # partic,                            
+                            
                             # -------------------------------------------------
                             #                     Foot:
                             # -------------------------------------------------
@@ -202,6 +289,18 @@ class AccountInvoice(orm.Model):
                                 if invoice.payment_term else '', 
                             # TODO bank
                             ))
+
+                # -----------------------------------------------------------------                
+                # Note pre line:
+                # -----------------------------------------------------------------                
+                #TODO if line.text_note_post:
+                #    get_comment_line(self, parameter, line.text_note_post)
+
+            # -----------------------------------------------------------------                
+            # Note post document:
+            # -----------------------------------------------------------------                
+            # TODO if invoice.text_note_post:
+            #    get_comment_line(self, parameter, invoice.text_note_post)
 
         res = self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'invoice', parameter=parameter, context=context)

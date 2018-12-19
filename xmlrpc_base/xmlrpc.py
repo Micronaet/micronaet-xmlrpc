@@ -51,10 +51,10 @@ class XmlrpcServer(orm.Model):
         '''
         res = ''
         for c in value:
-            if ord(c) <127:
+            if ord(c) < 127:
                 res += c
             else:
-                res += '#'           
+                res += '*'           
         return res
         
     def get_xmlrpc_server(self, cr, uid, context=None):
