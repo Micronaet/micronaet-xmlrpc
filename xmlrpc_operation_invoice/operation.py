@@ -133,6 +133,7 @@ class AccountInvoice(orm.Model):
         # Access company record for extra parameters:
         # ---------------------------------------------------------------------        
         picking_pool = self.pool.get('stock.picking')
+        product_pool = self.pool.get('product.product')
         company_pool = self.pool.get('res.company')
         
         company_ids = company_pool.search(cr, uid, [], context=context)
@@ -222,8 +223,9 @@ class AccountInvoice(orm.Model):
 
                 # 5. Partic:
                 if invoice.partner_id.use_partic:
-                    partic = '' # TODO get_partic_description(
-                    #    invoice.partner_id.id, product.id)
+                    partic = product_pool._xmlrpc_get_partic_description(
+                        cr, uid, product.id, invoice.partner_id.id, 
+                        context=context)
                 else:
                     partic = ''
                 
@@ -320,9 +322,9 @@ class AccountInvoice(orm.Model):
             if invoice.text_note_post:
                 get_comment_line(self, parameter, invoice.text_note_post)
 
-        open('/home/thebrush/prova.csv', 'w').write(
-            parameter['input_file_string'])
-        return False
+        #open('/home/thebrush/prova.csv', 'w').write(
+        #    parameter['input_file_string'])
+        #return False
         
         
         
