@@ -114,7 +114,7 @@ class AccountInvoice(orm.Model):
                 # TODO change filler space
                 parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
-                        '%36sD%16s%-60s%1242s\r\n' % (
+                        '%36sD%16s%-60s%204s\r\n' % (
                             '',
                             '',
                             self._xmlrpc_clean_description(
@@ -143,7 +143,7 @@ class AccountInvoice(orm.Model):
         mask = '%s%s%s%s%s' % ( #3 block for readability:
             '%-2s%-2s%-6s%-8s%-2s%-8s%-8s', #header
             '%-1s%-16s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s%1s%-8s', #row
-            '%-220s%-220s%-220s%-220s%-220s%-20s%-10s', # Fattura PA
+            '%-20s%-10s%-24s%-1s%-16s%-1s%-10s%-10s', # Fattura PA
             '%-3s', #foot
             '\r\n', # Win CR
             )
@@ -164,9 +164,9 @@ class AccountInvoice(orm.Model):
 
             ddt_number = ddt_date = ''
             for line in invoice.invoice_line:
-                # -----------------------------------------------------------------                
+                # -------------------------------------------------------------
                 # Order, Partner order, DDT reference:
-                # -----------------------------------------------------------------                
+                # -------------------------------------------------------------
                 picking = line.generator_move_id.picking_id
                 if picking and (not last_picking or last_picking != picking):
                     last_picking = picking # Save for not print again
@@ -187,47 +187,43 @@ class AccountInvoice(orm.Model):
                     agent_code = invoice.partner_id.agent_id.sql_agent_code \
                          or invoice.partner_id.agent_id.sql_supplier_code or ''
 
-                # -----------------------------------------------------------------                
+                # -------------------------------------------------------------
                 # Note pre line:
-                # -----------------------------------------------------------------                
+                # -------------------------------------------------------------
                 if line.text_note_pre:
                     get_comment_line(self, parameter, line.text_note_pre)
                 
                 # -------------------------------------------------------------
-                # Fattura PA extra fields:
+                # Fattura PA "long" fields:
                 # -------------------------------------------------------------
                 product = line.product_id
-                # Extra data for Fattura PA:
-                # 1. Description long:
+
+                # Description:
                 if line.use_text_description:
                     description = line.name or ''  
                 else:
                     description = product.name or ''
                 
-                # 2. Color:
-                colour = (product.colour or '').strip()[:220]
-                
-                # 3. FSC Certified:
-                if product.fsc_certified_id and company.fsc_certified and \
-                        company.fsc_from_date<= invoice.date_invoice:
-                    fsc = product.fsc_certified_id.text or ''
-                else:
-                    fsc = ''
-
-                # 4. PEFC Certified:
-                if product.pefc_certified_id and company.pefc_certified and \
-                        company.pefc_from_date<= o.date_invoice:
-                    pefc = product.pefc_certified_id.text or ''
-                else:
-                    pefc = ''
-
-                # 5. Partic:
-                if invoice.partner_id.use_partic:
-                    partic = product_pool._xmlrpc_get_partic_description(
-                        cr, uid, product.id, invoice.partner_id.id, 
-                        context=context)
-                else:
-                    partic = ''
+                # -------------------------------------------------------------
+                # Invoice field "needed" Fattura PA:
+                # -------------------------------------------------------------
+                goods_description = \
+                    (invoice.goods_description_id.name or '')[:24]
+                carriage_condition = \
+                    invoice.carriage_condition_id.account_ref or ''
+                transportation_reason = \
+                    (invoice.transportation_reason_id.name or '')[:16]
+                transportation_method = \
+                    invoice.transportation_method_id.account_ref or ''
+                carrier_code = \
+                    invoice.default_carrier_id.partner_id.sql_supplier_code or ''
+                parcels = '%s' % invoice.parcels
+                    
+                # TODO check error:
+                if invoice.default_carrier_id and not carrier_code:                    
+                    raise osv.except_osv(
+                        _('XMLRPC error'), 
+                        _('Carrier need Account code!'))
                 
                 # -------------------------------------------------------------
                 
@@ -292,14 +288,18 @@ class AccountInvoice(orm.Model):
                             # -------------------------------------------------
                             # Extra data for Fattura PA
                             # -------------------------------------------------
-                            # TODO
-                            self._xmlrpc_clean_description(description, 220),
-                            self._xmlrpc_clean_description(colour, 220),
-                            self._xmlrpc_clean_description(fsc, 220),
-                            self._xmlrpc_clean_description(pefc, 220),
-                            self._xmlrpc_clean_description(partic, 220),
                             ddt_number,
                             ddt_date,
+                            
+                            # -------------------------------------------------
+                            # Extra data for invoice:
+                            # -------------------------------------------------
+                            goods_description,
+                            carriage_condition,
+                            transportation_reason,
+                            transportation_method,
+                            carrier_code,
+                            parcels,
 
                             # -------------------------------------------------
                             #                     Foot:
@@ -311,10 +311,48 @@ class AccountInvoice(orm.Model):
                             ))
 
                 # -------------------------------------------------------------
+                # Fattura PA "long" fields:
+                # -------------------------------------------------------------
+                product = line.product_id
+                # Extra data for Fattura PA:
+                
+                # 1. Description long:
+                if len(description) > 60:
+                    get_comment_line(self, parameter, 
+                        self._xmlrpc_clean_description(description, 220))
+                
+                # 2. Color:
+                get_comment_line(self, parameter, 
+                    self._xmlrpc_clean_description(product.colour or '', 220))
+                
+                # 3. FSC Certified:
+                if product.fsc_certified_id and company.fsc_certified and \
+                        company.fsc_from_date<= invoice.date_invoice:
+                    get_comment_line(self, parameter,
+                        self._xmlrpc_clean_description(
+                            product.fsc_certified_id.text or '', 220))
+
+                # 4. PEFC Certified:
+                if product.pefc_certified_id and company.pefc_certified and \
+                        company.pefc_from_date<= o.date_invoice:
+                    get_comment_line(self, parameter, 
+                        self._xmlrpc_clean_description(
+                            product.pefc_certified_id.text or '', 220))
+
+                # 5. Partic:
+                if invoice.partner_id.use_partic:
+                    partic = product_pool._xmlrpc_get_partic_description(
+                        cr, uid, product.id, invoice.partner_id.id, 
+                        context=context)
+                    get_comment_line(self, parameter,
+                        self._xmlrpc_clean_description(partic, 220))
+
+                # -------------------------------------------------------------
                 # Note pre line:
                 # -------------------------------------------------------------
                 if line.text_note_post:
-                    get_comment_line(self, parameter, line.text_note_post)
+                    get_comment_line(self, parameter,
+                        get_comment_line(self, parameter, line.text_note_post))
 
             # -----------------------------------------------------------------                
             # Note post document:
@@ -323,9 +361,9 @@ class AccountInvoice(orm.Model):
                 get_comment_line(self, parameter, invoice.text_note_post)
 
         # XXX Remove used for extract file:
-        #open('/home/thebrush/prova.csv', 'w').write(
-        #    parameter['input_file_string'])
-        #return False
+        open('/home/thebrush/prova.csv', 'w').write(
+            parameter['input_file_string'])
+        return False
         
         res = self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'invoice', parameter=parameter, context=context)
