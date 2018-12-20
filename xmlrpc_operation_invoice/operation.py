@@ -211,11 +211,11 @@ class AccountInvoice(orm.Model):
                 # Invoice field "needed" Fattura PA:
                 # -------------------------------------------------------------
                 goods_description = \
-                    (invoice.goods_description_id.account_ref or '')[:24]
+                    invoice.goods_description_id.account_ref or ''
                 carriage_condition = \
                     invoice.carriage_condition_id.account_ref or ''
                 transportation_reason = \
-                    (invoice.transportation_reason_id.account_ref or '')[:16]
+                    invoice.transportation_reason_id.account_ref or ''
                 transportation_method = \
                     invoice.transportation_method_id.account_ref or ''
                 carrier_code = \
@@ -224,7 +224,7 @@ class AccountInvoice(orm.Model):
                 parcels = '%s' % invoice.parcels
                     
                 # TODO check error:
-                # goods, carriage, transportation, method
+                # Direct invoice: goods, carriage, transportation, method
                 if invoice.default_carrier_id and not carrier_code:                    
                     raise osv.except_osv(
                         _('XMLRPC error'), 
