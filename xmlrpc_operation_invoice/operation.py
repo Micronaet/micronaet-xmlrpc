@@ -114,7 +114,7 @@ class AccountInvoice(orm.Model):
                 # TODO change filler space
                 parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
-                        '%36sD%16s%-60s%204s\r\n' % (
+                        '%36sD%16s%-60s%206s\r\n' % (
                             '',
                             '',
                             self._xmlrpc_clean_description(
@@ -143,13 +143,14 @@ class AccountInvoice(orm.Model):
         mask = '%s%s%s%s%s' % ( #3 block for readability:
             '%-2s%-2s%-6s%-8s%-2s%-8s%-8s', #header
             '%-1s%-16s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s%1s%-8s', #row
-            '%-20s%-10s%-24s%-1s%-16s%-1s%-10s%-10s', # Fattura PA
+            '%-2s%-20s%-10s%-24s%-1s%-16s%-1s%-10s%-10s', # Fattura PA
             '%-3s', #foot
             '\r\n', # Win CR
             )
 
         parameter['input_file_string'] = ''
         last_picking = False # Last picking for reference:
+        
         for invoice in self.browse(cr, uid, ids, context=context):
             if not invoice.number:
                 raise osv.except_osv(
@@ -163,6 +164,7 @@ class AccountInvoice(orm.Model):
                 get_comment_line(self, parameter, invoice.text_note_pre)
 
             ddt_number = ddt_date = ''
+            i_ddt = 0
             for line in invoice.invoice_line:
                 # -------------------------------------------------------------
                 # Order, Partner order, DDT reference:
@@ -174,6 +176,7 @@ class AccountInvoice(orm.Model):
                         picking_pool.write_reference_from_picking(picking))
                     ddt_number = picking.ddt_id.name[:20]
                     ddt_date = picking.ddt_id.date[:10]
+                    i_ddt += 1
                 
                 try: # Module: invoice_payment_cost (not in dep.)
                     refund_line = 'S' if line.refund_line else ' '
@@ -208,18 +211,20 @@ class AccountInvoice(orm.Model):
                 # Invoice field "needed" Fattura PA:
                 # -------------------------------------------------------------
                 goods_description = \
-                    (invoice.goods_description_id.name or '')[:24]
+                    (invoice.goods_description_id.account_ref or '')[:24]
                 carriage_condition = \
                     invoice.carriage_condition_id.account_ref or ''
                 transportation_reason = \
-                    (invoice.transportation_reason_id.name or '')[:16]
+                    (invoice.transportation_reason_id.account_ref or '')[:16]
                 transportation_method = \
                     invoice.transportation_method_id.account_ref or ''
                 carrier_code = \
-                    invoice.default_carrier_id.partner_id.sql_supplier_code or ''
+                    invoice.default_carrier_id.partner_id.sql_supplier_code \
+                        or ''
                 parcels = '%s' % invoice.parcels
                     
                 # TODO check error:
+                # goods, carriage, transportation, method
                 if invoice.default_carrier_id and not carrier_code:                    
                     raise osv.except_osv(
                         _('XMLRPC error'), 
@@ -288,6 +293,7 @@ class AccountInvoice(orm.Model):
                             # -------------------------------------------------
                             # Extra data for Fattura PA
                             # -------------------------------------------------
+                            i_ddt,
                             ddt_number,
                             ddt_date,
                             
