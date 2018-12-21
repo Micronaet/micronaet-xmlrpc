@@ -78,7 +78,7 @@ class AccountInvoice(orm.Model):
     _inherit = 'account.invoice'
   
     def _xmlrpc_clean_description(self, value, cut):
-        ''' Remove \n and \t and return first 60 char
+        ''' Remove \n and \t and return first 'cut' char
         ''' 
         value = value.replace('\n', ' ')            
         value = value.replace('\r', '')
@@ -106,24 +106,30 @@ class AccountInvoice(orm.Model):
             # TODO manage list of invoices?
         '''
         def get_comment_line(self, parameter, value):
-            ''' Split line in comment line max 60 char
+            ''' Split line in comment line max 64 char
             '''
             value = (value or '').strip()
             
-            while value: # Split in 60 char:
+            while value: # Split in 64 char:
                 # TODO change filler space
                 parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
-                        '%36sD%16s%-60s%206s\r\n' % (
+                        '%36sD%16s%-64s%206s\r\n' % (
                             '',
                             '',
                             self._xmlrpc_clean_description(
-                                value, 60),# Remove \n 
+                                value, 64),# Remove \n 
                             '',
                             ))
-                value = value[60:]
+                value = value[64:]
             return True
 
+        # ---------------------------------------------------------------------        
+        # Start procedure:
+        # ---------------------------------------------------------------------        
+        if context is None:
+            context = {}
+        
         assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
 
         # TODO use with validate trigger for get the number
@@ -142,7 +148,7 @@ class AccountInvoice(orm.Model):
         # Generate string for export file:
         mask = '%s%s%s%s%s' % ( #3 block for readability:
             '%-2s%-2s%-6s%-8s%-2s%-8s%-8s', #header
-            '%-1s%-16s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s%1s%-8s', #row
+            '%-1s%-16s%-64s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s%1s%-8s', #row
             '%-2s%-20s%-10s%-24s%-1s%-16s%-1s%-10s%-10s', # Fattura PA
             '%-3s', #foot
             '\r\n', # Win CR
@@ -151,7 +157,12 @@ class AccountInvoice(orm.Model):
         parameter['input_file_string'] = ''
         last_picking = False # Last picking for reference:
         
-        for invoice in self.browse(cr, uid, ids, context=context):
+        for invoice_temp in self.browse(cr, uid, ids, context=context):
+            # Reload invoice with partner lang:
+            context['lang'] = invoice_temp.partner_id.lang or 'it_IT'
+            invoice = self.browse(cr, uid, invoice_temp.id, context=context)
+            
+            partner = invoice.partner_id
             if not invoice.number:
                 raise osv.except_osv(
                     _('XMLRPC sync error'), 
@@ -196,7 +207,8 @@ class AccountInvoice(orm.Model):
                 # Note pre line:
                 # -------------------------------------------------------------
                 if line.text_note_pre:
-                    get_comment_line(self, parameter, line.text_note_pre)
+                    for block in line.text_note_pre.split('\n'):
+                        get_comment_line(self, parameter, block)
                 
                 # -------------------------------------------------------------
                 # Fattura PA "long" fields:
@@ -266,8 +278,8 @@ class AccountInvoice(orm.Model):
                             'R',
                             # Code (16)
                             product.default_code or '', 
-                            # Description (60)
-                            self._xmlrpc_clean_description(description, 60),
+                            # Description (64)
+                            self._xmlrpc_clean_description(description, 64),
                             # UOM (2)
                             product.uom_id.account_ref or '',
                             # Q. 10N (2 dec.)
@@ -325,7 +337,7 @@ class AccountInvoice(orm.Model):
                 # Extra data for Fattura PA:
                 
                 # 1. Description long:
-                if len(description) > 60:
+                if len(description) > 64:
                     get_comment_line(self, parameter, 
                         self._xmlrpc_clean_description(description, 220))
                 
@@ -342,7 +354,7 @@ class AccountInvoice(orm.Model):
 
                 # 4. PEFC Certified:
                 if product.pefc_certified_id and company.pefc_certified and \
-                        company.pefc_from_date<= o.date_invoice:
+                        company.pefc_from_date<= invoice.date_invoice:
                     get_comment_line(self, parameter, 
                         self._xmlrpc_clean_description(
                             product.pefc_certified_id.text or '', 220))
@@ -356,22 +368,57 @@ class AccountInvoice(orm.Model):
                         self._xmlrpc_clean_description(partic, 220))
 
                 # -------------------------------------------------------------
-                # Note pre line:
+                # Note post line:
                 # -------------------------------------------------------------
                 if line.text_note_post:
-                    get_comment_line(self, parameter,
-                        get_comment_line(self, parameter, line.text_note_post))
+                    get_comment_line(self, parameter, line.text_note_post)
 
             # -----------------------------------------------------------------                
-            # Note post document:
-            # -----------------------------------------------------------------                
+            # End document data:
+            # -----------------------------------------------------------------
+            # A. End note comment:
             if invoice.text_note_post:
-                get_comment_line(self, parameter, invoice.text_note_post)
+                text = invoice.text_note_post
+                for block in text.split('\n'):
+                    get_comment_line(self, parameter, block)
+            
+            # B. Text note for account position
+            text = partner.property_account_position.text_note_invoice or ''
+            if text:
+                text = picking_pool._parser_template_substitute(invoice, text)
+                for block in text.split('\n'):
+                    get_comment_line(self, parameter, block)
+            
+            # C. Text comment for account position
+            text = partner.property_account_position.text_comment_invoice or ''
+            if text:
+                text = picking_pool._parser_template_substitute(invoice, text)
+                for block in text.split('\n'):
+                    get_comment_line(self, parameter, block)
+
+            # D. FSC PEFC Certified:
+            try:
+                if company.fsc_certified or company.pefc_certified:
+                    text = company.xfc_document_note
+                    for block in text.split('\n'):
+                        get_comment_line(self, parameter, block)
+            except:
+                pass # no FSC Management            
+            
+            # E. Split payment:
+            try:
+                if partner.split_payment:
+                    text = \
+                        'Operazione soggetta alla scissione dei pagamenti. '+\
+                        'Art. 17 ter DPR633/72'
+                    get_comment_line(self, parameter, text)
+            except:
+                pass # no Split Payment Management            
 
         # XXX Remove used for extract file:
-        #open('/home/thebrush/prova.csv', 'w').write(
-        #    parameter['input_file_string'])
-        #return False
+        open('/home/thebrush/prova.csv', 'w').write(
+            parameter['input_file_string'])
+        return False
         
         res = self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'invoice', parameter=parameter, context=context)
