@@ -174,8 +174,10 @@ class AccountInvoice(orm.Model):
                     last_picking = picking # Save for not print again
                     get_comment_line(self, parameter,
                         picking_pool.write_reference_from_picking(picking))
-                    ddt_number = picking.ddt_id.name[:20]
-                    ddt_date = picking.ddt_id.date[:10]
+                    if picking.ddt_id: # If DDT is present
+                        ddt_number = picking.ddt_id.name[:20]
+                        ddt_date = picking.ddt_id.date[:10]
+                        
                     i_ddt += 1
                 
                 try: # Module: invoice_payment_cost (not in dep.)
