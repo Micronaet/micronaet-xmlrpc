@@ -409,7 +409,7 @@ class AccountInvoice(orm.Model):
             try:
                 if partner.split_payment:
                     text = \
-                        'Operazione soggetta alla scissione dei pagamenti. '+\
+                        'Operazione soggetta alla scissione dei pagamenti. ' +\
                         'Art. 17 ter DPR633/72'
                     get_comment_line(self, parameter, text)
             except:
