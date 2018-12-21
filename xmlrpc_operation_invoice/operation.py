@@ -416,9 +416,9 @@ class AccountInvoice(orm.Model):
                 pass # no Split Payment Management            
 
         # XXX Remove used for extract file:
-        open('/home/thebrush/prova.csv', 'w').write(
-            parameter['input_file_string'])
-        return False
+        #open('/home/thebrush/prova.csv', 'w').write(
+        #    parameter['input_file_string'])
+        #return False
         
         res = self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'invoice', parameter=parameter, context=context)
