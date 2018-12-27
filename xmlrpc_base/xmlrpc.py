@@ -117,7 +117,7 @@ class XmlrpcOperation(orm.Model):
         'demo': fields.boolean('Demo mode'),
         'name': fields.char('Operation', size=64, required=True),
         #'operation': fields.char('ID Operation', size=64, required=True),
-        'shell_command': fields.char('Shell command', size=120),
+        'shell_command': fields.char('Shell command', size=200),
         'input_filename': fields.char('Input filename', size=100),
         'input_path': fields.char('Input path', size=180),
         'result_filename': fields.char('Result filename', size=100),
