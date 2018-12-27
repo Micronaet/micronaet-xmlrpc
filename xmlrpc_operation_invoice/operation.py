@@ -319,7 +319,7 @@ class AccountInvoice(orm.Model):
                             # -------------------------------------------------
                             i_ddt,
                             ddt_number,
-                            ddt_date,
+                            ddt_date.replace('-', ''),
                             
                             # -------------------------------------------------
                             # Extra data for invoice:
