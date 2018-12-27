@@ -108,7 +108,12 @@ class AccountInvoice(orm.Model):
         def get_comment_line(self, parameter, value):
             ''' Split line in comment line max 64 char
             '''
-            value = (value or '').strip()
+            value = (value or u'').strip()
+
+            # -----------------------------------------------------------------
+            # Replace some not ASCII char:
+            # -----------------------------------------------------------------
+            value = value.replace(u'€', u'EUR')
             
             while value: # Split in 64 char:
                 # TODO change filler space
