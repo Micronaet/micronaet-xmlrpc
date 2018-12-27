@@ -193,8 +193,10 @@ class AccountInvoice(orm.Model):
                     last_picking = picking # Save for not print again
                     get_comment_line(self, parameter,
                         picking_pool.write_reference_from_picking(picking))
-                    if picking.ddt_id: # If DDT is present
-                        ddt_number = picking.ddt_id.name[:20]
+                    if picking.ddt_id: # If DDT is present                    
+                        ddt_number_block = picking.ddt_id.name.split('/')
+                        ddt_number = '%s-%s' % (
+                            ddt_number_block[1], ddt_number_block[-1])
                         ddt_date = picking.ddt_id.date[:10]
                         
                     i_ddt += 1
