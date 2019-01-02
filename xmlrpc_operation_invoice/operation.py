@@ -106,7 +106,7 @@ class AccountInvoice(orm.Model):
             # TODO manage list of invoices?
         '''
         def get_comment_line(self, parameter, value):
-            ''' Split line in comment line max 64 char
+            ''' Split line in comment line max 60 char
             '''
             value = (value or u'').strip()
 
@@ -118,18 +118,18 @@ class AccountInvoice(orm.Model):
             value = value.replace(u'®', u' (R)')
             value = value.replace(u'™', u' TM')
             
-            while value: # Split in 64 char:
+            while value: # Split in 60 char:
                 # TODO change filler space
                 parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
-                        '%36sD%16s%-64s%206s\r\n' % (
+                        '%36sD%16s%-60s%206s\r\n' % (
                             '',
                             '',
                             self._xmlrpc_clean_description(
-                                value, 64),# Remove \n 
+                                value, 60),# Remove \n 
                             '',
                             ))
-                value = value[64:]
+                value = value[60:]
             return True
 
         # ---------------------------------------------------------------------        
@@ -156,7 +156,7 @@ class AccountInvoice(orm.Model):
         # Generate string for export file:
         mask = '%s%s%s%s%s' % ( #3 block for readability:
             '%-2s%-2s%-6s%-8s%-2s%-8s%-8s', #header
-            '%-1s%-16s%-64s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s%1s%-8s', #row
+            '%-1s%-16s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s%1s%-8s', #row
             '%-2s%-20s%-10s%-24s%-1s%-16s%-1s%-10s%-10s', # Fattura PA
             '%-3s', #foot
             '\r\n', # Win CR
@@ -288,8 +288,8 @@ class AccountInvoice(orm.Model):
                             'R',
                             # Code (16)
                             product.default_code or '', 
-                            # Description (64)
-                            self._xmlrpc_clean_description(description, 64),
+                            # Description (60)
+                            self._xmlrpc_clean_description(description, 60),
                             # UOM (2)
                             product.uom_id.account_ref or '',
                             # Q. 10N (2 dec.)
@@ -347,7 +347,7 @@ class AccountInvoice(orm.Model):
                 # Extra data for Fattura PA:
                 
                 # 1. Description long:
-                if len(description) > 64:
+                if len(description) > 60:
                     get_comment_line(self, parameter, 
                         self._xmlrpc_clean_description(description, 220))
                 
