@@ -19,8 +19,8 @@
             <field name="inherit_id" ref="account.invoice_form"/>
             <field name="arch" type="xml">
                 <xpath expr="/form/header/field[@name='state']" position="before">
-                    <button name="xmlrpc_export_invoice" string="Export in Account" type="object" attrs="{'invisible':['|',('state','=','draft'),('xmlrpc_sync','=',True)]}"/>
-                    <button name="reset_xmlrpc_export_invoice" string="Reset sync" type="object" groups="xmlrpc_operation_invoice.sync_admin"/>
+                    <button name="xmlrpc_export_invoice" string="Export in Account" type="object" attrs="{'invisible':['|',('state','=','draft'),('xmlrpc_sync','=',True)]}" icon="gtk-refresh"/>
+                    <button name="reset_xmlrpc_export_invoice" string="Reset sync" type="object" groups="xmlrpc_operation_invoice.sync_admin" icon="gtk-undo" confirm="Sbloccando la fattura dovrete poi reimportarla nel gestionale eventualmente eliminando la precedente, confermi?"/>
                     <field name="xmlrpc_sync" invisible="1"/>
                 </xpath>
                 <xpath expr="/form/sheet" position="before">
@@ -66,7 +66,7 @@
                     <button name="dummy_button" string="Account unsync" type="object" icon="gtk-no" attrs="{'invisible':[('xmlrpc_sync','=',True)]}"/>
                     <button name="dummy_button" string="Account sync" type="object" icon="gtk-yes" attrs="{'invisible':[('xmlrpc_sync','=',False)]}"/>
                     <button name="xmlrpc_export_invoice" string="Export in Account" type="object" attrs="{'invisible':['|',('state','=','draft'),('xmlrpc_sync','=',True)]}" icon="gtk-refresh"/>
-                    <button name="reset_xmlrpc_export_invoice" string="Reset sync" type="object" groups="xmlrpc_operation_invoice.sync_admin" icon="gtk-undo" />
+                    <button name="reset_xmlrpc_export_invoice" string="Reset sync" type="object" groups="xmlrpc_operation_invoice.sync_admin" icon="gtk-undo" confirm="Sbloccando la fattura dovrete poi reimportarla nel gestionale eventualmente eliminando la precedente, confermi?"/>
                 </field>
             </field>
         </record>
