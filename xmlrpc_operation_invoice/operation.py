@@ -426,14 +426,14 @@ class AccountInvoice(orm.Model):
                 pass # no Split Payment Management            
             
             # F. Private partner:    
-            try:
-                if partner.is_private:
-                    text = "COPIA, IL DOCUMENTO FISCALMENTE VALIDO E' " + \
-                        "ESCLUSIVAMENTE QUELLO DISPONIBILE NELL'AREA " + \
-                        "RISERVATA DELL'AGENZIA DELLE ENTRATE"
-                    get_comment_line(self, parameter, text)
-            except:
-                pass # no Partner private
+            #try:
+            #    if partner.is_private:
+            #        text = "COPIA, IL DOCUMENTO FISCALMENTE VALIDO E' " + \
+            #            "ESCLUSIVAMENTE QUELLO DISPONIBILE NELL'AREA " + \
+            #            "RISERVATA DELL'AGENZIA DELLE ENTRATE"
+            #        get_comment_line(self, parameter, text)
+            #except:
+            #    pass # no Partner private
 
         # XXX Remove used for extract file:
         #open('/home/thebrush/prova.csv', 'w').write(
