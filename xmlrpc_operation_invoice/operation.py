@@ -425,7 +425,16 @@ class AccountInvoice(orm.Model):
             except:
                 pass # no Split Payment Management            
             
-            # F. Private partner:    
+            # F. Force vector
+            try:
+                if invoice.force_vector:
+                    text = invoice.force_vector
+                    for block in text.split('\n'):
+                        get_comment_line(self, parameter, block)
+            except:
+                pass # Error do nothing
+
+            # G. Private partner:    
             #try:
             #    if partner.is_private:
             #        text = "COPIA, IL DOCUMENTO FISCALMENTE VALIDO E' " + \
