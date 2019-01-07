@@ -428,7 +428,7 @@ class AccountInvoice(orm.Model):
             # F. Force vector
             try:
                 if invoice.force_vector:
-                    text = invoice.force_vector
+                    text = 'Vettore:\n%s' % invoice.force_vector.strip()
                     for block in text.split('\n'):
                         get_comment_line(self, parameter, block)
             except:
