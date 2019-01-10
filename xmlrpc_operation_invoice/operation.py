@@ -184,6 +184,7 @@ class AccountInvoice(orm.Model):
 
             ddt_number = ddt_date = ''
             i_ddt = 0
+            last_ddt = False
             for line in invoice.invoice_line:
                 # -------------------------------------------------------------
                 # Order, Partner order, DDT reference:
@@ -198,8 +199,9 @@ class AccountInvoice(orm.Model):
                         ddt_number = '%s-%s' % (
                             ddt_number_block[1], ddt_number_block[-1])
                         ddt_date = picking.ddt_id.date[:10]
-                        
-                    i_ddt += 1
+                    if not last_ddt or ddt_number != last_ddt:
+                        i_ddt += 1
+                        last_ddt = ddt_number
                 
                 try: # Module: invoice_payment_cost (not in dep.)
                     refund_line = 'S' if line.refund_line else ' '
