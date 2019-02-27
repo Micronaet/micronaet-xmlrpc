@@ -156,7 +156,7 @@ class AccountInvoice(orm.Model):
         # Generate string for export file:
         mask = '%s%s%s%s%s' % ( #3 block for readability:
             '%-2s%-2s%-6s%-8s%-2s%-8s%-8s', #header
-            '%-1s%-16s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s%1s%-8s', #row
+            '%-1s%-16s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s%1s%-8s%-8s', #row
             '%-2s%-20s%-10s%-24s%-1s%-16s%-1s%-10s%-10s', # Fattura PA
             '%-3s', #foot
             '\r\n', # Win CR
@@ -316,7 +316,9 @@ class AccountInvoice(orm.Model):
                             line.account_id.account_ref or '', 
                             # Refund (1)
                             refund_line,
-                            (product.duty_code or '')[:8], # Duty (8) 
+                            (product.duty_code or '')[:8], # Duty (8)
+                            ('%s' % (product.weight_net or '')).replace(
+                                '.', ',')[:8],
 
                             # -------------------------------------------------
                             # Extra data for Fattura PA
