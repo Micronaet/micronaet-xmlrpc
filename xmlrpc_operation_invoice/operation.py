@@ -450,6 +450,17 @@ class AccountInvoice(orm.Model):
             #except:
             #    pass # no Partner private
 
+            # H. Force vector
+            try:
+                privacy_policy = (
+                    invoice.company_id.privacy_policy or '').strip()
+                if privacy_policy:
+                    text = 'Privacy: %s' % privacy_policy
+                    for block in text.split('\n'):
+                        get_comment_line(self, parameter, block)
+            except:
+                pass # Error do nothing
+
         # XXX Remove used for extract file:
         #open('/home/thebrush/prova.csv', 'w').write(
         #    parameter['input_file_string'])
