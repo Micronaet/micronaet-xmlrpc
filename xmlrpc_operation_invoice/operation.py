@@ -281,7 +281,9 @@ class AccountInvoice(orm.Model):
                             # Transport reason (2)    
                             invoice.transportation_reason_id.import_id or '', 
                             # Customer code (8)
-                            invoice.partner_id.sql_customer_code or '', 
+                            invoice.partner_id.sql_customer_code or '',
+                            # Destination code (8)
+                            #invoice.partner_id.sql_destination_code or '',
                             # Agent code (8)
                             agent_code,
 
@@ -355,7 +357,7 @@ class AccountInvoice(orm.Model):
                 # 1. Description long:
                 if len(description) > 60:
                     get_comment_line(self, parameter, 
-                        self._xmlrpc_clean_description(description, 220))
+                        self._xmlrpc_clean_description(description[60:], 220))
                 
                 # 2. Color:
                 get_comment_line(self, parameter, 
