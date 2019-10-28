@@ -189,6 +189,9 @@ class AccountInvoice(orm.Model):
                 # -------------------------------------------------------------
                 # Order, Partner order, DDT reference:
                 # -------------------------------------------------------------
+                # destination (if not present DDT used invoice code):
+                ddt_destination = invoice.partner_id.sql_destination_code or ''
+                
                 picking = line.generator_move_id.picking_id
                 if picking and (not last_picking or last_picking != picking):
                     last_picking = picking # Save for not print again
@@ -207,8 +210,6 @@ class AccountInvoice(orm.Model):
                         if not last_ddt or ddt_number != last_ddt:
                             i_ddt += 1
                             last_ddt = ddt_number
-                    else:
-                        ddt_destination = ''
                                         
                 try: # Module: invoice_payment_cost (not in dep.)
                     refund_line = 'S' if line.refund_line else ' '
@@ -333,7 +334,7 @@ class AccountInvoice(orm.Model):
                             i_ddt,
                             ddt_number,
                             ddt_date.replace('-', ''),
-                            ddt_destination,
+                            ddt_destination, # or invoice if DDT not present
                             
                             # -------------------------------------------------
                             # Extra data for invoice:
