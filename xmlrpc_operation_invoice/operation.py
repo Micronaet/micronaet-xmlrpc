@@ -157,7 +157,7 @@ class AccountInvoice(orm.Model):
         mask = '%s%s%s%s%s' % ( #3 block for readability:
             '%-2s%-2s%-6s%-8s%-2s%-8s%-8s', #header
             '%-1s%-16s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s%1s%-8s%-8s', #row
-            '%-2s%-20s%-10s%-24s%-1s%-16s%-1s%-10s%-10s', # Fattura PA
+            '%-2s%-20s%-10s%-8s%-24s%-1s%-16s%-1s%-10s%-10s', # Fattura PA
             '%-3s', #foot
             '\r\n', # Win CR
             )
@@ -182,9 +182,9 @@ class AccountInvoice(orm.Model):
             if invoice.text_note_pre:
                 get_comment_line(self, parameter, invoice.text_note_pre)
 
-            ddt_number = ddt_date = ''
+            ddt_number = ddt_date = ddt_destination = ''
             i_ddt = 0
-            last_ddt = False
+            last_ddt = False            
             for line in invoice.invoice_line:
                 # -------------------------------------------------------------
                 # Order, Partner order, DDT reference:
@@ -195,16 +195,21 @@ class AccountInvoice(orm.Model):
                     get_comment_line(self, parameter,
                         picking_pool.write_reference_from_picking(picking))
                     if picking.ddt_id: # If DDT is present                    
-                        ddt_number_block = picking.ddt_id.name.split('/')
+                        ddt = picking.ddt_id
+                        ddt_number_block = ddt.name.split('/')
                         ddt_number = '%s-%s' % (
                             ddt_number_block[1], ddt_number_block[-1])
-                        ddt_date = picking.ddt_id.date[:10]
+                        ddt_destination = \
+                            ddt.destination_partner_id.sql_destination_code    
+                        ddt_date = ddt.date[:10]
 
                         # If DDT Block print ID:
                         if not last_ddt or ddt_number != last_ddt:
                             i_ddt += 1
                             last_ddt = ddt_number
-                
+                    else:
+                        ddt_destination = ''
+                                        
                 try: # Module: invoice_payment_cost (not in dep.)
                     refund_line = 'S' if line.refund_line else ' '
                 except:
@@ -328,6 +333,7 @@ class AccountInvoice(orm.Model):
                             i_ddt,
                             ddt_number,
                             ddt_date.replace('-', ''),
+                            ddt_destination,
                             
                             # -------------------------------------------------
                             # Extra data for invoice:
