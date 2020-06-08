@@ -303,7 +303,7 @@ class AccountInvoice(orm.Model):
                             # Customer code (8)
                             invoice.partner_id.sql_customer_code or '',
                             # Destination code (8)
-                            invoice.partner_id.sql_destination_code or '',
+                            invoice.destination_partner_id.sql_destination_code or '',
                             # Agent code (8)
                             agent_code,
 
