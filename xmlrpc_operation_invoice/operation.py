@@ -267,7 +267,19 @@ class AccountInvoice(orm.Model):
                         _('Carrier need Account code!'))
                 
                 # -------------------------------------------------------------
+                # LAST BLOCK: Reference for order / DDT yet writed:
+                # -------------------------------------------------------------
+                if not previous_picking and picking:
+                    previous_picking = picking
                 
+                if previous_picking != picking:
+                    get_comment_line(self, parameter,
+                        picking_pool.write_reference_from_picking(picking))
+                    previous_picking = picking
+
+                # -------------------------------------------------------------
+                #                         DATA LINE:
+                # -------------------------------------------------------------                
                 parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
                         mask % (                        
@@ -400,18 +412,8 @@ class AccountInvoice(orm.Model):
                 if line.text_note_post:
                     get_comment_line(self, parameter, line.text_note_post)
 
-                # -------------------------------------------------------------
-                # LAST BLOCK: Reference for order / DDT yet writed:
-                # -------------------------------------------------------------
-                if not previous_picking and picking:
-                    previous_picking = picking
-                
-                if previous_picking != picking:
-                    get_comment_line(self, parameter,
-                        picking_pool.write_reference_from_picking(picking))
-
             # -----------------------------------------------------------------                
-            # End document data:
+            # End document dat
             # -----------------------------------------------------------------
             # BEFORE ALL: 
             if previous_picking:  # Always write last line comment:
