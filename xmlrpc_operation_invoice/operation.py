@@ -122,7 +122,7 @@ class AccountInvoice(orm.Model):
                 # TODO change filler space
                 parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
-                        '%36sD%16s%-60s%222s\r\n' % (
+                        '%36sD%16s%-60s%230s\r\n' % (
                             '',
                             '',
                             self._xmlrpc_clean_description(
