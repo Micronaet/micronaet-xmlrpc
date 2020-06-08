@@ -184,19 +184,21 @@ class AccountInvoice(orm.Model):
 
             ddt_number = ddt_date = ddt_destination = ''
             i_ddt = 0
-            last_ddt = False            
+            last_ddt = False 
+            previous_picking = False           
             for line in invoice.invoice_line:
                 # -------------------------------------------------------------
                 # Order, Partner order, DDT reference:
                 # -------------------------------------------------------------
                 # destination (if not present DDT used invoice code):
-                ddt_destination = invoice.partner_id.sql_destination_code or ''
+                ddt_destination = invoice.partner_id.sql_destination_code or ''                
                 
                 picking = line.generator_move_id.picking_id
+                    
                 if picking and (not last_picking or last_picking != picking):
                     last_picking = picking # Save for not print again
-                    get_comment_line(self, parameter,
-                        picking_pool.write_reference_from_picking(picking))
+                    #get_comment_line(self, parameter,
+                    #    picking_pool.write_reference_from_picking(picking))
                     if picking.ddt_id: # If DDT is present                    
                         ddt = picking.ddt_id
                         ddt_number_block = ddt.name.split('/')
@@ -398,9 +400,24 @@ class AccountInvoice(orm.Model):
                 if line.text_note_post:
                     get_comment_line(self, parameter, line.text_note_post)
 
+                # -------------------------------------------------------------
+                # LAST BLOCK: Reference for order / DDT yet writed:
+                # -------------------------------------------------------------
+                if not previous_picking and picking:
+                    previous_picking = picking
+                
+                if previous_picking != picking:
+                    get_comment_line(self, parameter,
+                        picking_pool.write_reference_from_picking(picking))
+
             # -----------------------------------------------------------------                
             # End document data:
             # -----------------------------------------------------------------
+            # BEFORE ALL: 
+            if previous_picking:  # Always write last line comment:
+                get_comment_line(self, parameter,
+                    picking_pool.write_reference_from_picking(picking))
+
             # A. End note comment:
             if invoice.text_note_post:
                 text = invoice.text_note_post
