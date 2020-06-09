@@ -81,6 +81,14 @@ class AccountInvoice(orm.Model):
     def xmlrpc_export_scheduled(self, cr, uid, ids, context=None):
         """ Schedule for import
         """
+        if context is None:
+            context = {}
+        if not ids:
+            ids = context.get('active_ids')
+        if not ids:
+            _logger.error('Error in selecton invoice')
+            return False
+
         total = 0
         import pdb; pdb.set_trace()
         for invoice in self.browse(cr, uid, ids, context=context):
