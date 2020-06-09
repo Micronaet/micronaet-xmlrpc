@@ -13,17 +13,8 @@ from email.mime.text import MIMEText
 config_folder = './config'
 log_folder = './log'
 pidfile = '/tmp/invoicepa_daemon.pid'
+log_exec_file = './log/execution.log'
 
-# A. Check if yet running:
-pid = str(os.getpid())
-if os.path.isfile(pidfile):
-    print("%s Invoice Daemon already running" % pidfile)
-    sys.exit()
-
-# B. Create PID file:
-pid_f = open(pidfile, 'w')
-pid_f.write(pid)
-pid_f.close()
 
 # -----------------------------------------------------------------------------
 # Function:
@@ -37,6 +28,25 @@ def write_log(log_f, message, mode='info'):
         message,
     ))
 
+
+# -----------------------------------------------------------------------------
+# Check multi execution:
+# -----------------------------------------------------------------------------
+log_exec_f = open(log_exec_file, 'a')
+
+# A. Check if yet running:
+pid = str(os.getpid())
+if os.path.isfile(pidfile):
+    write_log(
+        log_exec_f, 'Invoice Daemon already running [%s]' % pidfile, 'error')
+    sys.exit()
+else:
+    write_log(log_exec_f, 'Invoice Daemon running [%s]' % pidfile)
+
+# B. Create PID file:
+pid_f = open(pidfile, 'w')
+pid_f.write(pid)
+pid_f.close()
 
 # -----------------------------------------------------------------------------
 # Script:
@@ -185,3 +195,5 @@ try:
         break  # No more config file read
 finally:
     os.unlink(pidfile)
+    write_log(log_exec_f, 'Invoice Daemon stopped [%s]' % pidfile)
+    log_exec_f.close()
