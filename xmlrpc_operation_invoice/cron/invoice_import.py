@@ -9,6 +9,7 @@ import ConfigParser
 import erppeek
 import smtplib
 
+import pdb; pdb.set_trace()
 config_folder = './config'
 for root, folders, files in os.walk(config_folder):
     for cfg_file in files:
