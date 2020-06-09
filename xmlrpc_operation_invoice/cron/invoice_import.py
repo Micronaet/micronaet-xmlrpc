@@ -122,4 +122,4 @@ for root, folders, files in os.walk(config_folder):
                     odoo_mailer.smtp_user, to, msg.as_string())
 
             smtp_server.quit()
-        break  # No more config file read
+    break  # No more config file read
