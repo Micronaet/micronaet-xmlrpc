@@ -134,7 +134,7 @@ for root, folders, files in os.walk(config_folder):
                     email_text.append(error_comment)
                 elif destination and not destination.sql_destination_code:
                     error_comment = \
-                        'Fattura senza il codice destinatione di Mexal %s' % \
+                        'Fattura senza il codice destinazione di Mexal %s' % \
                         number
                     email_text.append(error_comment)
                 elif not invoice_pool.xmlrpc_export_invoice([invoice_id]):
