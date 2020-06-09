@@ -527,6 +527,7 @@ class AccountInvoice(orm.Model):
                 # TODO test if number passed if for correct invoice number!
                 self.write(cr, uid, ids, {
                     'xmlrpc_sync': True,
+                    'xmlrpc_scheduled': False,
                     }, context=context)
                 return True
             else:    
