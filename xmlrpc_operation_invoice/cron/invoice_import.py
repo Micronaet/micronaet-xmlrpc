@@ -96,7 +96,7 @@ for root, folders, files in os.walk(config_folder):
                     error_comment = 'Invoice %s not imported (managed)' % \
                         number
             except:
-                print('%s' % (sys.exc_into(),))
+                print('%s' % (sys.exc_info(),))
                 error_comment = 'Invoice %s not imported (unmanaged)' % \
                     number
 
