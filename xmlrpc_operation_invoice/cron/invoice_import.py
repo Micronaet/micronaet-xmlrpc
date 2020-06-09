@@ -5,6 +5,7 @@
 
 # Modules required:
 import os
+import sys
 import ConfigParser
 import erppeek
 import smtplib
@@ -95,6 +96,7 @@ for root, folders, files in os.walk(config_folder):
                     error_comment = 'Invoice %s not imported (managed)' % \
                         number
             except:
+                print('%s' % (sys.exc_into(),))
                 error_comment = 'Invoice %s not imported (unmanaged)' % \
                     number
 
