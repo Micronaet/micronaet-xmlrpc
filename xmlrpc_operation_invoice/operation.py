@@ -77,6 +77,20 @@ class AccountInvoice(orm.Model):
     '''    
     _inherit = 'account.invoice'
   
+    def xmlrpc_export_scheduled(self, cr, uid, ids, context=None):
+        """ Schedule for import
+        """
+        return self.write(cr, uid, ids, {
+            'xmlrpc_scheduled': True,
+            }, context=context)
+            
+    def xmlrpc_export_unscheduled(self, cr, uid, ids, context=None):
+        """ Schedule for import
+        """
+        return self.write(cr, uid, ids, {
+            'xmlrpc_scheduled': False,
+            }, context=context)
+            
     def _xmlrpc_clean_description(self, value, cut):
         ''' Remove \n and \t and return first 'cut' char
         ''' 
@@ -530,6 +544,9 @@ class AccountInvoice(orm.Model):
     
     _columns = {
         'xmlrpc_sync': fields.boolean('XMLRPC syncronized'),        
+        'xmlrpc_scheduled': fields.boolean(
+            'XMLRPC Schedulata', 
+            help='Schedulata per importazione automatica'),        
         'xmlrpc_note': fields.text('XMLRPC note'),        
         }    
 

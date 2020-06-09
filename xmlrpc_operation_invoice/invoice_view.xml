@@ -21,7 +21,10 @@
                 <xpath expr="/form/header/field[@name='state']" position="before">
                     <button name="xmlrpc_export_invoice" string="Export in Account" type="object" attrs="{'invisible':['|',('state','=','draft'),('xmlrpc_sync','=',True)]}" icon="gtk-refresh"/>
                     <button name="reset_xmlrpc_export_invoice" string="Reset sync" type="object" groups="xmlrpc_operation_invoice.sync_admin" icon="gtk-undo" attrs="{'invisible':[('xmlrpc_sync','=',False)]}" confirm="Sbloccando la fattura dovrete poi reimportarla nel gestionale eventualmente eliminando la precedente, confermi?"/>
+                    <button name="xmlrpc_export_scheduled" string="Import schedulato" type="object" attrs="{'invisible':['|','|',('state','=','draft'),('xmlrpc_sync','=',True),('xmlrpc_scheduled','=',True)]}" icon="terp-calendar"/>
+                    <button name="xmlrpc_export_unscheduled" string="Rimosso import schedulato" type="object" attrs="{'invisible':['|','|',('state','=','draft'),('xmlrpc_sync','=',True),('xmlrpc_scheduled','=',False)]}" icon="terp-cancel"/>
                     <field name="xmlrpc_sync" invisible="1"/>
+                    <field name="xmlrpc_scheduled" invisible="1" />
                 </xpath>
                 <xpath expr="/form/sheet" position="before">
                     <div style="background-color:green;text-align:center;font-weight:bold;color:white;">
@@ -44,8 +47,11 @@
             <field name="inherit_id" ref="account.invoice_supplier_form"/>
             <field name="arch" type="xml">
                 <xpath expr="/form/header/field[@name='state']" position="before">
+                    <button name="xmlrpc_export_scheduled" string="Import schedulato" type="object" attrs="{'invisible':['|','|',('state','=','draft'),('xmlrpc_sync','=',True),('xmlrpc_scheduled','=',True)]}" icon="terp-calendar"/>
+                    <button name="xmlrpc_export_unscheduled" string="Rimosso import schedulato" type="object" attrs="{'invisible':['|','|',('state','=','draft'),('xmlrpc_sync','=',True),('xmlrpc_scheduled','=',False)]}" icon="terp-cancel"/>
                     <button name="xmlrpc_export_invoice" string="Export in Account" type="object" attrs="{'invisible':['|',('state','not in',('open','=','paid')),('xmlrpc_sync','=',True)]}"/>
                     <field name="xmlrpc_sync" invisible="1"/>
+                    <field name="xmlrpc_scheduled" invisible="1"/>
                 </xpath>
                 <xpath expr="/form/sheet" position="before">
                     <div style="background-color:green;text-align:center;font-weight:bold;color:white;">
@@ -67,6 +73,11 @@
                     <button name="dummy_button" string="Account sync" type="object" icon="gtk-yes" attrs="{'invisible':[('xmlrpc_sync','=',False)]}"/>
                     <button name="xmlrpc_export_invoice" string="Export in Account" type="object" attrs="{'invisible':['|',('state','=','draft'),('xmlrpc_sync','=',True)]}" icon="gtk-refresh"/>
                     <button name="reset_xmlrpc_export_invoice" string="Reset sync" type="object" groups="xmlrpc_operation_invoice.sync_admin" icon="gtk-undo" attrs="{'invisible':[('xmlrpc_sync','=',False)]}" confirm="Sbloccando la fattura dovrete poi reimportarla nel gestionale eventualmente eliminando la precedente, confermi?"/>
+                    <button name="xmlrpc_export_scheduled" string="Import schedulato" type="object" attrs="{'invisible':['|','|',('state','=','draft'),('xmlrpc_sync','=',True),('xmlrpc_scheduled','=',True)]}" icon="terp-calendar"/>
+                    <button name="xmlrpc_export_unscheduled" string="Rimosso import schedulato" type="object" attrs="{'invisible':['|','|',('state','=','draft'),('xmlrpc_sync','=',True),('xmlrpc_scheduled','=',False)]}" icon="terp-cancel"/>
+
+                    <field name="xmlrpc_sync" invisible="1"/>
+                    <field name="xmlrpc_scheduled" invisible="1"/>
                 </field>
             </field>
         </record>
