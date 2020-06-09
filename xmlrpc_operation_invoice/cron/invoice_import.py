@@ -122,12 +122,26 @@ for root, folders, files in os.walk(config_folder):
             invoice_id = invoice_ids[-1]  # Always the last
             invoice = invoice_pool.browse(invoice_id)
             number = invoice.number
+            partner = invoice.partner_id
+            destination = invoice.destination_partner_id
+
+            # Before check:
             try:
-                if not invoice_pool.xmlrpc_export_invoice([invoice_id]):
+                if not partner.sql_customer_code:
+                    error_comment = \
+                        'Fattura senza il codice cliente di Mexal %s' % \
+                        number
+                    email_text.append(error_comment)
+                elif destination and not destination.sql_destination_code:
+                    error_comment = \
+                        'Fattura senza il codice destinatione di Mexal %s' % \
+                        number
+                    email_text.append(error_comment)
+                elif not invoice_pool.xmlrpc_export_invoice([invoice_id]):
                     error_comment = 'Invoice %s not imported (managed)' % \
                         number
             except:
-                print('%s' % (sys.exc_info(),))
+                print('%s' % (sys.exc_info(), ))
                 error_comment = 'Invoice %s not imported (unmanaged)' % \
                     number
 
