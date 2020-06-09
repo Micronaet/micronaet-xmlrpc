@@ -78,9 +78,7 @@ class AccountInvoice(orm.Model):
     """
     _inherit = 'account.invoice'
 
-    def xmlrpc_export_scheduled(self, cr, uid, ids, context=None):
-        """ Schedule for import
-        """
+    def server_action_xmlrpc_export_scheduled(self, cr, uid, ids, context=None):
         if context is None:
             context = {}
         if not ids:
@@ -94,11 +92,17 @@ class AccountInvoice(orm.Model):
         for invoice in self.browse(cr, uid, ids, context=context):
             if not invoice.xmlrpc_scheduled and not invoice.xmlrpc_sync:
                 total += 1
-                self.write(cr, uid, [invoice.id], {
-                    'xmlrpc_scheduled': True,
-                    }, context=context)
+                self.xmlrpc_export_scheduled(
+                    cr, uid, [invoice.id], context=context)
         _logger.warning('Invoice to be imported, tot.: %s' % total)
         return True
+
+    def xmlrpc_export_scheduled(self, cr, uid, ids, context=None):
+        """ Schedule for import
+        """
+        return self.write(cr, uid, ids, {
+            'xmlrpc_scheduled': True,
+            }, context=context)
 
     def xmlrpc_export_unscheduled(self, cr, uid, ids, context=None):
         """ Schedule for import
