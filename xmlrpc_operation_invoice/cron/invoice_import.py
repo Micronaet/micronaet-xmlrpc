@@ -37,13 +37,13 @@ log_exec_f = open(log_exec_file, 'a')
 # A. Check if yet running:
 pid = str(os.getpid())
 if os.path.isfile(pidfile):
-    message = 'Invoice Daemon already running [%s]' % pidfile
+    message = '[%s] Invoice Daemon already running [%s]' % (pid, pidfile)
     write_log(
         log_exec_f, message, 'error')
     print(message)
     sys.exit()
 else:
-    write_log(log_exec_f, 'Invoice Daemon running [%s]' % pidfile)
+    write_log(log_exec_f, '[%s] Invoice Daemon running [%s]' % (pid, pidfile))
 
 # B. Create PID file:
 pid_f = open(pidfile, 'w')
@@ -197,5 +197,5 @@ try:
         break  # No more config file read
 finally:
     os.unlink(pidfile)
-    write_log(log_exec_f, 'Invoice Daemon stopped [%s]' % pidfile)
+    write_log(log_exec_f, '[%s] Invoice Daemon stopped [%s]' % (pid, pidfile))
     log_exec_f.close()
