@@ -280,8 +280,8 @@ class AccountInvoice(orm.Model):
                 # Start transport:
                 start_transport = invoice.start_transport or ''
                 if start_transport:
-                    start_transport = start_transport.replace(' ', '').replace(
-                        '-', '').replace('/', '')
+                    start_transport = start_transport[:-3].replace(
+                        ' ', '').replace('-', '').replace('/', '')
 
                 # -------------------------------------------------------------
                 #                         DATA LINE:
