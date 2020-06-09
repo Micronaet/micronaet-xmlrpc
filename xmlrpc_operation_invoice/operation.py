@@ -372,9 +372,9 @@ class AccountInvoice(orm.Model):
                             # Codice Pagamento 3
                             invoice.payment_term.import_id \
                                 if invoice.payment_term else '', 
-                            # TODO bank
-                            
                             start_transport,
+
+                            # TODO bank
                             ))
 
                 # -------------------------------------------------------------
