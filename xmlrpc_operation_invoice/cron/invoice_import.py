@@ -9,12 +9,32 @@ import sys
 import ConfigParser
 import erppeek
 import smtplib
+from datetime import datetime
 from email.MIMEMultipart import MIMEMultipart
 # from email.MIMEBase import MIMEBase
 from email.mime.text import MIMEText
 # from email import Encoders
 
 config_folder = './config'
+log_folder = './log'
+
+
+# -----------------------------------------------------------------------------
+# Function:
+# -----------------------------------------------------------------------------
+def write_log(log_f, message, mode='info'):
+    """ Log on file
+    """
+    log_f.write('%s - [%s] %s\n' % (
+        datetime.now(),
+        mode.upper(),
+        message,
+    ))
+
+
+# -----------------------------------------------------------------------------
+# Script:
+# -----------------------------------------------------------------------------
 for root, folders, files in os.walk(config_folder):
     for cfg_file in files:
         if not cfg_file.endswith('cfg'):
@@ -33,6 +53,12 @@ for root, folders, files in os.walk(config_folder):
         port = config.get('dbaccess', 'port')
 
         recipients = config.get('SMTP', 'recipients')
+
+        # ---------------------------------------------------------------------
+        # Log file:
+        # ---------------------------------------------------------------------
+        log_f = open(os.path.join(log_folder, '%.log' % dbname), 'a')
+        write_log(log_f, 'Inizio importazione', 'info')
 
         # ---------------------------------------------------------------------
         # Connect to ODOO:
@@ -108,16 +134,17 @@ for root, folders, files in os.walk(config_folder):
                 print('[ERROR] %s. %s' % (dbname, error_comment))
                 error.append(invoice_id)
                 email_text.append('Fattura non importata: %s' % number)
-                # TODO sent mail?
+                write_log(
+                    log_f, 'Non importata la fattura: %s' % number, 'error')
             else:
                 print('[INFO] %s Invoice %s imported' % (dbname, number))
                 email_text.append('Fattura importata: %s' % number)
+                write_log(log_f, 'Importata la fattura: %s' % number)
 
         if email_text:  # Every database:
-            # TODO sent mail imported invoice
             recipients = recipients.replace(' ', '')
             for to in recipients.split(','):
-                print('Senting mail to: %s ...' % to)
+                print('Sending mail to: %s ...' % to)
                 msg = MIMEMultipart()
                 msg['Subject'] = 'Importazione automatica fatture: %s' % dbname
                 msg['From'] = odoo_mailer.smtp_user
@@ -127,6 +154,6 @@ for root, folders, files in os.walk(config_folder):
                 # Send mail:
                 smtp_server.sendmail(
                     odoo_mailer.smtp_user, to, msg.as_string())
-
+            write_log(log_f, 'Invio mail: %s\n' % (to, ))
             smtp_server.quit()
     break  # No more config file read
