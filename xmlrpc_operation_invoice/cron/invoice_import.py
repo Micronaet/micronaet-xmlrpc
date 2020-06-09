@@ -156,4 +156,5 @@ for root, folders, files in os.walk(config_folder):
                     odoo_mailer.smtp_user, to, msg.as_string())
             write_log(log_f, 'Invio mail: %s\n' % (to, ))
             smtp_server.quit()
+        log_f.close()
     break  # No more config file read
