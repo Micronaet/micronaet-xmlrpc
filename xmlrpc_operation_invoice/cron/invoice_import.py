@@ -87,7 +87,7 @@ for root, folders, files in os.walk(config_folder):
                 print('[WARNING] %s. No invoice scheduled for import' % dbname)
                 break
 
-            invoice_id = invoice_ids[0]
+            invoice_id = invoice_ids[-1]
             invoice = invoice_pool.browse(invoice_id)
             number = invoice.number
             try:
