@@ -21,7 +21,7 @@ for root, folders, files in os.walk(config_folder):
         email_text = []  # List of importation
 
         config = ConfigParser.ConfigParser()
-        config.read([cfg_file])
+        config.read([os.path.join(root, cfg_file)])
         dbname = config.get('dbaccess', 'dbname')
         user = config.get('dbaccess', 'user')
         pwd = config.get('dbaccess', 'pwd')
