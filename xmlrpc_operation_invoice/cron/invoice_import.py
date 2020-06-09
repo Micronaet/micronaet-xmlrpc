@@ -9,7 +9,6 @@ import ConfigParser
 import erppeek
 import smtplib
 
-import pdb; pdb.set_trace()
 config_folder = './config'
 for root, folders, files in os.walk(config_folder):
     for cfg_file in files:
@@ -75,6 +74,7 @@ for root, folders, files in os.walk(config_folder):
         # ---------------------------------------------------------------------
         # Import invoice:
         # ---------------------------------------------------------------------
+        import pdb; pdb.set_trace()
         while True:  # Read every time for the undo process in ODOO
             error_comment = ''
             invoice_ids = invoice_pool.search([
@@ -89,22 +89,23 @@ for root, folders, files in os.walk(config_folder):
 
             invoice_id = invoice_ids[0]
             invoice = invoice_pool.browse(invoice_id)
+            number = invoice.number
             try:
                 if not invoice_pool.xmlrpc_export_invoice([invoice_id]):
                     error_comment = 'Invoice %s not imported (managed)' % \
-                        invoice.name
+                        number
             except:
                 error_comment = 'Invoice %s not imported (unmanaged)' % \
-                    invoice.name
+                    number
 
             if error_comment:
                 print('[ERROR] %s. %s' % (dbname, error_comment))
                 error.append(invoice_id)
-                email_text.append('Fattura non importata: %s' % invoice.name)
+                email_text.append('Fattura non importata: %s' % number)
                 # TODO sent mail?
             else:
-                print('[INFO] %s Invoice %s imported' % (dbname, invoice.name))
-                email_text.append('Fattura importata: %s' % invoice.name)
+                print('[INFO] %s Invoice %s imported' % (dbname, number))
+                email_text.append('Fattura importata: %s' % number)
 
         if email_text:  # Every database:
             # TODO sent mail imported invoice
