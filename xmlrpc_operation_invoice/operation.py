@@ -137,6 +137,7 @@ class AccountInvoice(orm.Model):
         # ---------------------------------------------------------------------        
         if context is None:
             context = {}
+        start_hour_default = '08:00'  # Always 8    
         
         assert len(ids) == 1, 'No multi export for now' # TODO remove!!!
 
@@ -280,9 +281,9 @@ class AccountInvoice(orm.Model):
                 # Start transport:
                 start_transport = invoice.start_transport or ''
                 if start_transport:
-                    import pdb; pdb.set_trace()
-                    start_transport = start_transport[:-3].replace(
+                    start_transport = start_transport[:10].replace(
                         ' ', '').replace('-', '').replace('/', '')
+                    start_transport += start_hour_default    
 
                 # -------------------------------------------------------------
                 #                         DATA LINE:
