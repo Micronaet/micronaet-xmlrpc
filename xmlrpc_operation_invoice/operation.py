@@ -72,6 +72,7 @@ class XmlrpcOperation(orm.Model):
                 _('Connect error:'), _('XMLRPC connecting server'))
         return res
 
+
 class AccountInvoice(orm.Model):
     """ Add export function to invoice obj
     """
@@ -80,9 +81,15 @@ class AccountInvoice(orm.Model):
     def xmlrpc_export_scheduled(self, cr, uid, ids, context=None):
         """ Schedule for import
         """
-        return self.write(cr, uid, ids, {
-            'xmlrpc_scheduled': True,
-            }, context=context)
+        total = 0
+        for invoice in self.browse(cr, uid, ids, context=context):
+            if not invoice.xmlrpc_scheduled and not invoice.xmlrpc_sync:
+                total += 1
+                self.write(cr, uid, [invoice.id], {
+                    'xmlrpc_scheduled': True,
+                    }, context=context)
+        _logger.warning('Invoice to be imported, tot.: %s' % total)
+        return True
 
     def xmlrpc_export_unscheduled(self, cr, uid, ids, context=None):
         """ Schedule for import

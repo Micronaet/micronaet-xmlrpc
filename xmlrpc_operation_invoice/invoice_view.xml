@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>
+         <!-- Server Action:-->
+         <record id="ir_schedule_all_selected_invoice" model="ir.actions.server">
+             <field name="name">Schedula import fatture selezionate</field>
+             <field name="type">ir.actions.server</field>
+             <field name="model_id" ref="model_account_invoice" />
+             <field name="binding_model_id" ref="model_account_invoice" />
+             <field name="state">code</field>
+             <field name="code">action = env['account.invoice'].xmlrpc_export_scheduled()</field>
+         </record>
+
         <record model="ir.ui.view" id="view_account_invoice_sync_search">
             <field name="name">account.invoice.sync.search</field>
             <field name="model">account.invoice</field>
