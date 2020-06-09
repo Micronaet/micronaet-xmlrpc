@@ -442,7 +442,8 @@ class AccountInvoice(orm.Model):
             # -----------------------------------------------------------------
             # BEFORE ALL:
             if previous_picking:  # Always write last line comment:
-                get_comment_line(self, parameter,
+                get_comment_line(
+                    self, parameter,
                     picking_pool.write_reference_from_picking(picking))
 
             # A. End note comment:
@@ -472,7 +473,7 @@ class AccountInvoice(orm.Model):
                     for block in text.split('\n'):
                         get_comment_line(self, parameter, block)
             except:
-                pass # no FSC Management
+                pass  # no FSC Management
 
             # E. Split payment:
             try:
@@ -494,13 +495,13 @@ class AccountInvoice(orm.Model):
                 pass # Error do nothing
 
             # G. Private partner:
-            #try:
+            # try:
             #    if partner.is_private:
             #        text = "COPIA, IL DOCUMENTO FISCALMENTE VALIDO E' " + \
             #            "ESCLUSIVAMENTE QUELLO DISPONIBILE NELL'AREA " + \
             #            "RISERVATA DELL'AGENZIA DELLE ENTRATE"
             #        get_comment_line(self, parameter, text)
-            #except:
+            # except:
             #    pass # no Partner private
 
             # H. Force vector
@@ -515,9 +516,9 @@ class AccountInvoice(orm.Model):
                 pass # Error do nothing
 
         # XXX Remove used for extract file:
-        #open('/home/thebrush/prova.csv', 'w').write(
+        # open('/home/thebrush/prova.csv', 'w').write(
         #    parameter['input_file_string'])
-        #return False
+        # return False
 
         res = self.pool.get('xmlrpc.operation').execute_operation(
             cr, uid, 'invoice', parameter=parameter, context=context)
@@ -551,5 +552,3 @@ class AccountInvoice(orm.Model):
             help='Schedulata per importazione automatica'),
         'xmlrpc_note': fields.text('XMLRPC note'),
         }
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
