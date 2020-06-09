@@ -95,7 +95,7 @@ class AccountInvoice(orm.Model):
                 self.xmlrpc_export_scheduled(
                     cr, uid, [invoice.id], context=context)
         _logger.warning('Invoice to be imported, tot.: %s' % total)
-        return True
+        return {}
 
     def xmlrpc_export_scheduled(self, cr, uid, ids, context=None):
         """ Schedule for import
