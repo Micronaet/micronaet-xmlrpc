@@ -197,5 +197,5 @@ try:
         break  # No more config file read
 finally:
     os.unlink(pidfile)
-    write_log(log_exec_f, '[%s] Invoice Daemon stopped [%s]' % (pid, pidfile))
+    write_log(log_exec_f, '[%s] Invoice Daemon stopped [%s]\n' % (pid, pidfile))
     log_exec_f.close()
