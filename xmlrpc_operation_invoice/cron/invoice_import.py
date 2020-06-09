@@ -37,7 +37,7 @@ log_exec_f = open(log_exec_file, 'a')
 # A. Check if yet running:
 pid = str(os.getpid())
 if os.path.isfile(pidfile):
-    message = '[%s] Invoice Daemon already running [%s]' % (pid, pidfile)
+    message = '\n[%s] Invoice Daemon already running [%s]\n' % (pid, pidfile)
     write_log(
         log_exec_f, message, 'error')
     print(message)
