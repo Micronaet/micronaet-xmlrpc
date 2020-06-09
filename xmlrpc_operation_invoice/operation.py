@@ -82,6 +82,7 @@ class AccountInvoice(orm.Model):
         """ Schedule for import
         """
         total = 0
+        import pdb; pdb.set_trace()
         for invoice in self.browse(cr, uid, ids, context=context):
             if not invoice.xmlrpc_scheduled and not invoice.xmlrpc_sync:
                 total += 1
