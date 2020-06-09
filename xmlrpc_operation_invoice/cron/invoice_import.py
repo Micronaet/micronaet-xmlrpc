@@ -57,7 +57,8 @@ for root, folders, files in os.walk(config_folder):
         # ---------------------------------------------------------------------
         # Log file:
         # ---------------------------------------------------------------------
-        log_f = open(os.path.join(log_folder, '%.log' % dbname), 'a')
+        log_file = os.path.join(log_folder, '%.log' % dbname)
+        log_f = open(log_file, 'a')
         write_log(log_f, 'Inizio importazione', 'info')
 
         # ---------------------------------------------------------------------
