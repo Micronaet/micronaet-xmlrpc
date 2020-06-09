@@ -155,7 +155,8 @@ for root, folders, files in os.walk(config_folder):
                 # Send mail:
                 smtp_server.sendmail(
                     odoo_mailer.smtp_user, to, msg.as_string())
-            write_log(log_f, 'Invio mail: %s\n' % (to, ))
+            write_log(log_f, 'Invio mail: %s' % (to, ))
             smtp_server.quit()
+        write_log(log_f, 'Fine importazione\n')
         log_f.close()
     break  # No more config file read
