@@ -122,7 +122,7 @@ class AccountInvoice(orm.Model):
                 # TODO change filler space
                 parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
-                        '%44sD%16s%-60s%222s\r\n' % (
+                        '%44sD%16s%-60s%235s\r\n' % (
                             '',
                             '',
                             self._xmlrpc_clean_description(
@@ -158,7 +158,7 @@ class AccountInvoice(orm.Model):
             '%-2s%-2s%-6s%-8s%-2s%-8s%-8s%-8s', #header
             '%-1s%-16s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s%1s%-8s%-8s', #row
             '%-2s%-20s%-10s%-8s%-24s%-1s%-16s%-1s%-10s%-10s', # Fattura PA
-            '%-3s', #foot
+            '%-3s%-13s', #foot
             '\r\n', # Win CR
             )
 
@@ -277,6 +277,12 @@ class AccountInvoice(orm.Model):
                         picking_pool.write_reference_from_picking(picking))
                     previous_picking = picking
 
+                # Start transport:
+                start_transport = invoice.start_transport or ''
+                if start_transport:
+                    start_transport = start_transport.replace(' ', '').replace(
+                        '-', '').replace('/', '')
+
                 # -------------------------------------------------------------
                 #                         DATA LINE:
                 # -------------------------------------------------------------                
@@ -367,6 +373,8 @@ class AccountInvoice(orm.Model):
                             invoice.payment_term.import_id \
                                 if invoice.payment_term else '', 
                             # TODO bank
+                            
+                            start_transport,
                             ))
 
                 # -------------------------------------------------------------
