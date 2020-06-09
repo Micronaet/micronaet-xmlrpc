@@ -79,7 +79,7 @@ for root, folders, files in os.walk(config_folder):
         # ---------------------------------------------------------------------
         # Import invoice:
         # ---------------------------------------------------------------------
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         while True:  # Read every time for the undo process in ODOO
             error_comment = ''
             invoice_ids = invoice_pool.search([
