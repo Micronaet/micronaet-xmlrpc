@@ -59,7 +59,7 @@ for root, folders, files in os.walk(config_folder):
         # ---------------------------------------------------------------------
         log_file = os.path.join(log_folder, '%s.log' % dbname)
         log_f = open(log_file, 'a')
-        write_log(log_f, 'Inizio importazione', 'info')
+        write_log(log_f, 'Inizio importazione')
 
         # ---------------------------------------------------------------------
         # Connect to ODOO:
