@@ -59,7 +59,7 @@ for root, folders, files in os.walk(config_folder):
             odoo_mailer.name,
             odoo_mailer.smtp_host,
             odoo_mailer.smtp_port,
-            )
+            ))
 
         if odoo_mailer.smtp_encryption in ('ssl', 'starttls'):
             smtp_server = smtplib.SMTP_SSL(
