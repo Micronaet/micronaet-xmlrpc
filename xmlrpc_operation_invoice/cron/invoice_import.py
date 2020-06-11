@@ -119,13 +119,11 @@ try:
             else:
                 print('[ERR] %s. Connect only SMTP SSL server!' % dbname)
                 break
-                # server_smtp.start() # TODO Check
             smtp_server.login(odoo_mailer.smtp_user, odoo_mailer.smtp_pass)
 
             # -----------------------------------------------------------------
             # Import invoice:
             # -----------------------------------------------------------------
-            # import pdb; pdb.set_trace()
             while True:  # Read every time for the undo process in ODOO
                 error_comment = ''
                 invoice_ids = invoice_pool.search([

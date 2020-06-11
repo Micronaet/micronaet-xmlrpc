@@ -20,24 +20,19 @@
 import os
 import sys
 import logging
-import openerp
-import xmlrpclib
-import openerp.netsvc as netsvc
-import openerp.addons.decimal_precision as dp
 from openerp.osv import fields, osv, expression, orm
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from openerp import SUPERUSER_ID, api
-from openerp import tools
 from openerp.tools.translate import _
-from openerp.tools.float_utils import float_round as round
-from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
+from openerp.tools import (
+    DEFAULT_SERVER_DATE_FORMAT,
     DEFAULT_SERVER_DATETIME_FORMAT,
     DATETIME_FORMATS_MAP,
     float_compare)
 
 
 _logger = logging.getLogger(__name__)
+
 
 class XmlrpcOperation(orm.Model):
     """ Model name: XmlrpcOperation
@@ -84,7 +79,7 @@ class AccountInvoice(orm.Model):
         if not ids:
             ids = context.get('active_ids')
         if not ids:
-            _logger.error('Error in selecton invoice')
+            _logger.error('Error in selection invoice')
             return False
 
         total = 0
@@ -230,7 +225,7 @@ class AccountInvoice(orm.Model):
                 picking = line.generator_move_id.picking_id
 
                 if picking and (not last_picking or last_picking != picking):
-                    last_picking = picking # Save for not print again
+                    last_picking = picking  # Save for not print again
                     # get_comment_line(self, parameter,
                     #    picking_pool.write_reference_from_picking(picking))
                     if picking.ddt_id: # If DDT is present
@@ -247,7 +242,7 @@ class AccountInvoice(orm.Model):
                             i_ddt += 1
                             last_ddt = ddt_number
 
-                try: # Module: invoice_payment_cost (not in dep.)
+                try:  # Module: invoice_payment_cost (not in dep.)
                     refund_line = 'S' if line.refund_line else ' '
                 except:
                     refund_line = ' '
@@ -255,7 +250,7 @@ class AccountInvoice(orm.Model):
                 if invoice.mx_agent_id: # Agent set up in document
                     agent_code = invoice.mx_agent_id.sql_agent_code or \
                         invoice.mx_agent_id.sql_supplier_code or ''
-                else: # use partner one's
+                else:  # use partner one's
                     agent_code = invoice.partner_id.agent_id.sql_agent_code \
                          or invoice.partner_id.agent_id.sql_supplier_code or ''
 
@@ -303,6 +298,7 @@ class AccountInvoice(orm.Model):
                 # -------------------------------------------------------------
                 # LAST BLOCK: Reference for order / DDT yet writed:
                 # -------------------------------------------------------------
+                import pdb; pdb.set_trace()
                 if not previous_picking and picking:
                     previous_picking = picking
 
@@ -460,6 +456,7 @@ class AccountInvoice(orm.Model):
             # End document dat
             # -----------------------------------------------------------------
             # BEFORE ALL:
+            import pdb; pdb.set_trace()
             if previous_picking:  # Always write last line comment:
                 get_comment_line(
                     self, parameter,
