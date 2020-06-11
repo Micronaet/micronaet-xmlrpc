@@ -298,7 +298,6 @@ class AccountInvoice(orm.Model):
                 # -------------------------------------------------------------
                 # LAST BLOCK: Reference for order / DDT yet writed:
                 # -------------------------------------------------------------
-                import pdb; pdb.set_trace()
                 if not previous_picking and picking:
                     previous_picking = picking
 
