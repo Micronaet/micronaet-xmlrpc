@@ -221,14 +221,13 @@ class AccountInvoice(orm.Model):
                 # -------------------------------------------------------------
                 # destination (if not present DDT used invoice code):
                 ddt_destination = invoice.partner_id.sql_destination_code or ''
-
                 picking = line.generator_move_id.picking_id
 
                 if picking and (not last_picking or last_picking != picking):
                     last_picking = picking  # Save for not print again
                     # get_comment_line(self, parameter,
                     #    picking_pool.write_reference_from_picking(picking))
-                    if picking.ddt_id: # If DDT is present
+                    if picking.ddt_id:  # If DDT is present
                         ddt = picking.ddt_id
                         ddt_number_block = ddt.name.split('/')
                         ddt_number = '%s-%s' % (
@@ -247,7 +246,7 @@ class AccountInvoice(orm.Model):
                 except:
                     refund_line = ' '
 
-                if invoice.mx_agent_id: # Agent set up in document
+                if invoice.mx_agent_id:  # Agent set up in document
                     agent_code = invoice.mx_agent_id.sql_agent_code or \
                         invoice.mx_agent_id.sql_supplier_code or ''
                 else:  # use partner one's
@@ -285,7 +284,7 @@ class AccountInvoice(orm.Model):
                     invoice.transportation_method_id.account_ref or ''
                 carrier_code = \
                     invoice.default_carrier_id.partner_id.sql_supplier_code \
-                        or ''
+                    or ''
                 parcels = '%s' % invoice.parcels
 
                 # TODO check error:
@@ -296,9 +295,9 @@ class AccountInvoice(orm.Model):
                         _('Carrier need Account code!'))
 
                 # -------------------------------------------------------------
-                # LAST BLOCK: Reference for order / DDT yet writed:
+                # LAST BLOCK: Reference for order / DDT yet wrote:
                 # -------------------------------------------------------------
-                if not previous_picking and picking:
+                if not previous_picking and picking:  # For sure (needed?)
                     previous_picking = picking
 
                 if picking and previous_picking != picking:
@@ -459,7 +458,8 @@ class AccountInvoice(orm.Model):
             if previous_picking:  # Always write last line comment:
                 get_comment_line(
                     self, parameter,
-                    picking_pool.write_reference_from_picking(picking))
+                    picking_pool.write_reference_from_picking(
+                        previous_picking))
 
             # A. End note comment:
             if invoice.text_note_post:
