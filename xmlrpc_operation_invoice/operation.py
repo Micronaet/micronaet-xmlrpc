@@ -454,7 +454,6 @@ class AccountInvoice(orm.Model):
             # End document dat
             # -----------------------------------------------------------------
             # BEFORE ALL:
-            import pdb; pdb.set_trace()
             if previous_picking:  # Always write last line comment:
                 get_comment_line(
                     self, parameter,
