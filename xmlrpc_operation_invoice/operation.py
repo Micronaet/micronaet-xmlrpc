@@ -302,7 +302,7 @@ class AccountInvoice(orm.Model):
                 if not previous_picking and picking:
                     previous_picking = picking
 
-                if previous_picking != picking:
+                if picking and previous_picking != picking:
                     get_comment_line(
                         self, parameter,
                         picking_pool.write_reference_from_picking(picking))
