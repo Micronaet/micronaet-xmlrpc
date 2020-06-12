@@ -309,8 +309,6 @@ class AccountInvoice(orm.Model):
                 # Start transport:
                 start_transport = invoice.start_transport or ''
                 if start_transport:
-                    import pdb; pdb.set_trace()
-
                     # GMT problem
                     start_dt = datetime.strptime(
                         start_transport, DEFAULT_SERVER_DATETIME_FORMAT) + \
