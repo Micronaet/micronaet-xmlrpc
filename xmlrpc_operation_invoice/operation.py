@@ -309,7 +309,14 @@ class AccountInvoice(orm.Model):
                 # Start transport:
                 start_transport = invoice.start_transport or ''
                 if start_transport:
-                    start_transport = start_transport[:10].replace(
+                    import pdb; pdb.set_trace()
+
+                    # GMT problem
+                    start_dt = datetime.strptime(
+                        start_transport, DEFAULT_SERVER_DATETIME_FORMAT) + \
+                        timedelta(hours=2)  # TODO Very bad GMT update!
+                    start_transport = start_dt.strftime(
+                        DEFAULT_SERVER_DATE_FORMAT)[:10].replace(
                         ' ', '').replace('-', '').replace('/', '')
                     start_transport += start_hour_default
 
