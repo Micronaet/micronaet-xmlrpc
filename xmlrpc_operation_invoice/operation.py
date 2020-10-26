@@ -420,26 +420,32 @@ class AccountInvoice(orm.Model):
 
                 # 1. Description long:
                 if len(description) > 60:
-                    get_comment_line(self, parameter,
-                        self._xmlrpc_clean_description(description[60:], 220))
+                    get_comment_line(
+                        self,
+                        parameter,
+                        self._xmlrpc_clean_description(description[60:]),
+                    )
 
                 # 2. Color:
-                get_comment_line(self, parameter,
-                    self._xmlrpc_clean_description(product.colour or '', 220))
+                get_comment_line(
+                    self,
+                    parameter,
+                    self._xmlrpc_clean_description(product.colour or ''),
+                )
 
                 # 3. FSC Certified:
                 if product.fsc_certified_id and company.fsc_certified and \
-                        company.fsc_from_date<= invoice.date_invoice:
+                        company.fsc_from_date <= invoice.date_invoice:
                     get_comment_line(self, parameter,
                         self._xmlrpc_clean_description(
-                            product.fsc_certified_id.text or '', 220))
+                            product.fsc_certified_id.text or ''))
 
                 # 4. PEFC Certified:
                 if product.pefc_certified_id and company.pefc_certified and \
                         company.pefc_from_date<= invoice.date_invoice:
                     get_comment_line(self, parameter,
                         self._xmlrpc_clean_description(
-                            product.pefc_certified_id.text or '', 220))
+                            product.pefc_certified_id.text or ''))
 
                 # 5. Partic:
                 if invoice.partner_id.use_partic:
@@ -447,7 +453,7 @@ class AccountInvoice(orm.Model):
                         cr, uid, product.id, invoice.partner_id.id,
                         context=context)
                     get_comment_line(self, parameter,
-                        self._xmlrpc_clean_description(partic, 220))
+                        self._xmlrpc_clean_description(partic))
 
                 # -------------------------------------------------------------
                 # Note post line:
@@ -502,7 +508,7 @@ class AccountInvoice(orm.Model):
                         'Art. 17 ter DPR633/72'
                     get_comment_line(self, parameter, text)
             except:
-                pass # no Split Payment Management
+                pass  # no Split Payment Management
 
             # F. Force vector
             try:
@@ -511,7 +517,7 @@ class AccountInvoice(orm.Model):
                     for block in text.split('\n'):
                         get_comment_line(self, parameter, block)
             except:
-                pass # Error do nothing
+                pass  # Error do nothing
 
             # G. Private partner:
             # try:
@@ -532,7 +538,7 @@ class AccountInvoice(orm.Model):
                     for block in text.split('\n'):
                         get_comment_line(self, parameter, block)
             except:
-                pass # Error do nothing
+                pass  # Error do nothing
 
         # XXX Remove used for extract file:
         # open('/home/thebrush/prova.csv', 'w').write(
@@ -562,7 +568,6 @@ class AccountInvoice(orm.Model):
             _('Sync error:'),
             _('Cannot sync with accounting! (return esit not present'),
             )
-        return False
 
     _columns = {
         'xmlrpc_sync': fields.boolean('XMLRPC syncronized'),
