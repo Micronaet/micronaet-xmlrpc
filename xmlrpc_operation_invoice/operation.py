@@ -146,11 +146,11 @@ class AccountInvoice(orm.Model):
             value = value.replace(u'®', u' (R)')
             value = value.replace(u'™', u' TM')
 
-            while value: # Split in 60 char:
+            while value:  # Split in 60 char:
                 # TODO change filler space
                 parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
-                        '%44sD%16s%-60s%235s\r\n' % (
+                        '%44sD%16s%-60s%237s\r\n' % (
                             '',
                             '',
                             self._xmlrpc_clean_description(
