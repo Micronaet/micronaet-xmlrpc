@@ -28,6 +28,9 @@
             <field name="model">account.invoice</field>
             <field name="inherit_id" ref="account.invoice_form"/>
             <field name="arch" type="xml">
+                <field name="account_id" position="after">
+                    <field name="xmlrpc_invoice_mode"/>
+                </field>
                 <xpath expr="/form/header/field[@name='state']" position="before">
                     <button name="xmlrpc_export_invoice" string="Export in Account" type="object" attrs="{'invisible':['|',('state','=','draft'),('xmlrpc_sync','=',True)]}" icon="gtk-refresh"/>
                     <button name="reset_xmlrpc_export_invoice" string="Reset sync" type="object" groups="xmlrpc_operation_invoice.sync_admin" icon="gtk-undo" attrs="{'invisible':[('xmlrpc_sync','=',False)]}" confirm="Sbloccando la fattura dovrete poi reimportarla nel gestionale eventualmente eliminando la precedente, confermi?"/>

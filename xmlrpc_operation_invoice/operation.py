@@ -570,6 +570,15 @@ class AccountInvoice(orm.Model):
             )
 
     _columns = {
+        'xmlrpc_invoice_mode': fields.selection(
+            string=u'Modalità fattura contabile',
+            selection=[
+                ('acconto', 'Acconto'),
+                # ('differita', 'Differita'),
+                # ('accompagnatoria', 'Accompagnatoria'),
+            ],
+        ),
+
         'xmlrpc_sync': fields.boolean('XMLRPC syncronized'),
         'xmlrpc_scheduled': fields.boolean(
             'XMLRPC Schedulata',
