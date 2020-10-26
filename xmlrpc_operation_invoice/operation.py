@@ -184,10 +184,10 @@ class AccountInvoice(orm.Model):
 
         # Generate string for export file:
         mask = '%s%s%s%s%s' % (  # 3 block for readability:
-            '%-2s%-2s%-6s%-8s%-2s%-8s%-8s%-8s', # header
-            '%-1s%-16s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s%1s%-8s%-8s', # row
+            '%-2s%-2s%-6s%-8s%-2s%-8s%-8s%-8s',  # header
+            '%-1s%-16s%-60s%-2s%10.2f%10.3f%-5s%-5s%-50s%-10s%-8s%1s%-8s%-8s',  # row
             '%-2s%-20s%-10s%-8s%-24s%-1s%-16s%-1s%-10s%-10s',  # Fattura PA
-            '%-3s%-13s',  # foot
+            '%-3s%-13s%2s',  # foot
             '\r\n',  # Win CR
             )
 
@@ -406,8 +406,9 @@ class AccountInvoice(orm.Model):
                             # -------------------------------------------------
                             # Codice Pagamento 3
                             invoice.payment_term.import_id \
-                                if invoice.payment_term else '',
+                            if invoice.payment_term else '',
                             start_transport,
+                            invoice.xmlrpc_invoice_mode or '',
 
                             # TODO bank
                             ))
@@ -573,9 +574,9 @@ class AccountInvoice(orm.Model):
         'xmlrpc_invoice_mode': fields.selection(
             string=u'Modalità fattura contabile',
             selection=[
-                ('acconto', 'Acconto'),
-                # ('differita', 'Differita'),
-                # ('accompagnatoria', 'Accompagnatoria'),
+                ('ac', 'Fattura di Acconto'),
+                # ('fd', 'Fattura Differita'),
+                # ('fa', 'Fattura Accompagnatoria'),
             ],
         ),
 
