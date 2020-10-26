@@ -105,7 +105,7 @@ class AccountInvoice(orm.Model):
             'xmlrpc_scheduled': False,
             }, context=context)
 
-    def _xmlrpc_clean_description(self, value, cut):
+    def _xmlrpc_clean_description(self, value, cut=False):
         """ Remove \n and \t and return first 'cut' char
         """
         value = value.replace('\n', ' ')
