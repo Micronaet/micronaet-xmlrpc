@@ -271,6 +271,10 @@ class AccountInvoice(orm.Model):
                 else:
                     description = product.name or ''
 
+                # Add extra duty code if needed:
+                if invoice.fiscal_position.duty_print and product.duty_code:                
+                    description += '\nCustom code: %s' % product.duty_code 
+
                 # -------------------------------------------------------------
                 # Invoice field "needed" Fattura PA:
                 # -------------------------------------------------------------
@@ -530,7 +534,7 @@ class AccountInvoice(orm.Model):
             # except:
             #    pass # no Partner private
 
-            # H. Force vector
+            # H. Privacy policy:
             try:
                 privacy_policy = (
                     invoice.company_id.privacy_policy or '').strip()
@@ -540,6 +544,17 @@ class AccountInvoice(orm.Model):
                         get_comment_line(self, parameter, block)
             except:
                 pass  # Error do nothing
+
+            # I. Custom duty block:
+            try:
+                if invoice.fiscal_position.duty_print:
+                    duty_block = (invoice.duty_block or '').strip()
+                    if duty_block:
+                        for block in duty_block.split('\n'):
+                            get_comment_line(self, parameter, block)
+            except:
+                pass  # Error do nothing
+                
 
         # XXX Remove used for extract file:
         # open('/home/thebrush/prova.csv', 'w').write(
