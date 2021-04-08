@@ -272,8 +272,8 @@ class AccountInvoice(orm.Model):
                     description = product.name or ''
 
                 # Add extra duty code if needed:
-                if invoice.fiscal_position.duty_print and product.duty_code:                
-                    description += '\nCustom code: %s' % product.duty_code 
+                if invoice.fiscal_position.duty_print and product.duty_code:
+                    description += '\nCustom code: %s' % product.duty_code
 
                 # -------------------------------------------------------------
                 # Invoice field "needed" Fattura PA:
@@ -383,7 +383,7 @@ class AccountInvoice(orm.Model):
                             line.account_id.account_ref or '',
                             # Refund (1)
                             refund_line,
-                            (product.duty_code or '')[:8], # Duty (8)
+                            (product.duty_code or '')[:8],  # Duty (8)
                             ('%s' % (product.weight_net or '')).replace(
                                 '.', ',')[:8],
 
@@ -554,7 +554,7 @@ class AccountInvoice(orm.Model):
                             get_comment_line(self, parameter, block)
             except:
                 pass  # Error do nothing
-                
+
 
         # XXX Remove used for extract file:
         # open('/home/thebrush/prova.csv', 'w').write(
