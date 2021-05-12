@@ -5,7 +5,7 @@ import os
 import sys
 import ConfigParser
 import erppeek
-import smtplib
+import smtplib, ssl
 from datetime import datetime
 from email.MIMEMultipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -99,6 +99,9 @@ try:
             # -----------------------------------------------------------------
             # SMTP:
             # -----------------------------------------------------------------
+            # Create a secure SSL context
+            context = ssl.create_default_context()
+            
             mailer_ids = mailer.search([])
             if not mailer_ids:
                 print('[ERR] No mail server configured in ODOO %s' % dbname)
@@ -111,11 +114,17 @@ try:
                 odoo_mailer.smtp_port,
                 ))
 
-            if odoo_mailer.smtp_encryption in ('ssl', 'starttls'):
+            if odoo_mailer.smtp_encryption == 'ssl':
                 smtp_server = smtplib.SMTP_SSL(
                     odoo_mailer.smtp_host,
                     odoo_mailer.smtp_port,
                 )
+            elif odoo_mailer.smtp_encryption == 'starttls':
+                import pdb; pdb.set_trace()
+                smtp_server = smtplib.SMTP(smtp_server,port)
+                smtp_server.ehlo() # Can be omitted
+                smtp_server.starttls(context=context) # Secure the connection
+                ssmtp_servererver.ehlo() # Can be omitted
             else:
                 print('[ERR] %s. Connect only SMTP SSL server!' % dbname)
                 break
