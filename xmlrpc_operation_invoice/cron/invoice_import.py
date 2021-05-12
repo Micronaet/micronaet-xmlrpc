@@ -125,9 +125,9 @@ try:
                     odoo_mailer.smtp_host,
                     odoo_mailer.smtp_port,
                     )
-                smtp_server.ehlo() # Can be omitted
+                # smtp_server.ehlo() # Can be omitted
                 smtp_server.starttls() #context=context) # Secure the connection
-                ssmtp_servererver.ehlo() # Can be omitted
+                # smtp_servererver.ehlo() # Can be omitted
             else:
                 print('[ERR] %s. Connect only SMTP SSL server!' % dbname)
                 break
