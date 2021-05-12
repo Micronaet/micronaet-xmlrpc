@@ -121,7 +121,10 @@ try:
                 )
             elif odoo_mailer.smtp_encryption == 'starttls':
                 import pdb; pdb.set_trace()
-                smtp_server = smtplib.SMTP(smtp_server,port)
+                smtp_server = smtplib.SMTP(
+                    odoo_mailer.smtp_host,
+                    odoo_mailer.smtp_port,
+                    )
                 smtp_server.ehlo() # Can be omitted
                 smtp_server.starttls(context=context) # Secure the connection
                 ssmtp_servererver.ehlo() # Can be omitted
