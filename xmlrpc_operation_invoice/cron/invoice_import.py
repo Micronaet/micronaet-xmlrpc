@@ -120,7 +120,6 @@ try:
                     odoo_mailer.smtp_port,
                 )
             elif odoo_mailer.smtp_encryption == 'starttls':
-                import pdb; pdb.set_trace()
                 smtp_server = smtplib.SMTP(
                     odoo_mailer.smtp_host,
                     odoo_mailer.smtp_port,
