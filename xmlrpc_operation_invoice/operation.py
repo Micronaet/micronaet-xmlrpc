@@ -150,7 +150,7 @@ class AccountInvoice(orm.Model):
                 # TODO change filler space
                 parameter['input_file_string'] += self.pool.get(
                     'xmlrpc.server').clean_as_ascii(
-                        '%44sD%16s%-60s%237s\r\n' % (
+                        '%44sD%16s%-60s%242s\r\n' % (
                             '',
                             '',
                             self._xmlrpc_clean_description(
@@ -447,7 +447,7 @@ class AccountInvoice(orm.Model):
 
                 # 4. PEFC Certified:
                 if product.pefc_certified_id and company.pefc_certified and \
-                        company.pefc_from_date<= invoice.date_invoice:
+                        company.pefc_from_date <= invoice.date_invoice:
                     get_comment_line(self, parameter,
                         self._xmlrpc_clean_description(
                             product.pefc_certified_id.text or ''))
