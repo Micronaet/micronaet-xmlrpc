@@ -183,7 +183,7 @@ class AccountInvoice(orm.Model):
         company = company_pool.browse(cr, uid, company_ids, context=context)[0]
 
         # Generate string for export file:
-        mask = '%s%s%s%s%s' % (  # 3 block for readability:
+        mask = '%s%s%s%s%s' % (  # blocks for readability:
             # header:
             '%-2s%-2s%-6s%-8s%-2s%-8s%-8s%-8s',
             # row:
