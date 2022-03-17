@@ -190,6 +190,7 @@ class AccountInvoice(orm.Model):
             '%-3s%-13s%2s',  # foot
             '\r\n',  # Win CR
             )
+        # todo remember to change also get_comment_line function!!!!!!!!!!!!!!!
 
         parameter['input_file_string'] = ''
         last_picking = False  # Last picking for reference:
