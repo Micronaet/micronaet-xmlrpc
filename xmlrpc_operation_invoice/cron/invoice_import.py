@@ -101,13 +101,16 @@ try:
             # -----------------------------------------------------------------
             # Create a secure SSL context
             context = ssl.create_default_context()
-            
+
             mailer_ids = mailer.search([])
             if not mailer_ids:
                 print('[ERR] No mail server configured in ODOO %s' % dbname)
                 break
 
-            odoo_mailer = mailer.browse(mailer_ids)[0]
+            odoo_mailer = sorted(
+                mailer.browse(mailer_ids),
+                key=lambda x: x.sequence,
+                )[0]
             print('[INFO] Sending using "%s" connection [%s:%s]' % (
                 odoo_mailer.name,
                 odoo_mailer.smtp_host,
@@ -125,7 +128,8 @@ try:
                     odoo_mailer.smtp_port,
                     )
                 # smtp_server.ehlo() # Can be omitted
-                smtp_server.starttls() #context=context) # Secure the connection
+                smtp_server.starttls()
+                # context=context) # Secure the connection
                 # smtp_servererver.ehlo() # Can be omitted
             else:
                 print('[ERR] %s. Connect only SMTP SSL server!' % dbname)
